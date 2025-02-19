@@ -7,8 +7,11 @@ class O3DataModel:
     def __init__(self, json_file):
         super().__init__()
 
-        assert os.path.exists(json_file), f"File not found: {json_file}"
-        assert os.path.isfile(json_file), f"Is not a file: {json_file}"
+        if ~os.path.exists(json_file):
+            raise FileExistsError(f"File not found: {json_file}")
+
+        if ~os.path.isfile(json_file):
+            raise TypeError(f"Is not a file: {json_file}")
 
         self.json_file = json_file
         self.json_obj = None
