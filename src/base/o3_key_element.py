@@ -1,5 +1,5 @@
-from o3_element import O3Element
-from o3_attribute import O3Attribute
+from base.o3_element import O3Element
+from base.o3_attribute import O3Attribute
 
 
 class O3KeyElement(O3Element):
