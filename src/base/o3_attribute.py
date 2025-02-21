@@ -27,6 +27,9 @@ class O3Attribute(O3Element):
         if len(self.standard_values_list) == 1 and 'Reference System' in self.standard_values_list[0].value_name:
             self.standard_values_list.pop(0)
 
+    @property
+    def sql_field_name(self):
+        return ''.join(self.string_code.split('_')[1:])
 
 if __name__ == "__main__":
     pass

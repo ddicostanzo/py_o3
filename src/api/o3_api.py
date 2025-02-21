@@ -17,6 +17,7 @@ class O3DataModel:
         self.json_obj = None
         self.key_elements = {}
         self.__standard_value_lists = {}
+        self.__value_data_types = set()
 
         self.__read_json()
         self.__load_elements()
@@ -43,11 +44,27 @@ class O3DataModel:
         return self.__standard_value_lists
 
     def __read_standard_values(self):
-        for _, ke in self.key_elements.items():
-            assert isinstance(ke, O3KeyElement)
+        for ke in self.__read_all_key_elements():
             for ele_attr in ke.list_attributes:
                 if len(ele_attr.standard_values_list) > 0:
                     self.__standard_value_lists[ele_attr.value_name] = ele_attr.standard_values_list
+
+    def __read_all_key_elements(self):
+        for _, ke in self.key_elements.items():
+            assert isinstance(ke, O3KeyElement)
+            yield ke
+
+    def __read_value_data_types(self):
+        for ke in self.__read_all_key_elements():
+            for ele_attr in ke.list_attributes:
+                self.__value_data_types.add(ele_attr.value_data_type)
+
+    @property
+    def value_data_types(self):
+        if len(self.__value_data_types) == 0:
+            self.__read_value_data_types()
+
+        return self.__value_data_types
 
 
 if __name__ == "__main__":
