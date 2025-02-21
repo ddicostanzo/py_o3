@@ -1,19 +1,22 @@
 from base.o3_key_element import O3KeyElement
 import json
-import os
+import pathlib
 
 
 class O3DataModel:
     def __init__(self, json_file):
         super().__init__()
 
-        if ~os.path.exists(json_file):
-            raise FileExistsError(f"File not found: {json_file}")
+        path = pathlib.Path.joinpath(pathlib.Path.cwd(), json_file)
+        path.absolute()
 
-        if ~os.path.isfile(json_file):
-            raise TypeError(f"Is not a file: {json_file}")
+        if not path.exists():
+            raise FileExistsError(f"Path not found: {path}")
 
-        self.json_file = json_file
+        if not path.is_file():
+            raise TypeError(f"Is not a file: {path}")
+
+        self.json_file = path
         self.json_obj = None
         self.key_elements = {}
         self.__standard_value_lists = {}
