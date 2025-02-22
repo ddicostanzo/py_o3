@@ -19,7 +19,9 @@ class O3Attribute(O3Element):
         self.__sql_data_types = {"Boolean": "bit",
                                  "DICOM Image": "varbinary",
                                  "Date": "datetime2",
-                                 "Decimal": "decimal("
+                                 "Decimal": "decimal(19,9)",
+                                 "Integer": "int",
+                                 "String": "varchar(max)"
                                  }
 
     def __check_reference_system(self, item_dict):
