@@ -4,8 +4,10 @@ import warnings
 
 
 class O3Attribute(O3Element):
-    def __init__(self, item_dict):
+    def __init__(self, item_dict, **kwargs):
+
         super().__init__(item_dict)
+
         self.value_data_type = item_dict['ValueDataType']
         self.standard_values_use = item_dict['StandardValuesUse']
         self.standard_values_list = item_dict['StandardValuesList']
@@ -13,9 +15,12 @@ class O3Attribute(O3Element):
         self.reference_system_for_values = item_dict['ReferenceSystemForValues']
         self.allow_null_values = item_dict['AllowNullValues']
         self.value_example = item_dict['ValueExample']
-        self.__check_reference_system(item_dict)
-        self.__clean_standard_values_list()
-        self.__clean_value_data_types()
+
+        if kwargs.get('clean', True):
+            self.__check_reference_system(item_dict)
+            self.__clean_standard_values_list()
+            self.__clean_value_data_types()
+
         self.__sql_data_types = {"MSSQL": {"Boolean": "bit",
                                            "DICOM Image": "varbinary",
                                            "Date": "datetime2",
@@ -23,12 +28,12 @@ class O3Attribute(O3Element):
                                            "Integer": "int",
                                            "String": "varchar(max)"
                                            },
-                                 "PSQL": {"Boolean": "bit",
-                                          "DICOM Image": "varbinary",
-                                          "Date": "datetime2",
-                                          "Decimal": "decimal(19,9)",
-                                          "Integer": "int",
-                                          "String": "varchar(max)"
+                                 "PSQL": {"Boolean": "boolean",
+                                          "DICOM Image": "bytea",
+                                          "Date": "timestamptz",
+                                          "Decimal": "numeric(19,9)",
+                                          "Integer": "integer",
+                                          "String": "text"
                                           }
                                  }
 

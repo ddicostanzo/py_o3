@@ -2,7 +2,7 @@ from src.base.o3_key_element import O3KeyElement
 
 
 class O3Relationship:
-    def __init__(self, item_dict):
+    def __init__(self, item_dict, **kwargs):
         super().__init__(item_dict)
 
         self.subject_element = item_dict['SubjectElement']
