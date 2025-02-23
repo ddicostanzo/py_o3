@@ -33,17 +33,35 @@ class O3KeyElement(O3Element):
             raise KeyError(f"Provided SQL server {sql_server} is not supported. Only MSSQL and PSQL are supported.")
 
         if sql_server == 'MSSQL':
-            return f'{self.__sql_field_name}Id INT Identity(1, 1)'
+            return f'{self.__sql_field_name}Id IDENTITY(1, 1) NOT NULL PRIMARY KEY'
         else:
             return f'{self.__sql_field_name}Id SERIAL PRIMARY KEY'
+
+    def __sql_history_timestamp_field(self, sql_server):
+        if sql_server not in self.supported_sql_servers:
+            raise KeyError(f"Provided SQL server {sql_server} is not supported.")
+        if sql_server == 'MSSQL':
+            return f'HistoryDateTime datetime2 NOT NULL'
+        else:
+            return f'HistoryDateTime timestamptz NOT NULL'
+
+    def __sql_history_user_field(self, sql_server):
+        if sql_server not in self.supported_sql_servers:
+            raise KeyError(f"Provided SQL server {sql_server} is not supported.")
+        if sql_server == 'MSSQL':
+            return f'HistoryUser varchar(max) NOT NULL'
+        else:
+            return f'HistoryUser text NOT NULL'
 
     @property
     def __create_table_start(self):
         return f'CREATE TABLE {self.__sql_field_name}'
 
-    def create_sql_table_text(self, sql_server):
-        _fields = [x.create_sql_field_text(sql_server) for x in self.list_attributes]
+    def create_sql_table_text(self, sql_server, **kwargs):
+        _fields = [x.create_sql_field_text(sql_server, **kwargs) for x in self.list_attributes]
         _fields.insert(0, self.__sql_identity_field(sql_server))
+        _fields.append(self.__sql_history_timestamp_field(sql_server))
+        _fields.append(self.__sql_history_user_field(sql_server))
         _text = f'{self.__create_table_start} ({", ".join(_fields)});'
         return _text
 

@@ -16,6 +16,7 @@ class O3Attribute(O3Element):
         self.standard_values_list = [O3StandardValue(x) for x in self.standard_values_list]
         self.reference_system_for_values = item_dict['ReferenceSystemForValues']
         self.allow_null_values = item_dict['AllowNullValues']
+        self.__sql_nullable = None
         self.value_example = item_dict['ValueExample']
         self.__set_sql_data_type_methods = [self.__set_date_for_iso8601,
                                             self.__set_standard_values_sql,
@@ -65,6 +66,43 @@ class O3Attribute(O3Element):
     @property
     def __sql_field_name(self):
         return ''.join(self.string_code.split('_')[1:])
+
+    def __set_sql_nullable(self, **kwargs):
+        _phi = kwargs.get('PHI', True)
+
+        if self.allow_null_values in ['Yes', 'True', True, 'Yes, if diagnosis is for secondary cancer',
+                                      'Yes, except when intervention is TURP']:
+            self.__sql_nullable = 'NULL'
+
+        if self.allow_null_values in ['No']:
+            self.__sql_nullable = 'NOT NULL'
+
+        if _phi:
+            if self.allow_null_values == 'No for systems alloing PHI. Yes for systems not allowing PHI':
+                self.__sql_nullable = 'NOT NULL'
+            if self.allow_null_values == 'No for systems allowing PHI. Yes for systems not allowing PHI':
+                self.__sql_nullable = 'NOT NULL'
+            if self.allow_null_values == 'Yes for systems allowing PHI. No for systems not allowing PHI':
+                self.__sql_nullable = 'NULL'
+            if self.string_code == 'Patient_MRN':
+                self.__sql_nullable = 'NOT NULL'
+            if self.string_code == 'Patient_AnonPatID':
+                self.__sql_nullable = 'NULL'
+        else:
+            if self.allow_null_values == 'No for systems alloing PHI. Yes for systems not allowing PHI':
+                self.__sql_nullable = 'NULL'
+            if self.allow_null_values == 'No for systems allowing PHI. Yes for systems not allowing PHI':
+                self.__sql_nullable = 'NULL'
+            if self.allow_null_values == 'Yes for systems allowing PHI. No for systems not allowing PHI':
+                self.__sql_nullable = 'NOT NULL'
+            if self.string_code == 'Patient_MRN':
+                self.__sql_nullable = 'NULL'
+            if self.string_code == 'Patient_AnonPatID':
+                self.__sql_nullable = 'NOT NULL'
+
+        if self.__sql_nullable is None:
+            warnings.warn(f"No SQL nullable field set using logic. Defaulting to NULL for {self}")
+            self.__sql_nullable = 'NULL'
 
     def __sql_field_type(self, sql_server):
         if sql_server not in self.__sql_data_types.keys():
@@ -136,8 +174,9 @@ class O3Attribute(O3Element):
             if self.value_data_type == "string":
                 self.value_data_type = "String"
 
-    def create_sql_field_text(self, sql_server):
-        return f'{self.__sql_field_name} {self.__sql_field_type(sql_server)}'
+    def create_sql_field_text(self, sql_server, **kwargs):
+        self.__set_sql_nullable(**kwargs)
+        return f'{self.__sql_field_name} {self.__sql_field_type(sql_server)} {self.__sql_nullable}'
 
 
 if __name__ == "__main__":
