@@ -50,8 +50,14 @@ class O3Attribute(O3Element):
             self.standard_values_list.pop(0)
 
     @property
-    def sql_field_name(self):
+    def __sql_field_name(self):
         return ''.join(self.string_code.split('_')[1:])
+
+    def __sql_field_type(self, sql_server):
+        if sql_server not in self.__sql_data_types.keys():
+            raise KeyError(f"Provided SQL server {sql_server} is not supported. Only MSSQL and PSQL are supported.")
+        data_types = self.__sql_data_types[sql_server]
+        return data_types[self.value_data_type]
 
     def __clean_value_data_types(self):
 
@@ -70,6 +76,9 @@ class O3Attribute(O3Element):
                 self.value_data_type = "Date"
             if self.value_data_type == "string":
                 self.value_data_type = "String"
+
+    def sql_field_creation_text(self, sql_server):
+        return f'{self.__sql_field_name} {self.__sql_field_type(sql_server)}'
 
 
 if __name__ == "__main__":
