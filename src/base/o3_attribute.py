@@ -60,8 +60,9 @@ class O3Attribute(O3Element):
                         break
 
     def __clean_standard_values_list(self):
-        if len(self.standard_values_list) == 1 and 'Reference System' in self.standard_values_list[0].value_name:
-            self.standard_values_list.pop(0)
+        for i, item in enumerate(self.standard_values_list):
+            if 'Reference System' in item.value_name or 'Current ICD standard' in item.value_name:
+                self.standard_values_list.pop(i)
 
     @property
     def __sql_field_name(self):
