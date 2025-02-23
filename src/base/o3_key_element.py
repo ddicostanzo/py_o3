@@ -58,15 +58,25 @@ class O3KeyElement(O3Element):
         return f'CREATE TABLE {self.__sql_field_name}'
 
     def create_sql_table_text(self, sql_server, **kwargs):
+        _fields = self.__sql_fields_for_table(sql_server, **kwargs)
+        _foreign_keys = self.__sql_foreign_keys_for_table(sql_server, **kwargs)
+        _text = f'{self.__create_table_start} ({", ".join(_fields)});'
+        return _text
+
+    def __sql_fields_for_table(self, sql_server, **kwargs):
         _fields = [x.create_sql_field_text(sql_server, **kwargs) for x in self.list_attributes]
         _fields.insert(0, self.__sql_identity_field(sql_server))
         _fields.append(self.__sql_history_timestamp_field(sql_server))
         _fields.append(self.__sql_history_user_field(sql_server))
-        _text = f'{self.__create_table_start} ({", ".join(_fields)});'
-        return _text
+        return _fields
 
     def __str__(self):
         return self.key_element_name
+
+    def __sql_foreign_keys_for_table(self, sql_server, **kwargs):
+        _foreign_keys = ""
+
+        return _foreign_keys
 
 
 if __name__ == "__main__":
