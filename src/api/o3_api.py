@@ -4,7 +4,7 @@ import pathlib
 
 
 class O3DataModel:
-    def __init__(self, json_file):
+    def __init__(self, json_file, **kwargs):
         super().__init__()
 
         path = pathlib.Path.joinpath(pathlib.Path.cwd(), json_file)
@@ -21,12 +21,13 @@ class O3DataModel:
         self.key_elements = {}
         self.__standard_value_lists = {}
         self.__value_data_types = set()
+        self.__sql_data_types = set()
         self.__value_priority = set()
         self.__reference_system_for_standard_values = set()
         self.__allow_nulls = set()
 
         self.__read_json()
-        self.__load_elements()
+        self.__load_elements(**kwargs)
 
     def __read_json(self):
         with open(self.json_file, 'r') as file:
@@ -37,9 +38,9 @@ class O3DataModel:
             _json_text = _json_text.replace('(\\u002BOther)', "Other")
             self.json_obj = json.loads(_json_text)
 
-    def __load_elements(self):
+    def __load_elements(self, **kwargs):
         for obj in self.json_obj:
-            _element = O3KeyElement(obj)
+            _element = O3KeyElement(obj, **kwargs)
             self.key_elements[_element.key_element_name] = _element
 
     def __read_all_key_elements(self):
@@ -64,6 +65,9 @@ class O3DataModel:
     def __read_value_data_types(self):
         self.__read_property_from_attribute(self.__value_data_types, 'value_data_type')
 
+    def __read_sql_data_types(self):
+        self.__read_property_from_attribute(self.__sql_data_types, 'sql_data_type')
+
     def __read_value_priority(self):
         self.__read_property_from_attribute(self.__value_priority, 'value_priority')
 
@@ -87,6 +91,13 @@ class O3DataModel:
             self.__read_value_data_types()
 
         return self.__value_data_types
+
+    @property
+    def sql_data_types(self):
+        if len(self.__sql_data_types) == 0:
+            self.__read_sql_data_types()
+
+        return self.__sql_data_types
 
     @property
     def value_priority(self):
