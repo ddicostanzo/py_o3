@@ -77,7 +77,7 @@ class O3Attribute(O3Element):
             if self.value_data_type == "string":
                 self.value_data_type = "String"
 
-    def sql_field_creation_text(self, sql_server):
+    def create_sql_field_text(self, sql_server):
         return f'{self.__sql_field_name} {self.__sql_field_type(sql_server)}'
 
 

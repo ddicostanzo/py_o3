@@ -37,6 +37,16 @@ class O3KeyElement(O3Element):
         else:
             return f'{self.__sql_field_name}Id SERIAL PRIMARY KEY'
 
+    @property
+    def __create_table_start(self):
+        return f'CREATE TABLE {self.__sql_field_name}'
+
+    def create_sql_table_text(self, sql_server):
+        _fields = [x.create_sql_field_text(sql_server) for x in self.list_attributes]
+        _fields.insert(0, self.__sql_identity_field(sql_server))
+        _text = f'{self.__create_table_start} ({", ".join(_fields)});'
+        return _text
+
     def __str__(self):
         return self.key_element_name
 
