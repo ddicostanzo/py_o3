@@ -1,5 +1,14 @@
 from src.api.o3_api import O3DataModel
 
+
 #Todo: Create logic that accepts Key Elements and O3 Model to create SQL tables
-def create_table_for_key_element():
+def sql_table_from_key_element():
+    pass
+
+
+def sql_table_from_standard_value_list():
+    pass
+
+
+if __name__ == "__main__":
     pass
