@@ -1,4 +1,4 @@
-from api.o3_api import O3DataModel
+from api.data_model import O3DataModel
 
 
 if __name__ == "__main__":
