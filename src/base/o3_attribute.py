@@ -35,22 +35,6 @@ class O3Attribute(O3Element):
 
         self.__set_sql_data_types()
 
-        self.__sql_data_types = {"MSSQL": {"Boolean": "bit",
-                                           "Binary": "varbinary",
-                                           "Date": "datetime2",
-                                           "Decimal": "decimal(19,9)",
-                                           "Integer": "int",
-                                           "String": "varchar(max)"
-                                           },
-                                 "PSQL": {"Boolean": "boolean",
-                                          "Binary": "bytea",
-                                          "Date": "timestamptz",
-                                          "Decimal": "numeric(19,9)",
-                                          "Integer": "integer",
-                                          "String": "text"
-                                          }
-                                 }
-
     def __check_reference_system(self, item_dict):
         if self.reference_system_for_values is None:
             if any(['Reference System' in x for x in item_dict['StandardValuesList']]):
