@@ -4,7 +4,20 @@ from base.o3_relationship import O3Relationship
 
 
 class O3KeyElement(O3Element):
+
     def __init__(self, item_dict, **kwargs):
+        """
+        Instantiation of the O3 Key Element class
+
+        Parameters
+        ----------
+        item_dict
+            refers to the deserialized JSON item dictionary associated with the specific element
+        kwargs
+            clean: bool
+                provides an avenue to attempt to clean common errors in the typed data of the key element and
+                its attributes
+        """
         super().__init__(item_dict['keyelementdetail'])
 
         self.key_element_name = item_dict['KeyElementName']
