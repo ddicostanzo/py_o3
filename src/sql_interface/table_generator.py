@@ -1,5 +1,6 @@
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
+from src.sql_interface.attribute_to_column import AttributeToSQLColumn
 
 
 class KeyElementTableCreator:
@@ -10,46 +11,56 @@ class KeyElementTableCreator:
 
         self.sql_server_type = sql_server_type
         self.key_element = key_element
+        self.table_name = self.key_element.key_element_name.replace(' ', '')
+        self.columns = []
 
     @property
-    def __create_table_prefix(self):
-        return f'CREATE TABLE {self.key_element.key_element_name}'
+    def __table_prefix(self):
+        return f'CREATE TABLE {self.table_name}'
 
-    def create_sql_table_text(self, **kwargs):
-        _fields = self.__sql_fields_for_table(**kwargs)
-        _foreign_keys = self.__sql_foreign_keys_for_table(**kwargs)
-        _text = f'{self.__create_table_prefix} ({", ".join(_fields)});'
-        return _text
-
-    def __sql_foreign_keys_for_table(self, **kwargs):
-        _foreign_keys = ""
-
-        return _foreign_keys
-
-    def identity_column(self, key_element):
+    @property
+    def identity_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'{key_element.key_element_name}Id IDENTITY(1, 1) NOT NULL PRIMARY KEY'
+            return f'{self.table_name}Id IDENTITY(1, 1) NOT NULL PRIMARY KEY'
         else:
-            return f'{key_element.key_element_name}Id SERIAL PRIMARY KEY'
+            return f'{self.table_name}Id SERIAL PRIMARY KEY'
 
+    @property
     def history_timestamp_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
             return f'HistoryDateTime datetime2 NOT NULL'
         else:
             return f'HistoryDateTime timestamptz NOT NULL'
 
+    @property
     def history_user_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
             return f'HistoryUser varchar(max) NOT NULL'
         else:
             return f'HistoryUser text NOT NULL'
 
-    def __sql_fields_for_table(self, key_element, **kwargs):
-        _fields = [attribute_to_column(sql_server_type, x, **kwargs) for x in key_element.list_attributes]
-        _fields.insert(0, identity_column(sql_server_type, key_element))
-        _fields.append(history_timestamp_column(sql_server_type))
-        _fields.append(history_user_column(sql_server_type))
-        return _fields
+    def _create_columns(self, phi_allowed):
+        for this_attr in self.key_element.list_attributes:
+            self.columns.append(AttributeToSQLColumn(this_attr, phi_allowed, self.sql_server_type))
+
+    def sql_table(self, phi_allowed, **kwargs):
+        if len(self.columns) == 0:
+            self._create_columns(phi_allowed)
+
+        _column_sql_text = [x.column_creation_text for x in self.columns]
+        _column_sql_text.insert(0, self.identity_column)
+        _column_sql_text.append(self.history_timestamp_column)
+        _column_sql_text.append(self.history_user_column)
+
+        _foreign_keys = self.__foreign_keys_for_table(**kwargs)
+        _field_list = _column_sql_text + _foreign_keys
+        _text = f'{self.__table_prefix} ({", ".join(_field_list)});'
+        return _text
+
+    def __foreign_keys_for_table(self, **kwargs) -> list:
+        _foreign_keys = []
+
+        return _foreign_keys
 
 
 class StandardListTableCreator:
