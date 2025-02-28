@@ -26,6 +26,31 @@ class KeyElementTableCreator:
 
         return _foreign_keys
 
+    def identity_column(self, key_element):
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            return f'{key_element.key_element_name}Id IDENTITY(1, 1) NOT NULL PRIMARY KEY'
+        else:
+            return f'{key_element.key_element_name}Id SERIAL PRIMARY KEY'
+
+    def history_timestamp_column(self):
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            return f'HistoryDateTime datetime2 NOT NULL'
+        else:
+            return f'HistoryDateTime timestamptz NOT NULL'
+
+    def history_user_column(self):
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            return f'HistoryUser varchar(max) NOT NULL'
+        else:
+            return f'HistoryUser text NOT NULL'
+
+    def __sql_fields_for_table(self, key_element, **kwargs):
+        _fields = [attribute_to_column(sql_server_type, x, **kwargs) for x in key_element.list_attributes]
+        _fields.insert(0, identity_column(sql_server_type, key_element))
+        _fields.append(history_timestamp_column(sql_server_type))
+        _fields.append(history_user_column(sql_server_type))
+        return _fields
+
 
 class StandardListTableCreator:
     def __init__(self, names):
