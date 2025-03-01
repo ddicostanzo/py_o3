@@ -3,19 +3,18 @@ from src.helpers.enums import SupportedSQLServers
 from src.sql_interface.attribute_to_column import AttributeToSQLColumn
 
 
-class KeyElementTableCreator:
-    def __init__(self, sql_server_type: SupportedSQLServers, key_element: O3KeyElement):
+class SQLTable:
+    def __init__(self, sql_server_type):
+        self.table_name = None
+        self.columns = []
         if sql_server_type not in SupportedSQLServers:
             raise KeyError(f"Provided SQL server {sql_server_type} is not supported. "
                            f"Only MSSQL and PSQL are supported.")
 
         self.sql_server_type = sql_server_type
-        self.key_element = key_element
-        self.table_name = self.key_element.key_element_name.replace(' ', '')
-        self.columns = []
 
     @property
-    def __table_prefix(self):
+    def table_prefix(self):
         return f'CREATE TABLE {self.table_name}'
 
     @property
@@ -28,9 +27,9 @@ class KeyElementTableCreator:
     @property
     def history_timestamp_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'HistoryDateTime datetime2 NOT NULL'
+            return f'HistoryDateTime datetime2 NOT NULL DEFAULT SYSDATETIMEOFFSET()'
         else:
-            return f'HistoryDateTime timestamptz NOT NULL'
+            return f'HistoryDateTime timestamptz DEFAULT CURRENT_TIMESTAMP'
 
     @property
     def history_user_column(self):
@@ -38,6 +37,14 @@ class KeyElementTableCreator:
             return f'HistoryUser varchar(max) NOT NULL'
         else:
             return f'HistoryUser text NOT NULL'
+
+
+class KeyElementTableCreator(SQLTable):
+    def __init__(self, sql_server_type: SupportedSQLServers, key_element: O3KeyElement):
+        super().__init__(sql_server_type)
+
+        self.key_element = key_element
+        self.table_name = self.key_element.key_element_name.replace(' ', '')
 
     def _create_columns(self, phi_allowed):
         for this_attr in self.key_element.list_attributes:
@@ -54,7 +61,7 @@ class KeyElementTableCreator:
 
         _foreign_keys = self.__foreign_keys_for_table(**kwargs)
         _field_list = _column_sql_text + _foreign_keys
-        _text = f'{self.__table_prefix} ({", ".join(_field_list)});'
+        _text = f'{self.table_prefix} ({", ".join(_field_list)});'
         return _text
 
     def __foreign_keys_for_table(self, **kwargs) -> list:
@@ -63,9 +70,55 @@ class KeyElementTableCreator:
         return _foreign_keys
 
 
-class StandardListTableCreator:
-    def __init__(self, names):
-        self.list_of_names = names
+class StandardListTableCreator(SQLTable):
+    def __init__(self, sql_server_type, title, items: list):
+        super().__init__(sql_server_type)
+
+        self.table_name = title.replace(' ', '')
+        self.items = items
+
+        self.standard_value_item = ""
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            self.standard_value_item = "StandardValueItemName varchar(max) NOT NULL"
+        else:
+            self.standard_value_item = "StandardValueItemName text NOT NULL"
+
+        self.numeric_code = ""
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            self.numeric_code = "NumericCode varchar(max) NOT NULL"
+        else:
+            self.numeric_code = "NumericCode text NOT NULL"
+
+        self.active_flag = ""
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            self.active_flag = "ActiveFlag bit NOT NULL DEFAULT 1"
+        else:
+            self.active_flag = "ActiveFlag boolean NOT NULL DEFAULT 1"
+
+        self.columns = [self.identity_column,
+                        self.standard_value_item,
+                        self.numeric_code,
+                        self.active_flag,
+                        self.history_timestamp_column,
+                        self.history_user_column]
+
+    def sql_table(self):
+        _field_list = self.columns
+        _text = f'{self.table_prefix} ({", ".join(_field_list)});'
+        _commands = self.insert_commands()
+        for _command in _commands:
+            _text += _command
+        return _text
+
+    def insert_commands(self):
+        _commands = []
+
+        for x in self.items:
+            _commands.append(f'INSERT INTO {self.table_name} (StandardValueItemName, NumericCode,'
+                             f'HistoryUser) '
+                             f'VALUES (\'{x.value_name}\', \'{x.numeric_code}\', \'db_build\');')
+
+        return _commands
 
 
 if __name__ == "__main__":
