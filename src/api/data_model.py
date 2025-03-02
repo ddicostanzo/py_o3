@@ -1,4 +1,4 @@
-from base.o3_key_element import O3KeyElement
+from src.base.o3_key_element import O3KeyElement
 import json
 import pathlib
 

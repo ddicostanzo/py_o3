@@ -1,15 +1,16 @@
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
 from src.sql_interface.attribute_to_column import AttributeToSQLColumn
+from src.helpers.test_sql_server_type import check_sql_server_type
 
 
 class SQLTable:
     def __init__(self, sql_server_type):
+        if not check_sql_server_type(sql_server_type):
+            raise Exception("Unsupported SQL Server Type")
+
         self.table_name = None
         self.columns = []
-        if sql_server_type not in SupportedSQLServers:
-            raise KeyError(f"Provided SQL server {sql_server_type} is not supported. "
-                           f"Only MSSQL and PSQL are supported.")
 
         self.sql_server_type = sql_server_type
 
@@ -114,9 +115,9 @@ class StandardListTableCreator(SQLTable):
         _commands = []
 
         for x in self.items:
-            _commands.append(f'INSERT INTO {self.table_name} (StandardValueItemName, NumericCode,'
-                             f'HistoryUser) '
-                             f'VALUES (\'{x.value_name}\', \'{x.numeric_code}\', \'db_build\');')
+            _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode,"
+                             f"HistoryUser) "
+                             f"VALUES ('{x.value_name}', '{x.numeric_code}', 'db_build');")
 
         return _commands
 

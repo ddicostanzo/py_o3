@@ -1,5 +1,5 @@
-from base.o3_standard_value import O3StandardValue
-from base.o3_element import O3Element
+from src.base.o3_standard_value import O3StandardValue
+from src.base.o3_element import O3Element
 import warnings
 
 

@@ -3,13 +3,26 @@ from src.sql_interface.table_generator import KeyElementTableCreator, StandardLi
 from src.helpers.enums import SupportedSQLServers
 
 
+def create_tables(file_name, clean, server_type, phi_allowed):
+    model = O3DataModel(file_name, clean=clean)
+
+    tables = {}
+    for table_name, data in model.key_elements.items():
+        tables[table_name] = KeyElementTableCreator(server_type, data).sql_table(phi_allowed=phi_allowed)
+
+    for table_name, data in model.standard_value_lists.items():
+        tables[table_name] = StandardListTableCreator(server_type, table_name, data).sql_table()
+
+    return tables
+
+
 if __name__ == "__main__":
 
-    test = O3DataModel("./Resources/O3_20250128.json", clean=True)
-    sql_test = KeyElementTableCreator(SupportedSQLServers.MSSQL, test.key_elements["Diagnosis and Staging"])
-    _com = sql_test.sql_table(True)
-    sv_test = test.standard_value_lists['Dose Units']
-    sv_sql = StandardListTableCreator(SupportedSQLServers.MSSQL, 'Dose Units', sv_test).sql_table()
-    print(_com)
+    file_name = './Resources/O3_20250128.json'
+    clean = True
+    server_type = SupportedSQLServers.MSSQL
+    phi_allowed = True
+    tables = create_tables(file_name, clean, server_type, phi_allowed)
+
     print()
 
