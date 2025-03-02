@@ -34,7 +34,7 @@ class AttributeToSQLColumn:
 
     @property
     def column_creation_text(self):
-        return f'{self.column_name} {self.column_data_type} {self.column_nullable}'
+        return f'{self.column_name} {self.__sql_field_type} {self.column_nullable}'
 
     @property
     def __sql_field_type(self):

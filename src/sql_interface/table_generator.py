@@ -1,6 +1,7 @@
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
 from src.sql_interface.attribute_to_column import AttributeToSQLColumn
+from src.sql_interface.relationship_to_column import ChildRelationshipToColumn, InstanceRelationshipToColumn
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 
@@ -47,9 +48,25 @@ class KeyElementTableCreator(SQLTable):
         self.key_element = key_element
         self.table_name = self.key_element.string_code.replace(' ', '')
 
-    def _create_columns(self, phi_allowed):
+    def _create_attribute_columns(self, phi_allowed):
         for this_attr in self.key_element.list_attributes:
             self.columns.append(AttributeToSQLColumn(this_attr, phi_allowed, self.sql_server_type))
+
+    def _create_foreign_key_columns(self):
+        for this_rel in self.key_element.child_of_relationships:
+            _col_sql = ChildRelationshipToColumn(this_rel, self.sql_server_type)
+            self.columns.append(_col_sql)
+
+    def _create_instance_based_columns(self):
+        for this_rel in self.key_element.instance_of_relationships:
+            _col_sql = InstanceRelationshipToColumn(this_rel, self.sql_server_type)
+            self.columns.append(_col_sql)
+
+    def _create_columns(self, phi_allowed):
+        self._create_foreign_key_columns()
+        self._create_attribute_columns(phi_allowed)
+        # Unsure of how to manage instance of based columns, likely just a path to follow via FK
+        # self._create_instance_based_columns()
 
     def sql_table(self, phi_allowed, **kwargs):
         if len(self.columns) == 0:
@@ -60,9 +77,7 @@ class KeyElementTableCreator(SQLTable):
         _column_sql_text.append(self.history_timestamp_column)
         _column_sql_text.append(self.history_user_column)
 
-        _foreign_keys = self.__foreign_keys_for_table(**kwargs)
-        _field_list = _column_sql_text + _foreign_keys
-        _text = f'{self.table_prefix} ({", ".join(_field_list)});'
+        _text = f'{self.table_prefix} ({", ".join(_column_sql_text)});'
         return _text
 
 
@@ -110,7 +125,7 @@ class StandardListTableCreator(SQLTable):
         _commands = []
 
         for x in self.items:
-            _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode,"
+            _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode, "
                              f"HistoryUser) "
                              f"VALUES ('{x.value_name}', '{x.numeric_code}', 'db_build');")
 

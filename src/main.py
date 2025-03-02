@@ -1,6 +1,6 @@
 from api.data_model import O3DataModel
-from base.o3_relationship import O3Relationship
 from src.sql_interface.table_generator import KeyElementTableCreator, StandardListTableCreator
+from src.sql_interface.foreign_keys import ForeignKeysConstraints
 from src.helpers.enums import SupportedSQLServers
 
 
@@ -43,6 +43,13 @@ def test_names_in_relationships(sub, pred, model):
             pass
             # print(f"String Code {ke.string_code} not in predicate table")
 
+def foreign_key_constraints(model, sql_server_type):
+    _commands = []
+    for _, ke in model.key_elements.items():
+        for rel in ke.relationships:
+            _commands.append(ForeignKeysConstraints(rel, sql_server_type).column_creation_text)
+
+    return _commands
 
 if __name__ == "__main__":
 
@@ -55,6 +62,7 @@ if __name__ == "__main__":
     server_type = SupportedSQLServers.MSSQL
     phi_allowed = True
     tables = create_tables(model, server_type, phi_allowed)
+    fk_commands = foreign_key_constraints(model, server_type)
 
     print()
 

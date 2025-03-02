@@ -37,6 +37,26 @@ class O3KeyElement(O3Element):
 
     def __str__(self):
         return self.key_element_name
+    
+    @property
+    def child_of_relationships(self):
+        _child_of_relationships = []
+        for this_relationship in self.relationships:
+            if this_relationship.relationship_category == "ChildElement-Of":
+                if this_relationship.subject_element == self.string_code:
+                    _child_of_relationships.append(this_relationship)
+
+        return _child_of_relationships
+
+    @property
+    def instance_of_relationships(self):
+        _instance_of_relationships = []
+        for this_relationship in self.relationships:
+            if this_relationship.relationship_category == "InstanceAssociated-with":
+                if this_relationship.predicate_element == self.string_code:
+                    _instance_of_relationships.append(this_relationship)
+
+        return _instance_of_relationships
 
 
 if __name__ == "__main__":
