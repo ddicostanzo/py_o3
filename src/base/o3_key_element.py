@@ -29,11 +29,11 @@ class O3KeyElement(O3Element):
 
         self.dictionary_attributes = {x.value_name: x for x in self.list_attributes}
 
-        self.list_relationships = []
+        self.relationships = []
         for this_relationship in item_dict['list_relationships']:
             if this_relationship["SubjectElement"] == "Subject Element":
                 continue
-            self.list_relationships.append(O3Relationship(this_relationship, **kwargs))
+            self.relationships.append(O3Relationship(this_relationship, **kwargs))
 
     def __str__(self):
         return self.key_element_name

@@ -45,7 +45,7 @@ class KeyElementTableCreator(SQLTable):
         super().__init__(sql_server_type)
 
         self.key_element = key_element
-        self.table_name = self.key_element.key_element_name.replace(' ', '')
+        self.table_name = self.key_element.string_code.replace(' ', '')
 
     def _create_columns(self, phi_allowed):
         for this_attr in self.key_element.list_attributes:
@@ -64,11 +64,6 @@ class KeyElementTableCreator(SQLTable):
         _field_list = _column_sql_text + _foreign_keys
         _text = f'{self.table_prefix} ({", ".join(_field_list)});'
         return _text
-
-    def __foreign_keys_for_table(self, **kwargs) -> list:
-        _foreign_keys = []
-
-        return _foreign_keys
 
 
 class StandardListTableCreator(SQLTable):
