@@ -22,9 +22,9 @@ class SQLTable:
     @property
     def identity_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'{self.table_name}Id IDENTITY(1, 1) NOT NULL PRIMARY KEY'
+            return f'{self.table_name}Id INT NOT NULL PRIMARY KEY IDENTITY(1, 1)'
         else:
-            return f'{self.table_name}Id SERIAL PRIMARY KEY'
+            return f'{self.table_name}Id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY'
 
     @property
     def history_timestamp_column(self):

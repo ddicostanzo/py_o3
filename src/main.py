@@ -43,6 +43,7 @@ def test_names_in_relationships(sub, pred, model):
             pass
             # print(f"String Code {ke.string_code} not in predicate table")
 
+
 def foreign_key_constraints(model, sql_server_type):
     _commands = []
     for _, ke in model.key_elements.items():
@@ -50,6 +51,7 @@ def foreign_key_constraints(model, sql_server_type):
             _commands.append(ForeignKeysConstraints(rel, sql_server_type).column_creation_text)
 
     return _commands
+
 
 if __name__ == "__main__":
 
