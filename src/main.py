@@ -66,5 +66,11 @@ if __name__ == "__main__":
     tables = create_tables(model, server_type, phi_allowed)
     fk_commands = foreign_key_constraints(model, server_type)
 
+    location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
+    for k, v in tables.items():
+        with open(location, 'a') as file:
+            file.writelines(v)
+            file.writelines('\n')
+
     print()
 

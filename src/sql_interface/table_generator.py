@@ -1,3 +1,4 @@
+from helpers.string_helpers import strip_non_letters
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
 from src.sql_interface.attribute_to_column import AttributeToSQLColumn
@@ -20,16 +21,25 @@ class SQLTable:
         return f'CREATE TABLE {self.table_name}'
 
     @property
+    def table_suffix(self):
+        if self.sql_server_type == SupportedSQLServers.MSSQL:
+            return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}));'
+        else:
+            return ""
+
+    @property
     def identity_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'{self.table_name}Id INT NOT NULL PRIMARY KEY IDENTITY(1, 1)'
+            return f'{self.table_name}Id INT IDENTITY(1, 1) NOT NULL PRIMARY KEY'
         else:
-            return f'{self.table_name}Id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY'
+            return f'{self.table_name}Id SERIAL PRIMARY KEY'
 
     @property
     def history_timestamp_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'HistoryDateTime datetime2 NOT NULL DEFAULT SYSDATETIMEOFFSET()'
+            return (f'ValidFrom datetime2 GENERATED ALWAYS AS ROW START,\n'
+                    f'ValidTo datetime2 GENERATED ALWAYS AS ROW End,\n'
+                    f'PERIOD FOR SYSTEM_TIME(ValidFrom, ValidTo)')
         else:
             return f'HistoryDateTime timestamptz DEFAULT CURRENT_TIMESTAMP'
 
@@ -74,10 +84,10 @@ class KeyElementTableCreator(SQLTable):
 
         _column_sql_text = [x.column_creation_text for x in self.columns]
         _column_sql_text.insert(0, self.identity_column)
-        _column_sql_text.append(self.history_timestamp_column)
         _column_sql_text.append(self.history_user_column)
-
-        _text = f'{self.table_prefix} ({", ".join(_column_sql_text)});'
+        _column_sql_text.append(self.history_timestamp_column)
+        _joined_field_list = ",\n".join(_column_sql_text)
+        _text = f'{self.table_prefix} (\n{_joined_field_list}\n);\n{self.table_suffix}\n'
         return _text
 
 
@@ -85,7 +95,7 @@ class StandardListTableCreator(SQLTable):
     def __init__(self, sql_server_type, title, items: list):
         super().__init__(sql_server_type)
 
-        self.table_name = title.replace(' ', '')
+        self.table_name = strip_non_letters(title)
         self.items = items
 
         self.standard_value_item = ""
@@ -110,12 +120,14 @@ class StandardListTableCreator(SQLTable):
                         self.standard_value_item,
                         self.numeric_code,
                         self.active_flag,
+                        self.history_user_column,
                         self.history_timestamp_column,
-                        self.history_user_column]
+                        ]
 
     def sql_table(self):
         _field_list = self.columns
-        _text = f'{self.table_prefix} ({", ".join(_field_list)});'
+        _joined_field_list = ", \n".join(_field_list)
+        _text = f'{self.table_prefix} (\n{_joined_field_list}\n);\n{self.table_suffix}\n'
         _commands = self.insert_commands()
         for _command in _commands:
             _text += _command
@@ -127,7 +139,7 @@ class StandardListTableCreator(SQLTable):
         for x in self.items:
             _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode, "
                              f"HistoryUser) "
-                             f"VALUES ('{x.value_name}', '{x.numeric_code}', 'db_build');")
+                             f"VALUES ('{strip_non_letters(x.value_name)}', '{x.numeric_code}', 'db_build');\n")
 
         return _commands
 

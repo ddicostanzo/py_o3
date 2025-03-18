@@ -23,8 +23,8 @@ class AttributeToSQLColumn:
                                         self.__set_int_data_type,
                                         self.__set_decimal_data_type,
                                         self.__set_bool_data_type,
-                                        self.__set_date_data_type,
-                                        self.__set_binary_data_type]
+                                        self.__set_binary_data_type,
+                                        self.__set_date_data_type]
         self.__set_data_types()
         self.__set_nullable()
 

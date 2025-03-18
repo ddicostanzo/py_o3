@@ -29,7 +29,7 @@ class ForeignKeysConstraints:
 
     @property
     def column_creation_text(self):
-        return f"{self.__command_prefix()} {self.__command_body()} {self.__command_suffix()}"
+        return f"\n{self.__command_prefix()} {self.__command_body()} {self.__command_suffix()};\n"
 
 
 if __name__ == '__main__':
