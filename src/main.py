@@ -47,7 +47,7 @@ def test_names_in_relationships(sub, pred, model):
 def foreign_key_constraints(model, sql_server_type):
     _commands = []
     for _, ke in model.key_elements.items():
-        for rel in ke.relationships:
+        for rel in ke.child_of_relationships:
             _commands.append(ForeignKeysConstraints(rel, sql_server_type).column_creation_text)
 
     return _commands
@@ -71,6 +71,10 @@ if __name__ == "__main__":
         with open(location, 'a') as file:
             file.writelines(v)
             file.writelines('\n')
+
+    for com in fk_commands:
+        with open(location, 'a') as file:
+            file.write(com)
 
     print()
 

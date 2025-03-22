@@ -25,11 +25,11 @@ class ForeignKeysConstraints:
                 f"REFERENCES {self.predicate_table_name} ({self.predicate_element}Id)")
 
     def __command_suffix(self):
-        return f"ON DELETE CASCADE ON UPDATE CASCADE;"
+        return f"ON DELETE CASCADE ON UPDATE CASCADE"
 
     @property
     def column_creation_text(self):
-        return f"\n{self.__command_prefix()} {self.__command_body()} {self.__command_suffix()};\n"
+        return f"{self.__command_prefix()} {self.__command_body()} {self.__command_suffix()};\n"
 
 
 if __name__ == '__main__':

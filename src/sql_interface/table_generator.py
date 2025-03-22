@@ -23,7 +23,8 @@ class SQLTable:
     @property
     def table_suffix(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}));'
+            return f''
+            # return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}));'
         else:
             return ""
 
@@ -37,7 +38,7 @@ class SQLTable:
     @property
     def history_timestamp_column(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return (f'ValidFrom datetime2 GENERATED ALWAYS AS ROW START,\n'
+            return (f'ValidFrom datetime2 GENERATED ALWAYS AS ROW Start,\n'
                     f'ValidTo datetime2 GENERATED ALWAYS AS ROW End,\n'
                     f'PERIOD FOR SYSTEM_TIME(ValidFrom, ValidTo)')
         else:
@@ -75,7 +76,8 @@ class KeyElementTableCreator(SQLTable):
     def _create_columns(self, phi_allowed):
         self._create_foreign_key_columns()
         self._create_attribute_columns(phi_allowed)
-        # Unsure of how to manage instance of based columns, likely just a path to follow via FK
+
+        # Instance Of columns should have an intermediary table ActInstToProcCode style
         # self._create_instance_based_columns()
 
     def sql_table(self, phi_allowed, **kwargs):
