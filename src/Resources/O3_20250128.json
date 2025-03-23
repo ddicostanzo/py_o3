@@ -4514,7 +4514,7 @@
       },
       {
         "SubjectElement": "RTPrescription",
-        "RelationshipCategory": "ChildElement-Of",
+        "RelationshipCategory": "InstanceAssociated-with",
         "PredicateElement": "Patient",
         "Cardinality": "Many to One"
       },

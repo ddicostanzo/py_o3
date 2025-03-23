@@ -1,4 +1,4 @@
-from helpers.string_helpers import strip_non_letters
+from helpers.string_helpers import clean_table_and_column_names
 from src.helpers.test_sql_server_type import check_sql_server_type
 from src.helpers.enums import SupportedSQLServers
 
@@ -14,7 +14,7 @@ class ChildRelationshipToColumn:
 
     @property
     def __column_name(self):
-        return f"{strip_non_letters(self.relationship.predicate_element)}Id"
+        return f"{clean_table_and_column_names(self.relationship.predicate_element)}Id"
 
     @property
     def __column_type(self):
@@ -39,7 +39,7 @@ class InstanceRelationshipToColumn:
 
     @property
     def __column_name(self):
-        return f"{strip_non_letters(self.relationship.subject_element)}Id"
+        return f"{clean_table_and_column_names(self.relationship.subject_element)}Id"
 
     @property
     def __column_type(self):

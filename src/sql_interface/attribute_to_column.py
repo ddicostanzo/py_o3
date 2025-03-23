@@ -1,6 +1,6 @@
 import warnings
 
-from helpers.string_helpers import strip_non_letters
+from helpers.string_helpers import clean_table_and_column_names
 from src.helpers.enums import SupportedSQLServers
 from src.base.o3_attribute import O3Attribute
 from src.sql_interface.sql_type_from_o3_data_type import sql_data_types
@@ -32,8 +32,8 @@ class AttributeToSQLColumn:
     @property
     def column_name(self):
         if len(self.attribute.standard_values_list) > 0:
-            return strip_non_letters(''.join(self.attribute.string_code.split('_')[1:]) + 'Id')
-        return strip_non_letters(''.join(self.attribute.string_code.split('_')[1:]))
+            return clean_table_and_column_names(''.join(self.attribute.string_code.split('_')[1:]) + 'Id')
+        return clean_table_and_column_names(''.join(self.attribute.string_code.split('_')[1:]))
 
     @property
     def column_creation_text(self):

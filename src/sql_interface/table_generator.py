@@ -1,4 +1,4 @@
-from helpers.string_helpers import strip_non_letters
+from helpers.string_helpers import clean_table_and_column_names, clean_text_values
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
 from src.sql_interface.attribute_to_column import AttributeToSQLColumn
@@ -23,10 +23,10 @@ class SQLTable:
     @property
     def table_suffix(self):
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f''
-            # return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}));'
+            # return f''
+            return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}History));'
         else:
-            return ""
+            return ";"
 
     @property
     def identity_column(self):
@@ -89,7 +89,7 @@ class KeyElementTableCreator(SQLTable):
         _column_sql_text.append(self.history_user_column)
         _column_sql_text.append(self.history_timestamp_column)
         _joined_field_list = ",\n".join(_column_sql_text)
-        _text = f'{self.table_prefix} (\n{_joined_field_list}\n);\n{self.table_suffix}\n'
+        _text = f'{self.table_prefix} (\n{_joined_field_list}\n)\n{self.table_suffix}\n'
         return _text
 
 
@@ -97,7 +97,7 @@ class StandardListTableCreator(SQLTable):
     def __init__(self, sql_server_type, title, items: list):
         super().__init__(sql_server_type)
 
-        self.table_name = strip_non_letters(title)
+        self.table_name = clean_table_and_column_names(title)
         self.items = items
 
         self.standard_value_item = ""
@@ -129,7 +129,7 @@ class StandardListTableCreator(SQLTable):
     def sql_table(self):
         _field_list = self.columns
         _joined_field_list = ", \n".join(_field_list)
-        _text = f'{self.table_prefix} (\n{_joined_field_list}\n);\n{self.table_suffix}\n'
+        _text = f'{self.table_prefix} (\n{_joined_field_list}\n)\n{self.table_suffix}\n'
         _commands = self.insert_commands()
         for _command in _commands:
             _text += _command
@@ -141,7 +141,7 @@ class StandardListTableCreator(SQLTable):
         for x in self.items:
             _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode, "
                              f"HistoryUser) "
-                             f"VALUES ('{strip_non_letters(x.value_name)}', '{x.numeric_code}', 'db_build');\n")
+                             f"VALUES ('{clean_text_values(x.value_name)}', '{x.numeric_code}', 'db_build');\n")
 
         return _commands
 

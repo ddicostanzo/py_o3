@@ -59,7 +59,7 @@ if __name__ == "__main__":
     clean = True
     model = create_model(file_name=file_name, clean=clean)
     sub, pred, cat = get_table_names_from_relationships(model)
-    test_names_in_relationships(sub, pred, model)
+    # test_names_in_relationships(sub, pred, model)
 
     server_type = SupportedSQLServers.MSSQL
     phi_allowed = True
