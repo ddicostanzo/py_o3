@@ -88,7 +88,7 @@ class AttributeToSQLColumn:
 
     def __set_standard_values_data_type(self):
         if len(self.attribute.standard_values_list) > 0:
-            self.column_data_type = "Integer"
+            self.column_data_type = "String"
 
     def __set_empty_value_types(self):
         if self.attribute.value_data_type == "":
