@@ -4,14 +4,17 @@ import warnings
 
 
 class O3Attribute(O3Element):
-    def __init__(self, item_dict, **kwargs):
+    def __init__(self, key_element, item_dict, **kwargs):
 
         super().__init__(item_dict)
 
+        self.key_element = key_element
         self.__possible_value_data_types = ['Boolean', 'Binary', 'Date', 'Decimal', 'Integer', 'String']
         self.value_data_type = item_dict['ValueDataType']
         self.standard_values_use = item_dict['StandardValuesUse']
-        self.standard_values_list = [O3StandardValue(x) for x in item_dict['StandardValuesList']]
+        self.standard_values_list = [O3StandardValue(self.key_element,
+                                                     self,
+                                                     x) for x in item_dict['StandardValuesList']]
         self.reference_system_for_values = item_dict['ReferenceSystemForValues']
         self.allow_null_values = item_dict['AllowNullValues']
         self.value_example = item_dict['ValueExample']

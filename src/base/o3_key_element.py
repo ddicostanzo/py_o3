@@ -25,7 +25,7 @@ class O3KeyElement(O3Element):
 
         self.list_attributes = []
         for this_attr in item_dict['list_attributes']:
-            self.list_attributes.append(O3Attribute(this_attr, **kwargs))
+            self.list_attributes.append(O3Attribute(self, this_attr, **kwargs))
 
         self.dictionary_attributes = {x.value_name: x for x in self.list_attributes}
 

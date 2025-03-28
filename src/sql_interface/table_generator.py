@@ -1,3 +1,4 @@
+from base.o3_standard_value import O3StandardValue
 from helpers.string_helpers import clean_table_and_column_names, clean_text_values
 from src.base.o3_key_element import O3KeyElement
 from src.helpers.enums import SupportedSQLServers
@@ -94,36 +95,36 @@ class KeyElementTableCreator(SQLTable):
 
 
 class StandardListTableCreator(SQLTable):
-    def __init__(self, sql_server_type, title, items: list):
+    def __init__(self, sql_server_type, title, items: list[O3StandardValue]):
         super().__init__(sql_server_type)
 
         self.table_name = clean_table_and_column_names(title)
         self.items = items
 
-        self.standard_value_item = ""
         if self.sql_server_type == SupportedSQLServers.MSSQL:
+            self.key_element = "KeyElement varchar(max) NOT NULL"
+            self.attribute = "Attribute varchar(max) NOT NULL"
             self.standard_value_item = "StandardValueItemName varchar(max) NOT NULL"
-        else:
-            self.standard_value_item = "StandardValueItemName text NOT NULL"
-
-        self.numeric_code = ""
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
             self.numeric_code = "NumericCode varchar(max) NOT NULL"
-        else:
-            self.numeric_code = "NumericCode text NOT NULL"
-
-        self.active_flag = ""
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
             self.active_flag = "ActiveFlag bit NOT NULL DEFAULT 1"
+            self.unique_constraint = "CONSTRAINT AK_NumericCode Unique(NumericCode)"
         else:
+            self.key_element = "KeyElement text NOT NULL"
+            self.attribute = "Attribute text NOT NULL"
+            self.standard_value_item = "StandardValueItemName text NOT NULL"
+            self.numeric_code = "NumericCode text NOT NULL"
             self.active_flag = "ActiveFlag boolean NOT NULL DEFAULT 1"
+            self.unique_constraint = "Unique(NumericCode)"
 
         self.columns = [self.identity_column,
+                        self.key_element,
+                        self.attribute,
                         self.standard_value_item,
                         self.numeric_code,
                         self.active_flag,
                         self.history_user_column,
                         self.history_timestamp_column,
+                        self.unique_constraint
                         ]
 
     def sql_table(self):
@@ -139,11 +140,17 @@ class StandardListTableCreator(SQLTable):
         _commands = []
 
         for x in self.items:
-            _commands.append(f"INSERT INTO {self.table_name} (StandardValueItemName, NumericCode, "
-                             f"HistoryUser) "
-                             f"VALUES ('{clean_text_values(x.value_name)}', '{x.numeric_code}', 'db_build');\n")
+            _commands.append(f"INSERT INTO {self.table_name} (KeyElement, Attribute, StandardValueItemName, "
+                             f"NumericCode, HistoryUser) "
+                             f"VALUES ('{x.key_element.string_code}', '{x.attribute.string_code}', "
+                             f"{clean_text_values(x.value_name)}', '{x.numeric_code}', 'db_creation');\n")
 
         return _commands
+
+
+class LookupTableCreator(StandardListTableCreator):
+    def __init__(self, sql_server_type, items: list[O3StandardValue]):
+        super().__init__(sql_server_type, "StandardValuesLookup", items)
 
 
 if __name__ == "__main__":

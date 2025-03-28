@@ -1,22 +1,48 @@
 from api.data_model import O3DataModel
-from src.sql_interface.table_generator import KeyElementTableCreator, StandardListTableCreator
+from src.sql_interface.table_generator import KeyElementTableCreator, StandardListTableCreator, LookupTableCreator
 from src.sql_interface.foreign_keys import ForeignKeysConstraints
 from src.helpers.enums import SupportedSQLServers
 
 
-def create_model(file_name, clean):
-    return O3DataModel(file_name, clean=clean)
-
-
-def create_tables(model, server_type, phi_allowed):
-    tables = {}
+def create_key_element_tables(model: O3DataModel,
+                              server_type: SupportedSQLServers,
+                              phi_allowed: bool):
+    _tables: dict = {}
     for table_name, data in model.key_elements.items():
-        tables[table_name] = KeyElementTableCreator(server_type, data).sql_table(phi_allowed=phi_allowed)
+        _tables[table_name] = KeyElementTableCreator(server_type, data).sql_table(phi_allowed=phi_allowed)
 
+    return _tables
+
+
+def create_individual_standard_value_tables(model: O3DataModel,
+                                            server_type: SupportedSQLServers,):
+
+    _tables: dict = {}
     for table_name, data in model.standard_value_lists.items():
-        tables[table_name] = StandardListTableCreator(server_type, table_name, data).sql_table()
+        _tables[table_name] = StandardListTableCreator(server_type, table_name, data).sql_table()
+
+    return _tables
+
+
+def create_standard_value_lookup_table(model: O3DataModel,
+                                       server_type: SupportedSQLServers):
+
+    items: list = []
+    for _, values in model.standard_value_lists.items():
+        items.extend(values)
+
+    return {'StandardValueLookup': LookupTableCreator(server_type, items).sql_table()}
+
+
+def create_tables(model: O3DataModel, server_type: SupportedSQLServers, phi_allowed: bool):
+    tables = create_key_element_tables(model, server_type, phi_allowed)
+    tables.update(create_standard_value_lookup_table(model, server_type))
 
     return tables
+
+
+def create_model(file_name, clean):
+    return O3DataModel(file_name, clean=clean)
 
 
 def get_table_names_from_relationships(model):
