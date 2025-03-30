@@ -1,3 +1,4 @@
+from __future__ import annotations
 from collections.abc import Iterator
 
 from base.o3_attribute import O3Attribute
@@ -18,7 +19,7 @@ class O3DataModel:
     The O3 data model that is instantiated by a JSON schema
     that can be downloaded from: https://aapmbdsc.azurewebsites.net/
     """
-    def __init__(self, json_file, **kwargs):
+    def __init__(self, json_file: str, **kwargs):
         """
         The constructor of this class that takes the JSON file.
 

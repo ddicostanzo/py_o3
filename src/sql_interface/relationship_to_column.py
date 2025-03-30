@@ -1,3 +1,4 @@
+from __future__ import annotations
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from src.helpers.test_sql_server_type import check_sql_server_type
 from src.helpers.enums import SupportedSQLServers
@@ -6,14 +7,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.base.o3_relationship import O3Relationship
-    from src.helpers.enums import SupportedSQLServers
 
 
 class ChildRelationshipToColumn:
     """
     The Child Relationship column adds the primary key from the predicate element to the subject element's table.
     """
-    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers):
+    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
         """
         Instantiates a child relationship column using the relationship and SQL server type.
 
@@ -72,7 +72,7 @@ class ChildRelationshipToColumn:
 
 
 class InstanceRelationshipToColumn:
-    def __init__(self, relationship, sql_server_type):
+    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
         super().__init__()
         if not check_sql_server_type(sql_server_type):
             raise Exception("Unsupported SQL Server Type")

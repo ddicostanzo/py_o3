@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from src.base.o3_standard_value import O3StandardValue
 from src.base.o3_element import O3Element
 import warnings
@@ -11,7 +13,7 @@ class O3Attribute(O3Element):
     """
     The O3 Attribute class that manages the individual attributes for each element.
     """
-    def __init__(self, key_element: O3KeyElement, item_dict: dict, **kwargs):
+    def __init__(self, key_element: "O3KeyElement", item_dict: dict, **kwargs):
         """
         Instantiates an O3Attribute object using the parent key element and dictionary containing the attribute.
 
@@ -27,16 +29,16 @@ class O3Attribute(O3Element):
         """
         super().__init__(item_dict)
 
-        self.key_element = key_element
-        self.__possible_value_data_types = ['Boolean', 'Binary', 'Date', 'Decimal', 'Integer', 'String']
-        self.value_data_type = item_dict['ValueDataType']
-        self.standard_values_use = item_dict['StandardValuesUse']
-        self.standard_values_list = [O3StandardValue(self.key_element,
-                                                     self,
-                                                     x) for x in item_dict['StandardValuesList']]
-        self.reference_system_for_values = item_dict['ReferenceSystemForValues']
-        self.allow_null_values = item_dict['AllowNullValues']
-        self.value_example = item_dict['ValueExample']
+        self.key_element: "O3KeyElement" = key_element
+        self.__possible_value_data_types: list[str] = ['Boolean', 'Binary', 'Date', 'Decimal', 'Integer', 'String']
+        self.value_data_type: str = item_dict['ValueDataType']
+        self.standard_values_use: str = item_dict['StandardValuesUse']
+        self.standard_values_list: list[O3StandardValue] = [O3StandardValue(self.key_element,
+                                                            self,
+                                                            x) for x in item_dict['StandardValuesList']]
+        self.reference_system_for_values: str = item_dict['ReferenceSystemForValues']
+        self.allow_null_values: str = item_dict['AllowNullValues']
+        self.value_example: str = item_dict['ValueExample']
 
         if kwargs.get('clean', True):
             self.__check_reference_system(item_dict)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
@@ -11,7 +12,7 @@ class ForeignKeysConstraints:
     """
     The class to instantiate foreign keys constraints.
     """
-    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers):
+    def __init__(self, relationship: "O3Relationship", sql_server_type: "SupportedSQLServers"):
         """
         Instantiate foreign keys constraints from an O3 relationship.
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import warnings
 
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
@@ -14,7 +15,7 @@ class AttributeToSQLColumn:
     """
     The class that handles conversion of O3 attributes to SQL columns.
     """
-    def __init__(self, attribute: O3Attribute, phi_allowed: bool, sql_server_type: SupportedSQLServers):
+    def __init__(self, attribute: "O3Attribute", phi_allowed: bool, sql_server_type: SupportedSQLServers):
         """
         Instantiates the object that will convert the Attribute to a SQL column.
 
@@ -186,8 +187,7 @@ class AttributeToSQLColumn:
         for _method in self.__set_data_type_methods:
             _method()
             if self.column_data_type is not None:
-                raise KeyError(f"No data type for the attribute: {self.attribute} of type: "
-                               f"{self.attribute.value_data_type} is available.")
+                break
 
 
 if __name__ == "__main__":

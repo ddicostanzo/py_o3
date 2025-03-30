@@ -218,8 +218,8 @@ def write_sql_to_text(file_location: str, commands: list[str], **kwargs) -> None
     -------
     None
     """
-    for command in commands:
-        with open(file_location, kwargs.get('write_mode', 'a')) as file:
+    with open(file_location, kwargs.get('write_mode', 'a')) as file:
+        for command in commands:
             file.writelines(command)
 
 
@@ -236,8 +236,10 @@ if __name__ == "__main__":
     tables = create_tables(o3_model, sql_server_type, is_phi_allowed)
     fk_commands = foreign_key_constraints(o3_model, sql_server_type)
 
-    location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
-    write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w+')
+    # location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
+    location = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
+
+    write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
     write_sql_to_text(location, fk_commands, write_mode='a')
 
     print()

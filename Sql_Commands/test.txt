@@ -1024,6 +1024,7 @@ PERIOD FOR SYSTEM_TIME(ValidFrom, ValidTo),
 CONSTRAINT AK_NumericCode Unique(NumericCode)
 )
 WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.StandardValuesLookupHistory));
+
 INSERT INTO StandardValuesLookup (KeyElement, Attribute, StandardValueItemName, NumericCode, HistoryUser) VALUES ('Patient', 'Patient_CauseOfDeathAttribution', Unknown', 'O3_0010090_00001', 'db_creation');
 INSERT INTO StandardValuesLookup (KeyElement, Attribute, StandardValueItemName, NumericCode, HistoryUser) VALUES ('Patient', 'Patient_CauseOfDeathAttribution', Probably Related', 'O3_0010090_00002', 'db_creation');
 INSERT INTO StandardValuesLookup (KeyElement, Attribute, StandardValueItemName, NumericCode, HistoryUser) VALUES ('Patient', 'Patient_CauseOfDeathAttribution', Definitely Related', 'O3_0010090_00003', 'db_creation');

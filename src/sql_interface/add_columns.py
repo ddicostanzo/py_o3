@@ -1,3 +1,4 @@
+from __future__ import annotations
 from src.helpers.test_sql_server_type import check_sql_server_type
 from src.sql_interface.sql_type_from_o3_data_type import sql_data_types
 
@@ -8,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def add_column_sql_command(table: str, column_name: str, column_type: str,
-                           nullable: bool, sql_server_type: SupportedSQLServers) -> str:
+                           nullable: bool, sql_server_type: "SupportedSQLServers") -> str:
     """
     Creates the SQL command to add a column to a table.
 
@@ -45,7 +46,7 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
     return _statement
 
 
-def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: SupportedSQLServers) -> str:
+def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: "SupportedSQLServers") -> str:
     """
     Creates the SQL command to add a foreign key column to a table.
 
