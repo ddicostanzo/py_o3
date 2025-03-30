@@ -228,7 +228,7 @@ if __name__ == "__main__":
     o3_schema = './Resources/O3_20250128.json'
     clean_file = True
     o3_model = create_model(file_location=o3_schema, clean=clean_file)
-    sub, pred, cat = get_table_names_from_relationships(o3_model)
+    # sub, pred, cat = get_table_names_from_relationships(o3_model)
     # test_names_in_relationships(sub, pred, model)
 
     sql_server_type = SupportedSQLServers.MSSQL
