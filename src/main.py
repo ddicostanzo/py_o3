@@ -176,13 +176,51 @@ def test_names_in_relationships(subject: str, predicate: str, model: O3DataModel
             print(f"String Code {ke.string_code} not in predicate table")
 
 
-def foreign_key_constraints(model: O3DataModel, sql_type: SupportedSQLServers):
+def foreign_key_constraints(model: O3DataModel, sql_type: SupportedSQLServers) -> list[str]:
+    """
+    Generates foreign key constraints from the data model using Child Of relationships
+
+    Parameters
+    ----------
+    model: O3DataModel
+        the data model to accrue the relationships from
+    sql_type: SupportedSQLServers
+        the sql server type to create the commands for
+
+    Returns
+    -------
+    list[str]
+        A list of the foreign key constraints as SQL commands
+    """
     _commands = []
     for _, ke in model.key_elements.items():
         for rel in ke.child_of_relationships:
             _commands.append(ForeignKeysConstraints(rel, sql_type).column_creation_text)
 
     return _commands
+
+
+def write_sql_to_text(file_location: str, commands: list[str], **kwargs) -> None:
+    """
+    Writes the SQL command to text file
+
+    Parameters
+    ----------
+    file_location: str
+        The file location to write the SQL command to
+    commands: list[str]
+        The SQL commands to write
+    kwargs
+        write_mode: str
+            The open function mode to use. Defaults to 'a' if not provided
+
+    Returns
+    -------
+    None
+    """
+    for command in commands:
+        with open(file_location, kwargs.get('write_mode', 'a')) as file:
+            file.writelines(command)
 
 
 if __name__ == "__main__":
@@ -199,14 +237,8 @@ if __name__ == "__main__":
     fk_commands = foreign_key_constraints(o3_model, sql_server_type)
 
     location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
-    for k, v in tables.items():
-        with open(location, 'a') as file:
-            file.writelines(v)
-            file.writelines('\n')
-
-    for com in fk_commands:
-        with open(location, 'a') as file:
-            file.write(com)
+    write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w+')
+    write_sql_to_text(location, fk_commands, write_mode='a')
 
     print()
 
