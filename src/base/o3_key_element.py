@@ -4,8 +4,11 @@ from base.o3_relationship import O3Relationship
 
 
 class O3KeyElement(O3Element):
-
-    def __init__(self, item_dict, **kwargs):
+    """
+    The Key Element class. Instantiates an object using the parsed JSON dictionary. Will create attributes
+    and relationships.
+    """
+    def __init__(self, item_dict: dict, **kwargs):
         """
         Instantiation of the O3 Key Element class
 
@@ -37,9 +40,23 @@ class O3KeyElement(O3Element):
 
     def __str__(self):
         return self.key_element_name
+
+    def __repr__(self):
+        return (f"Value Name: {self.key_element_name}, Value Type: {self.value_type}, "
+                f"String Code: {self.string_code}, Numeric Code: {self.numeric_code}, "
+                f"ValuePriority: {self.value_priority}")
     
     @property
     def child_of_relationships(self):
+        """
+        The relationships of this Key Element where the subject element matches this string code and the
+        relationship category is "ChildElement-Of".
+
+        Returns
+        -------
+            list[O3Relationship]
+                The child of relationships for this key element
+        """
         _child_of_relationships = []
         for this_relationship in self.relationships:
             if this_relationship.relationship_category == "ChildElement-Of":
@@ -50,6 +67,15 @@ class O3KeyElement(O3Element):
 
     @property
     def instance_of_relationships(self):
+        """
+        The relationships of this Key Element where the subject element matches this string code and the
+        relationship category is "InstanceAssociated-with".
+
+        Returns
+        -------
+            list[O3Relationship]
+                the InstanceAssociated-with relationships for this key element
+        """
         _instance_of_relationships = []
         for this_relationship in self.relationships:
             if this_relationship.relationship_category == "InstanceAssociated-with":

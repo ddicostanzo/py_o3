@@ -21,7 +21,5 @@ class SQLColumnDataTypes(Enum):
     String = 6
 
 
-
-
 if __name__ == "__main__":
     pass

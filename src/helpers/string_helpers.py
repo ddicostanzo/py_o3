@@ -1,8 +1,8 @@
 import re
 
 
-def clean_table_and_column_names(text):
-    """Removes all non-letter characters from a string.
+def leave_only_letters_numbers_or_underscore(text):
+    """Removes characters that are not letters, numbers, or an underscore from a string.
 
     Args:
       text: The input string.
@@ -13,8 +13,8 @@ def clean_table_and_column_names(text):
     return re.sub(r'[^a-zA-Z0-9_]', '', text)
 
 
-def clean_text_values(text):
-    """Removes all non-letter characters from a string.
+def leave_letters_numbers_spaces_underscores_dashes(text):
+    """Removes characters not in letters, numbers, space, underscore, or dash from a string.
 
     Args:
       text: The input string.

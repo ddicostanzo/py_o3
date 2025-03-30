@@ -1,8 +1,35 @@
 from src.helpers.test_sql_server_type import check_sql_server_type
 from src.sql_interface.sql_type_from_o3_data_type import sql_data_types
 
+from typing import TYPE_CHECKING
 
-def add_column_sql_command(table, column_name, column_type, nullable, sql_server_type):
+if TYPE_CHECKING:
+    from src.helpers.enums import SupportedSQLServers
+
+
+def add_column_sql_command(table: str, column_name: str, column_type: str,
+                           nullable: bool, sql_server_type: SupportedSQLServers) -> str:
+    """
+    Creates the SQL command to add a column to a table.
+
+    Parameters
+    ----------
+    table: str
+        the table name
+    column_name: str
+        the column name
+    column_type: str
+        the column type
+    nullable: bool
+        whether the column is nullable
+    sql_server_type: SupportedSQLServers
+        the SQL server type
+
+    Returns
+    -------
+        str
+            the alter table command to add a column to a table
+    """
     if not check_sql_server_type(sql_server_type):
         raise Exception("Unsupported SQL Server Type")
 
@@ -18,7 +45,24 @@ def add_column_sql_command(table, column_name, column_type, nullable, sql_server
     return _statement
 
 
-def add_foreign_key_column_sql_command(table, column_name, sql_server_type):
+def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: SupportedSQLServers) -> str:
+    """
+    Creates the SQL command to add a foreign key column to a table.
+
+    Parameters
+    ----------
+    table: str
+        the table name to add a foreign key column
+    column_name: str
+        the column name
+    sql_server_type: SupportedSQLServers
+        the SQL server type
+
+    Returns
+    -------
+        str
+            the alter table command to add a foreign key column to a table
+    """
     if not check_sql_server_type(sql_server_type):
         raise Exception("Unsupported SQL Server Type")
 

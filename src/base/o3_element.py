@@ -1,5 +1,16 @@
 class O3Element:
-    def __init__(self, item_dict):
+    """
+    The base class for O3 key elements and attributes.
+    """
+    def __init__(self, item_dict: dict):
+        """
+        Instantiates the O3 Element using the parsed JSON file's dictionary of data
+
+        Parameters
+        ----------
+        item_dict: dict
+            The JSON dictionary containing the O3 element data.
+        """
         self.value_name = item_dict['ValueName']
         self.value_type = item_dict['ValueType']
         self.string_code = item_dict['StringCode']
@@ -13,6 +24,10 @@ class O3Element:
 
     def __str__(self):
         return self.value_name
+
+    def __repr__(self):
+        return (f"Value Name: {self.value_name}, Value Type: {self.value_type}, String Code: {self.string_code}, "
+                f"Numeric Code: {self.numeric_code}, ValuePriority: {self.value_priority}")
 
 
 if __name__ == "__main__":

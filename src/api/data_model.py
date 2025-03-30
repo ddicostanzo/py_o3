@@ -5,6 +5,13 @@ from src.base.o3_key_element import O3KeyElement
 import json
 import pathlib
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.base.o3_key_element import O3KeyElement
+    from base.o3_standard_value import O3StandardValue
+    from pathlib import Path
+
 
 class O3DataModel:
     """
@@ -26,7 +33,7 @@ class O3DataModel:
         """
         super().__init__()
 
-        path = pathlib.Path.joinpath(pathlib.Path.cwd(), json_file)
+        path: Path = pathlib.Path.joinpath(pathlib.Path.cwd(), json_file)
         path.absolute()
 
         if not path.exists():
@@ -35,15 +42,15 @@ class O3DataModel:
         if not path.is_file():
             raise TypeError(f"Is not a file: {path}")
 
-        self.json_file = path
-        self.json_obj = None
-        self.key_elements = {}
-        self.__standard_value_lists = {}
-        self.__value_data_types = set()
-        self.__sql_data_types = set()
-        self.__value_priority = set()
+        self.json_file: Path = path
+        self.json_obj: dict = {}
+        self.key_elements: dict[str, O3KeyElement] = {}
+        self.__standard_value_lists: dict[str, list[O3StandardValue]] = {}
+        self.__value_data_types: set[str] = set()
+        self.__sql_data_types: set[str] = set()
+        self.__value_priority: set[str] = set()
         self.__reference_system_for_standard_values = set()
-        self.__allow_nulls = set()
+        self.__allow_nulls: set[str] = set()
 
         self.__json_to_dictionary()
         self.__create_key_elements(**kwargs)
@@ -191,7 +198,7 @@ class O3DataModel:
         self.__read_property_from_attribute(self.__allow_nulls, 'allow_null_values')
 
     @property
-    def standard_value_lists(self) -> dict[str, list[str]]:
+    def standard_value_lists(self) -> dict[str, list[O3StandardValue]]:
         """
         Retrieves all standard value lists for the model in a dictionary
 
