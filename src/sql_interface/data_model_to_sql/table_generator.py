@@ -3,8 +3,8 @@ from __future__ import annotations
 from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
                                     leave_letters_numbers_spaces_underscores_dashes)
 from src.helpers.enums import SupportedSQLServers
-from src.sql_interface.attribute_to_column import AttributeToSQLColumn
-from src.sql_interface.relationship_to_column import ChildRelationshipToColumn, InstanceRelationshipToColumn
+from sql_interface.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
+from sql_interface.data_model_to_sql.relationship_to_column import ChildRelationshipToColumn, InstanceRelationshipToColumn
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
@@ -250,12 +250,14 @@ class StandardListTableCreator(SQLTable):
         self.items = items
 
         if self.sql_server_type == SupportedSQLServers.MSSQL:
-            self.key_element = "KeyElement varchar(max) NOT NULL"
-            self.attribute = "Attribute varchar(max) NOT NULL"
-            self.standard_value_item = "StandardValueItemName varchar(max) NOT NULL"
-            self.numeric_code = "NumericCode varchar(max) NOT NULL"
+            self.key_element = "KeyElement varchar(256) NOT NULL"
+            self.attribute = "Attribute varchar(256) NOT NULL"
+            self.standard_value_item = "StandardValueItemName varchar(256) NOT NULL"
+            self.numeric_code = "NumericCode varchar(32) NOT NULL"
             self.active_flag = "ActiveFlag bit NOT NULL DEFAULT 1"
             self.unique_constraint = "CONSTRAINT AK_NumericCode Unique(NumericCode)"
+            self.index = (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {self.table_name} "
+                          f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
         else:
             self.key_element = "KeyElement text NOT NULL"
             self.attribute = "Attribute text NOT NULL"
@@ -263,6 +265,8 @@ class StandardListTableCreator(SQLTable):
             self.numeric_code = "NumericCode text NOT NULL"
             self.active_flag = "ActiveFlag boolean NOT NULL DEFAULT 1"
             self.unique_constraint = "Unique(NumericCode)"
+            self.index = (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {self.table_name} "
+                          f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
 
         self.columns = [self.identity_column,
                         self.key_element,
@@ -302,13 +306,13 @@ class StandardListTableCreator(SQLTable):
             list[str]
                 the commands used to insert values into the table
         """
-        _commands = []
+        _commands = [self.index]
 
         for x in self.items:
             _commands.append(f"INSERT INTO {self.table_name} (KeyElement, Attribute, StandardValueItemName, "
                              f"NumericCode, HistoryUser) "
                              f"VALUES ('{x.key_element.string_code}', '{x.attribute.string_code}', "
-                             f"{leave_letters_numbers_spaces_underscores_dashes(x.value_name)}', "
+                             f"'{leave_letters_numbers_spaces_underscores_dashes(x.value_name)}', "
                              f"'{x.numeric_code}', 'db_creation');\n")
 
         _commands += "\n"

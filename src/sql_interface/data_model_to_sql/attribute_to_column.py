@@ -2,7 +2,7 @@ from __future__ import annotations
 import warnings
 
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from src.sql_interface.sql_type_from_o3_data_type import sql_data_types
+from sql_interface.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 from src.helpers.enums import SupportedSQLServers
 
 from typing import TYPE_CHECKING
@@ -167,7 +167,7 @@ class AttributeToSQLColumn:
 
     def __set_bool_data_type(self) -> None:
         """
-        If the the attribute value data type is set to Boolean, set the column_data_type to Boolean
+        If the attribute value data type is set to Boolean, set the column_data_type to Boolean
         """
         if "boolean" == self.attribute.value_data_type.lower():
             self.column_data_type = "Boolean"

@@ -1,6 +1,6 @@
 from api.data_model import O3DataModel
-from src.sql_interface.table_generator import KeyElementTableCreator, StandardListTableCreator, LookupTableCreator
-from src.sql_interface.foreign_keys import ForeignKeysConstraints
+from sql_interface.data_model_to_sql.table_generator import KeyElementTableCreator, StandardListTableCreator, LookupTableCreator
+from sql_interface.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 from src.helpers.enums import SupportedSQLServers
 
 
@@ -236,8 +236,8 @@ if __name__ == "__main__":
     tables = create_tables(o3_model, sql_server_type, is_phi_allowed)
     fk_commands = foreign_key_constraints(o3_model, sql_server_type)
 
-    # location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
-    location = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
+    location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
+    # location = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
 
     write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
     write_sql_to_text(location, fk_commands, write_mode='a')
