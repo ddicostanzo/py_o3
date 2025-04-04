@@ -1,5 +1,6 @@
 from api.data_model import O3DataModel
-from sql_interface.data_model_to_sql.table_generator import KeyElementTableCreator, StandardListTableCreator, LookupTableCreator
+from sql_interface.data_model_to_sql.table_generator import KeyElementTableCreator, StandardListTableCreator, \
+    LookupTableCreator, PatientIdentifierHash
 from sql_interface.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 from src.helpers.enums import SupportedSQLServers
 
@@ -56,7 +57,7 @@ def create_individual_standard_value_tables(model: O3DataModel,
 
 
 def create_standard_value_lookup_table(model: O3DataModel,
-                                       sql_type: SupportedSQLServers) -> dict:
+                                       sql_type: SupportedSQLServers) -> LookupTableCreator:
 
     """
     Creates a single table for the standard value lists that acts as a lookup table
@@ -76,7 +77,7 @@ def create_standard_value_lookup_table(model: O3DataModel,
     for _, values in model.standard_value_lists.items():
         items.extend(values)
 
-    return {'StandardValueLookup': LookupTableCreator(sql_type, items).sql_table()}
+    return LookupTableCreator(sql_type, items)
 
 
 def create_tables(model: O3DataModel, sql_type: SupportedSQLServers, phi_allowed: bool) -> dict:
@@ -100,8 +101,6 @@ def create_tables(model: O3DataModel, sql_type: SupportedSQLServers, phi_allowed
 
     """
     _tables = create_key_element_tables(model, sql_type, phi_allowed)
-    _tables.update(create_standard_value_lookup_table(model, sql_type))
-
     return _tables
 
 
@@ -225,21 +224,31 @@ def write_sql_to_text(file_location: str, commands: list[str], **kwargs) -> None
 
 if __name__ == "__main__":
 
-    o3_schema = './Resources/O3_20250128.json'
-    clean_file = True
-    o3_model = create_model(file_location=o3_schema, clean=clean_file)
+    o3_schema: str = './Resources/O3_20250128.json'
+    clean_file: bool = True
+    o3_model: O3DataModel = create_model(file_location=o3_schema, clean=clean_file)
     # sub, pred, cat = get_table_names_from_relationships(o3_model)
     # test_names_in_relationships(sub, pred, model)
 
-    sql_server_type = SupportedSQLServers.MSSQL
-    is_phi_allowed = True
-    tables = create_tables(o3_model, sql_server_type, is_phi_allowed)
-    fk_commands = foreign_key_constraints(o3_model, sql_server_type)
+    sql_server_type: SupportedSQLServers = SupportedSQLServers.MSSQL
+    is_phi_allowed: bool = True
+    tables: dict[str, str] = create_tables(o3_model, sql_server_type, is_phi_allowed)
 
-    location = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
-    # location = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
+    lookup_table: LookupTableCreator = create_standard_value_lookup_table(o3_model, sql_server_type)
+    tables['StandardValueLookup'] = lookup_table.sql_table()
+
+    patient_id_hash: PatientIdentifierHash = PatientIdentifierHash(sql_server_type, "PatientIdentifierHash")
+    tables['PatientIdentifierHash'] = patient_id_hash.sql_table()
+
+    insert_commands: list[str] = lookup_table.insert_commands()
+    fk_commands: list[str] = foreign_key_constraints(o3_model, sql_server_type)
+    fk_commands.append(patient_id_hash.foreign_key)
+
+    location: str = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
+    # location: str = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
 
     write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
+    write_sql_to_text(location, insert_commands, write_mode='a')
     write_sql_to_text(location, fk_commands, write_mode='a')
 
     print()

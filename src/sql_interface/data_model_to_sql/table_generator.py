@@ -4,7 +4,8 @@ from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
                                     leave_letters_numbers_spaces_underscores_dashes)
 from src.helpers.enums import SupportedSQLServers
 from sql_interface.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
-from sql_interface.data_model_to_sql.relationship_to_column import ChildRelationshipToColumn, InstanceRelationshipToColumn
+from sql_interface.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
+                                                                    InstanceRelationshipToColumn)
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
@@ -28,6 +29,7 @@ class SQLTable:
         sql_server_type: SupportedSQLServers
             the SQL server type to use
         """
+
         if not check_sql_server_type(sql_server_type):
             raise Exception("Unsupported SQL Server Type")
 
@@ -227,7 +229,30 @@ class KeyElementTableCreator(SQLTable):
         return _text
 
 
-class StandardListTableCreator(SQLTable):
+class CustomTable(SQLTable):
+    def __init__(self, sql_server_type: SupportedSQLServers, title: str, static_columns: dict[str, str]):
+        super().__init__(sql_server_type)
+        self.table_name = leave_only_letters_numbers_or_underscore(title)
+        self.static_columns = static_columns
+
+    def sql_table(self) -> str:
+        """
+        The SQL command text to generate the table on a server.
+
+        Returns
+        -------
+            str
+                the full SQL command text to generate the table for the standard value lists including inserting
+                the appropriate values
+        """
+        _field_list = self.columns
+        _joined_field_list = ", \n".join(_field_list)
+        _text = f'{self.table_prefix} (\n{_joined_field_list}\n)\n{self.table_suffix}\n'
+
+        return _text
+
+
+class StandardListTableCreator(CustomTable):
     """
     Base class to create Standard List tables
     """
@@ -244,58 +269,45 @@ class StandardListTableCreator(SQLTable):
         items: list[O3StandardValue]
             the items to include in the table
         """
-        super().__init__(sql_server_type)
 
-        self.table_name = leave_only_letters_numbers_or_underscore(title)
-        self.items = items
+        table_name = leave_only_letters_numbers_or_underscore(title)
 
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            self.key_element = "KeyElement varchar(256) NOT NULL"
-            self.attribute = "Attribute varchar(256) NOT NULL"
-            self.standard_value_item = "StandardValueItemName varchar(256) NOT NULL"
-            self.numeric_code = "NumericCode varchar(32) NOT NULL"
-            self.active_flag = "ActiveFlag bit NOT NULL DEFAULT 1"
-            self.unique_constraint = "CONSTRAINT AK_NumericCode Unique(NumericCode)"
-            self.index = (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {self.table_name} "
+        if sql_server_type == SupportedSQLServers.MSSQL:
+            static_columns = {
+                "key_element": "KeyElement varchar(256) NOT NULL",
+                "attribute": "Attribute varchar(256) NOT NULL",
+                "standard_value_item": "StandardValueItemName varchar(256) NOT NULL",
+                "numeric_code": "NumericCode varchar(32) NOT NULL",
+                "active_flag": "ActiveFlag bit NOT NULL DEFAULT 1",
+                "unique_constraint": "CONSTRAINT AK_NumericCode Unique(NumericCode)",
+                "index": (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {table_name} "
                           f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
+            }
         else:
-            self.key_element = "KeyElement text NOT NULL"
-            self.attribute = "Attribute text NOT NULL"
-            self.standard_value_item = "StandardValueItemName text NOT NULL"
-            self.numeric_code = "NumericCode text NOT NULL"
-            self.active_flag = "ActiveFlag boolean NOT NULL DEFAULT 1"
-            self.unique_constraint = "Unique(NumericCode)"
-            self.index = (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {self.table_name} "
+            static_columns = {
+                "key_element": "KeyElement text NOT NULL",
+                "attribute": "Attribute text NOT NULL",
+                "standard_value_item": "StandardValueItemName text NOT NULL",
+                "numeric_code": "NumericCode text NOT NULL",
+                "active_flag": "ActiveFlag boolean NOT NULL DEFAULT 1",
+                "unique_constraint": "Unique(NumericCode)",
+                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {self.table_name} "
                           f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
+            }
 
+        super().__init__(sql_server_type, title, static_columns)
+
+        self.items = items
         self.columns = [self.identity_column,
-                        self.key_element,
-                        self.attribute,
-                        self.standard_value_item,
-                        self.numeric_code,
-                        self.active_flag,
+                        self.static_columns["key_element"],
+                        self.static_columns["attribute"],
+                        self.static_columns["standard_value_item"],
+                        self.static_columns["numeric_code"],
+                        self.static_columns["active_flag"],
                         self.history_user_column,
                         self.history_timestamp_column,
-                        self.unique_constraint
+                        self.static_columns["unique_constraint"]
                         ]
-
-    def sql_table(self) -> str:
-        """
-        The SQL command text to generate the table on a server.
-
-        Returns
-        -------
-            str
-                the full SQL command text to generate the table for the standard value lists including inserting
-                the appropriate values
-        """
-        _field_list = self.columns
-        _joined_field_list = ", \n".join(_field_list)
-        _text = f'{self.table_prefix} (\n{_joined_field_list}\n)\n{self.table_suffix}\n'
-        _commands = self.insert_commands()
-        for _command in _commands:
-            _text += _command
-        return _text
 
     def insert_commands(self) -> list[str]:
         """
@@ -306,7 +318,7 @@ class StandardListTableCreator(SQLTable):
             list[str]
                 the commands used to insert values into the table
         """
-        _commands = [self.index]
+        _commands = [self.static_columns["index"]]
 
         for x in self.items:
             _commands.append(f"INSERT INTO {self.table_name} (KeyElement, Attribute, StandardValueItemName, "
@@ -335,6 +347,51 @@ class LookupTableCreator(StandardListTableCreator):
             the items to include in the table
         """
         super().__init__(sql_server_type, "StandardValuesLookup", items)
+
+
+class PatientIdentifierHash(CustomTable):
+    def __init__(self, sql_server_type: SupportedSQLServers, table_name: str):
+        """
+        Instantiates a new Patient Identifier Hash Table Creator class used for generating
+        a table for the mapping MRNs to different anonymized values
+
+        Parameters
+        ----------
+        sql_server_type: SupportedSQLServers
+            the SQL server type to use
+        title: str
+            the table name
+        """
+
+        if sql_server_type == SupportedSQLServers.MSSQL:
+            static_columns = {
+                "PatientId": "PatientId int NOT NULL",
+                "MRN": "MRN varchar(max) NOT NULL",
+                "AnonPatID": "AnonPatID varchar(max) NOT NULL",
+                "SetName": "SetName varchar(max) NOT NULL",
+            }
+        else:
+            static_columns = {
+                "PatientId": "PatientId text NOT NULL",
+                "MRN": "MRN text NOT NULL",
+                "AnonPatID": "AnonPatID text NOT NULL",
+                "SetName": "SetName text NOT NULL",
+            }
+
+        super().__init__(sql_server_type, table_name, static_columns)
+
+        self.columns = [self.identity_column,
+                        self.static_columns["PatientId"],
+                        self.static_columns["MRN"],
+                        self.static_columns["AnonPatID"],
+                        self.static_columns["SetName"],
+                        self.history_user_column,
+                        self.history_timestamp_column,
+                        ]
+        self.foreign_key = (f'ALTER TABLE {self.table_name} '
+                            f'ADD CONSTRAINT fk_{self.table_name}_Patient '
+                            f'FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) '
+                            f'ON DELETE CASCADE ON UPDATE CASCADE;')
 
 
 if __name__ == "__main__":
