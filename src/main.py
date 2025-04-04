@@ -3,8 +3,9 @@ from sql.data_model_to_sql.table_generator import KeyElementTableCreator, Standa
     LookupTableCreator, PatientIdentifierHash
 from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 from src.helpers.enums import SupportedSQLServers
-from sql.sql_connection.mssql_connection import MSSQLConnection
-from helpers.enums import SQLServerConnect
+from sql.connection.mssql import MSSQLConnection
+from helpers.enums import ServerToConnect
+
 
 def create_key_element_tables(model: O3DataModel,
                               sql_type: SupportedSQLServers,
@@ -245,13 +246,15 @@ if __name__ == "__main__":
     fk_commands: list[str] = foreign_key_constraints(o3_model, sql_server_type)
     fk_commands.append(patient_id_hash.foreign_key)
 
-    location: str = 'U:/CodeRepository/Dominic/O3/Sql_Commands/test.txt'
-    # location: str = '/Users/dominicdicostanzo/PycharmProjects/py_o3/Sql_Commands/test.txt'
+    location: str = '../Sql_Commands/test.txt'
 
-    o3_db = MSSQLConnection.create_connection(SQLServerConnect.O3)
+    o3_db = MSSQLConnection.create_connection(ServerToConnect.O3)
     o3_connection = o3_db.connection()
-    aura_db = MSSQLConnection.create_connection(SQLServerConnect.Aura)
-    aura_connection = aura_db.connection()
+    aura_db = MSSQLConnection.create_connection(ServerToConnect.Aura)
+
+    from sql.aria_integration.patient import Patient
+    pat = Patient(aura_db.connection())
+    rows = pat.get_data(100)
 
     # write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
     # write_sql_to_text(location, insert_commands, write_mode='a')

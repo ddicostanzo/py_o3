@@ -21,7 +21,7 @@ class SQLColumnDataTypes(Enum):
     String = 6
 
 
-class SQLServerConnect(Enum):
+class ServerToConnect(Enum):
     """
     Class holds the available servers to connect the software to
     """
