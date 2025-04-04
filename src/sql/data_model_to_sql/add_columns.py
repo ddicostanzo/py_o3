@@ -1,6 +1,6 @@
 from __future__ import annotations
 from src.helpers.test_sql_server_type import check_sql_server_type
-from sql_interface.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
+from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 
 from typing import TYPE_CHECKING
 

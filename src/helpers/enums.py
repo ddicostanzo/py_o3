@@ -21,5 +21,21 @@ class SQLColumnDataTypes(Enum):
     String = 6
 
 
+class SQLServerConnect(Enum):
+    """
+    Class holds the available servers to connect the software to
+    """
+    Aura = 'Aura'
+    O3 = 'O3'
+
+
+class SQLAuthentication(Enum):
+    """
+    Class holds the available authentication types for SQL servers
+    """
+    SQL = 'SQL'
+    Integrated = 'INTEGRATED'
+
+
 if __name__ == "__main__":
     pass

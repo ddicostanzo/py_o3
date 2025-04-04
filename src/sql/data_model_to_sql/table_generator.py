@@ -3,9 +3,9 @@ from __future__ import annotations
 from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
                                     leave_letters_numbers_spaces_underscores_dashes)
 from src.helpers.enums import SupportedSQLServers
-from sql_interface.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
-from sql_interface.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
-                                                                    InstanceRelationshipToColumn)
+from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
+from sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
+                                                          InstanceRelationshipToColumn)
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING

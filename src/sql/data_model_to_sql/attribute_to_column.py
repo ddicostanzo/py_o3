@@ -2,7 +2,7 @@ from __future__ import annotations
 import warnings
 
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from sql_interface.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
+from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 from src.helpers.enums import SupportedSQLServers
 
 from typing import TYPE_CHECKING
