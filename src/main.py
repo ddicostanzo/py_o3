@@ -254,7 +254,9 @@ if __name__ == "__main__":
 
     from sql.aria_integration.patient import Patient
     pat = Patient(aura_db.connection())
-    rows = pat.get_data(100)
+    for row in pat.get_data():
+        print(row)
+        print()
 
     # write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
     # write_sql_to_text(location, insert_commands, write_mode='a')

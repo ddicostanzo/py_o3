@@ -12,11 +12,12 @@ class Patient(Datatable):
     def get_data(self, num_results: int = None):
         with closing(self.connection) as conn:
             cursor = conn.cursor()
-            cursor.execute(self.query)
+
             if num_results is None:
-                rows = cursor.fetchall()
+                for row in cursor.execute(self.query):
+                    yield row
             else:
-                rows = cursor.fetchmany(num_results)
+                rows = cursor.execute(self.query).fetchmany(num_results)
 
         return rows
 
