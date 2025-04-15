@@ -7,9 +7,10 @@ dp.PatientDateOfBirth,
 Year(dp.PatientDateOfBirth) as 'YearOfBirth',
 dp.PatientDeathDate,
 DATEDIFF(day, dp.PatientDateOfBirth, dp.PatientDeathDate) / 365.25 as 'AgeAtDeath',
+dp.Ethnicity,
 race.LookupDescriptionENU as 'Race',
 pat.Sex,
-dp.PatientFullAddress
+dp.PatientDeathCause
 
 FROM DWH.FactPatient fp
 INNER JOIN DWH.DimPatient dp ON dp.DimPatientID = fp.DimPatientID
