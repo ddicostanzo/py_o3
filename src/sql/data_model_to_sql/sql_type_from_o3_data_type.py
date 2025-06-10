@@ -16,6 +16,5 @@ sql_data_types = {SupportedSQLServers.MSSQL: {"Boolean": "bit",
                                              }
                   }
 
-
 if __name__ == "__main__":
     pass

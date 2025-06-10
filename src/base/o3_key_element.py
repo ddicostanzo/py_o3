@@ -8,6 +8,7 @@ class O3KeyElement(O3Element):
     The Key Element class. Instantiates an object using the parsed JSON dictionary. Will create attributes
     and relationships.
     """
+
     def __init__(self, item_dict: dict, **kwargs):
         """
         Instantiation of the O3 Key Element class
@@ -45,7 +46,7 @@ class O3KeyElement(O3Element):
         return (f"Value Name: {self.key_element_name}, Value Type: {self.value_type}, "
                 f"String Code: {self.string_code}, Numeric Code: {self.numeric_code}, "
                 f"ValuePriority: {self.value_priority}")
-    
+
     @property
     def child_of_relationships(self):
         """

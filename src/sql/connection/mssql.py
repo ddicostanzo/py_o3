@@ -1,5 +1,5 @@
 from dotenv import dotenv_values
-from helpers.enums import ServerToConnect, SQLAuthentication
+from src.helpers.enums import ServerToConnect, SQLAuthentication
 import pyodbc
 
 
@@ -7,6 +7,7 @@ class MSSQLConnection:
     """
     Class holds the MS SQL connections for the O3 and Aura databases.
     """
+
     @classmethod
     def create_connection(cls, sql_server: ServerToConnect):
         """

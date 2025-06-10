@@ -5,6 +5,7 @@ from src.base.o3_element import O3Element
 import warnings
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from src.base.o3_key_element import O3KeyElement
 
@@ -13,6 +14,7 @@ class O3Attribute(O3Element):
     """
     The O3 Attribute class that manages the individual attributes for each element.
     """
+
     def __init__(self, key_element: "O3KeyElement", item_dict: dict, **kwargs):
         """
         Instantiates an O3Attribute object using the parent key element and dictionary containing the attribute.
@@ -34,8 +36,8 @@ class O3Attribute(O3Element):
         self.value_data_type: str = item_dict['ValueDataType']
         self.standard_values_use: str = item_dict['StandardValuesUse']
         self.standard_values_list: list[O3StandardValue] = [O3StandardValue(self.key_element,
-                                                            self,
-                                                            x) for x in item_dict['StandardValuesList']]
+                                                                            self,
+                                                                            x) for x in item_dict['StandardValuesList']]
         self.reference_system_for_values: str = item_dict['ReferenceSystemForValues']
         self.allow_null_values: str = item_dict['AllowNullValues']
         self.value_example: str = item_dict['ValueExample']

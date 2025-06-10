@@ -1,5 +1,5 @@
 from pyodbc import Connection
-from sql.aria_integration.queried_datatable import Datatable
+from src.sql.aria_integration.queried_datatable import Datatable
 
 
 class Patient(Datatable):

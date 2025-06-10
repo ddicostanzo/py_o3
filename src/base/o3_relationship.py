@@ -1,8 +1,8 @@
-
 class O3Relationship:
     """
     The O3 relationship class.
     """
+
     def __init__(self, item_dict: dict, **kwargs):
         """
         Instantiates an O3 relationship object.

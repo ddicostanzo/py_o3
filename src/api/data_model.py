@@ -19,6 +19,7 @@ class O3DataModel:
     The O3 data model that is instantiated by a JSON schema
     that can be downloaded from: https://aapmbdsc.azurewebsites.net/
     """
+
     def __init__(self, json_file: str, **kwargs):
         """
         The constructor of this class that takes the JSON file.

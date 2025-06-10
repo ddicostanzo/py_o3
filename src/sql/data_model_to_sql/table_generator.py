@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
-                                    leave_letters_numbers_spaces_underscores_dashes)
+from src.helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
+                                        leave_letters_numbers_spaces_underscores_dashes)
 from src.helpers.enums import SupportedSQLServers
-from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
-from sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
-                                                          InstanceRelationshipToColumn)
+from src.sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
+from src.sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
+                                                              InstanceRelationshipToColumn)
 from src.helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
@@ -20,6 +20,7 @@ class SQLTable:
     The base SQL table class that contains the base properties
     and attributes to use to create the SQL command.
     """
+
     def __init__(self, sql_server_type: SupportedSQLServers):
         """
         Instantiates a new instance of the SQLTable class.
@@ -121,6 +122,7 @@ class KeyElementTableCreator(SQLTable):
     """
     The class that creates a SQL table for an O3 Key Element.
     """
+
     def __init__(self, sql_server_type: SupportedSQLServers, key_element: "O3KeyElement"):
         """
         The instantiation of the Key Element Table Creator class that takes the Key Element and SQL type to use
@@ -256,6 +258,7 @@ class StandardListTableCreator(CustomTable):
     """
     Base class to create Standard List tables
     """
+
     def __init__(self, sql_server_type: SupportedSQLServers, title: str, items: list["O3StandardValue"]):
         """
         Instantiates a new Standard List Table Creator class used for generating a table for the standard value lists
@@ -335,6 +338,7 @@ class LookupTableCreator(StandardListTableCreator):
     """
     An inherited class that generates a single lookup table for all standard value lists.
     """
+
     def __init__(self, sql_server_type: SupportedSQLServers, items: list["O3StandardValue"]):
         """
         Instantiates a new Lookup Table class used for generating a table for the standard value lists

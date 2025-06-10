@@ -12,6 +12,7 @@ class ForeignKeysConstraints:
     """
     The class to instantiate foreign keys constraints.
     """
+
     def __init__(self, relationship: "O3Relationship", sql_server_type: "SupportedSQLServers"):
         """
         Instantiate foreign keys constraints from an O3 relationship.

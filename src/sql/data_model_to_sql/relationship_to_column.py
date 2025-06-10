@@ -1,5 +1,5 @@
 from __future__ import annotations
-from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from src.helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from src.helpers.test_sql_server_type import check_sql_server_type
 from src.helpers.enums import SupportedSQLServers
 
@@ -13,6 +13,7 @@ class ChildRelationshipToColumn:
     """
     The Child Relationship column adds the primary key from the predicate element to the subject element's table.
     """
+
     def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
         """
         Instantiates a child relationship column using the relationship and SQL server type.

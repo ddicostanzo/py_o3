@@ -2,6 +2,7 @@ class O3Element:
     """
     The base class for O3 key elements and attributes.
     """
+
     def __init__(self, item_dict: dict):
         """
         Instantiates the O3 Element using the parsed JSON file's dictionary of data
