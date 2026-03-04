@@ -1,4 +1,6 @@
-DECLARE @mrn nvarchar;
+-- Template query: @mrn must be set before execution.
+-- Example: SET @mrn = 'your_mrn_value';
+DECLARE @mrn nvarchar(50);
 
 SELECT
 

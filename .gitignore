@@ -301,4 +301,16 @@ pyrightconfig.json
 pyvenv.cfg
 pip-selfcheck.json
 
+# Environment variable files (all variants)
+.env.*
+
+# Certificate and key files
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated SQL output
+Sql_Commands/
+
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python,venv

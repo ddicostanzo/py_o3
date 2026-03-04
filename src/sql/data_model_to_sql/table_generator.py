@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from src.helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
-                                        leave_letters_numbers_spaces_underscores_dashes)
-from src.helpers.enums import SupportedSQLServers
-from src.sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
-from src.sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
-                                                              InstanceRelationshipToColumn)
-from src.helpers.test_sql_server_type import check_sql_server_type
+from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
+                                    leave_letters_numbers_spaces_underscores_dashes)
+from helpers.enums import SupportedSQLServers
+from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
+from sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
+                                                          InstanceRelationshipToColumn)
+from helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_key_element import O3KeyElement
+    from base.o3_key_element import O3KeyElement
     from base.o3_standard_value import O3StandardValue
 
 
@@ -32,7 +32,7 @@ class SQLTable:
         """
 
         if not check_sql_server_type(sql_server_type):
-            raise Exception("Unsupported SQL Server Type")
+            raise ValueError("Unsupported SQL Server Type")
 
         self.table_name = None
         self.columns = []
@@ -138,7 +138,7 @@ class KeyElementTableCreator(SQLTable):
         super().__init__(sql_server_type)
 
         self.key_element = key_element
-        self.table_name = self.key_element.string_code.replace(' ', '')
+        self.table_name = leave_only_letters_numbers_or_underscore(self.key_element.string_code)
 
     def _create_attribute_columns(self, phi_allowed: bool) -> None:
         """
@@ -294,7 +294,7 @@ class StandardListTableCreator(CustomTable):
                 "numeric_code": "NumericCode text NOT NULL",
                 "active_flag": "ActiveFlag boolean NOT NULL DEFAULT 1",
                 "unique_constraint": "Unique(NumericCode)",
-                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {self.table_name} "
+                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {table_name} "
                           f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
             }
 
@@ -324,11 +324,15 @@ class StandardListTableCreator(CustomTable):
         _commands = [self.static_columns["index"]]
 
         for x in self.items:
+            _ke_code = leave_only_letters_numbers_or_underscore(x.key_element.string_code)
+            _attr_code = leave_only_letters_numbers_or_underscore(x.attribute.string_code)
+            _value_name = leave_letters_numbers_spaces_underscores_dashes(x.value_name)
+            _numeric_code = leave_only_letters_numbers_or_underscore(str(x.numeric_code))
             _commands.append(f"INSERT INTO {self.table_name} (KeyElement, Attribute, StandardValueItemName, "
                              f"NumericCode, HistoryUser) "
-                             f"VALUES ('{x.key_element.string_code}', '{x.attribute.string_code}', "
-                             f"'{leave_letters_numbers_spaces_underscores_dashes(x.value_name)}', "
-                             f"'{x.numeric_code}', 'db_creation');\n")
+                             f"VALUES ('{_ke_code}', '{_attr_code}', "
+                             f"'{_value_name}', "
+                             f"'{_numeric_code}', 'db_creation');\n")
 
         _commands += "\n"
         return _commands
@@ -363,7 +367,7 @@ class PatientIdentifierHash(CustomTable):
         ----------
         sql_server_type: SupportedSQLServers
             the SQL server type to use
-        title: str
+        table_name: str
             the table name
         """
 

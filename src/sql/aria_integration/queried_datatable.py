@@ -21,14 +21,14 @@ class Datatable:
 
     def _data_generator(self):
         with closing(self.connection) as conn:
-            cursor = conn.cursor()
-            for row in cursor.execute(self.query):
-                yield row
+            with closing(conn.cursor()) as cursor:
+                for row in cursor.execute(self.query):
+                    yield row
 
     def _data_rows(self, num_results: int):
         with closing(self.connection) as conn:
-            cursor = conn.cursor()
-            rows = cursor.execute(self.query).fetchmany(num_results)
+            with closing(conn.cursor()) as cursor:
+                rows = cursor.execute(self.query).fetchmany(num_results)
 
         return rows
 

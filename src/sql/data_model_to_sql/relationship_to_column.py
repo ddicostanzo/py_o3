@@ -1,12 +1,12 @@
 from __future__ import annotations
-from src.helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from src.helpers.test_sql_server_type import check_sql_server_type
-from src.helpers.enums import SupportedSQLServers
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from helpers.test_sql_server_type import check_sql_server_type
+from helpers.enums import SupportedSQLServers
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_relationship import O3Relationship
+    from base.o3_relationship import O3Relationship
 
 
 class ChildRelationshipToColumn:
@@ -27,7 +27,7 @@ class ChildRelationshipToColumn:
         """
         super().__init__()
         if not check_sql_server_type(sql_server_type):
-            raise Exception("Unsupported SQL Server Type")
+            raise ValueError("Unsupported SQL Server Type")
 
         self.relationship = relationship
         self.sql_server_type = sql_server_type
@@ -76,7 +76,7 @@ class InstanceRelationshipToColumn:
     def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
         super().__init__()
         if not check_sql_server_type(sql_server_type):
-            raise Exception("Unsupported SQL Server Type")
+            raise ValueError("Unsupported SQL Server Type")
 
         self.relationship = relationship
         self.sql_server_type = sql_server_type

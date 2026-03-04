@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from src.helpers.enums import SupportedSQLServers
+from helpers.enums import SupportedSQLServers
 
 
-def check_sql_server_type(sql_server_type: SupportedSQLServers) -> bool | KeyError:
+def check_sql_server_type(sql_server_type: SupportedSQLServers) -> bool | ValueError:
     """
     Checks if the given SQL Server type is supported.
 
@@ -15,11 +15,11 @@ def check_sql_server_type(sql_server_type: SupportedSQLServers) -> bool | KeyErr
     Returns
     -------
         bool
-            True if the given SQL Server type is supported, raises KeyError otherwise
+            True if the given SQL Server type is supported, raises ValueError otherwise
     """
     if sql_server_type not in SupportedSQLServers:
-        raise KeyError(f"Provided SQL server {sql_server_type} is not supported. "
-                       f"Only MSSQL and PSQL are supported.")
+        raise ValueError(f"Provided SQL server {sql_server_type} is not supported. "
+                         f"Only MSSQL and PSQL are supported.")
     return True
 
 

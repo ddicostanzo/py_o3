@@ -1,5 +1,5 @@
 from dotenv import dotenv_values
-from src.helpers.enums import ServerToConnect, SQLAuthentication
+from helpers.enums import ServerToConnect, SQLAuthentication
 import pyodbc
 
 

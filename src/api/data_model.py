@@ -2,14 +2,14 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from base.o3_attribute import O3Attribute
-from src.base.o3_key_element import O3KeyElement
+from base.o3_key_element import O3KeyElement
 import json
 import pathlib
 
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_key_element import O3KeyElement
+    from base.o3_key_element import O3KeyElement
     from base.o3_standard_value import O3StandardValue
     from pathlib import Path
 
@@ -39,7 +39,7 @@ class O3DataModel:
         path.absolute()
 
         if not path.exists():
-            raise FileExistsError(f"Path not found: {path}")
+            raise FileNotFoundError(f"Path not found: {path}")
 
         if not path.is_file():
             raise TypeError(f"Is not a file: {path}")
@@ -47,12 +47,12 @@ class O3DataModel:
         self.json_file: Path = path
         self.json_obj: dict = {}
         self.key_elements: dict[str, O3KeyElement] = {}
-        self.__standard_value_lists: dict[str, list[O3StandardValue]] = {}
-        self.__value_data_types: set[str] = set()
-        self.__sql_data_types: set[str] = set()
-        self.__value_priority: set[str] = set()
-        self.__reference_system_for_standard_values = set()
-        self.__allow_nulls: set[str] = set()
+        self.__standard_value_lists: Optional[dict[str, list[O3StandardValue]]] = None
+        self.__value_data_types: Optional[set[str]] = None
+        self.__sql_data_types: Optional[set[str]] = None
+        self.__value_priority: Optional[set[str]] = None
+        self.__reference_system_for_standard_values: Optional[set[str]] = None
+        self.__allow_nulls: Optional[set[str]] = None
 
         self.__json_to_dictionary()
         self.__create_key_elements(**kwargs)
@@ -143,6 +143,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__standard_value_lists = {}
         for ele_attr in self.__attribute_generator():
             if len(ele_attr.standard_values_list) > 0:
                 self.__standard_value_lists[ele_attr.value_name] = ele_attr.standard_values_list
@@ -155,6 +156,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__value_data_types = set()
         self.__read_property_from_attribute(self.__value_data_types, 'value_data_type')
 
     def __read_sql_data_types(self) -> None:
@@ -165,6 +167,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__sql_data_types = set()
         self.__read_property_from_attribute(self.__sql_data_types, 'sql_data_type')
 
     def __read_value_priority(self) -> None:
@@ -175,6 +178,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__value_priority = set()
         self.__read_property_from_attribute(self.__value_priority, 'value_priority')
 
     def __read_reference_system_for_standard_values(self) -> None:
@@ -186,6 +190,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__reference_system_for_standard_values = set()
         self.__read_property_from_attribute(self.__reference_system_for_standard_values,
                                             'reference_system_for_values')
 
@@ -197,6 +202,7 @@ class O3DataModel:
         -------
             None
         """
+        self.__allow_nulls = set()
         self.__read_property_from_attribute(self.__allow_nulls, 'allow_null_values')
 
     @property
@@ -209,7 +215,7 @@ class O3DataModel:
             dict[str, list[str]]
                 A dictionary of the standard value lists with name of the list as the key and items as the value
         """
-        if len(self.__standard_value_lists) == 0:
+        if self.__standard_value_lists is None:
             self.__read_standard_values()
 
         return self.__standard_value_lists
@@ -224,7 +230,7 @@ class O3DataModel:
             set[str]
                 the unique value data types as a set
         """
-        if len(self.__value_data_types) == 0:
+        if self.__value_data_types is None:
             self.__read_value_data_types()
 
         return self.__value_data_types
@@ -239,7 +245,7 @@ class O3DataModel:
             set[str]
                 the unique sql data types as a set
         """
-        if len(self.__sql_data_types) == 0:
+        if self.__sql_data_types is None:
             self.__read_sql_data_types()
 
         return self.__sql_data_types
@@ -254,7 +260,7 @@ class O3DataModel:
             set[str]
                 the unique value priorities as a set
         """
-        if len(self.__value_priority) == 0:
+        if self.__value_priority is None:
             self.__read_value_priority()
 
         return self.__value_priority
@@ -269,7 +275,7 @@ class O3DataModel:
             set[str]
                 the reference systems for standard values as a set
         """
-        if len(self.__reference_system_for_standard_values) == 0:
+        if self.__reference_system_for_standard_values is None:
             self.__read_reference_system_for_standard_values()
 
         return self.__reference_system_for_standard_values
@@ -284,7 +290,7 @@ class O3DataModel:
             set[str]
                 the unique allow null values as a set
         """
-        if len(self.__allow_nulls) == 0:
+        if self.__allow_nulls is None:
             self.__read_allow_nulls()
 
         return self.__allow_nulls

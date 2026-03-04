@@ -1,14 +1,14 @@
 from __future__ import annotations
 import warnings
 
-from src.helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from src.sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
-from src.helpers.enums import SupportedSQLServers
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
+from helpers.enums import SupportedSQLServers
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_attribute import O3Attribute
+    from base.o3_attribute import O3Attribute
 
 
 class AttributeToSQLColumn:

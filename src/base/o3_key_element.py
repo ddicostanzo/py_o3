@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from base.o3_element import O3Element
 from base.o3_attribute import O3Attribute
 from base.o3_relationship import O3Relationship
@@ -47,7 +49,7 @@ class O3KeyElement(O3Element):
                 f"String Code: {self.string_code}, Numeric Code: {self.numeric_code}, "
                 f"ValuePriority: {self.value_priority}")
 
-    @property
+    @cached_property
     def child_of_relationships(self):
         """
         The relationships of this Key Element where the subject element matches this string code and the
@@ -66,7 +68,7 @@ class O3KeyElement(O3Element):
 
         return _child_of_relationships
 
-    @property
+    @cached_property
     def instance_of_relationships(self):
         """
         The relationships of this Key Element where the subject element matches this string code and the

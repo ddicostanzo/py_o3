@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "py-o3"
+version = "0.1.0"
+description = "A simple library with limited dependencies to instantiate the O3 data model from the JSON schema."
+requires-python = ">=3.10"
+dependencies = [
+    "pyodbc>=4.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
