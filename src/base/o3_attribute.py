@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from src.base.o3_standard_value import O3StandardValue
-from src.base.o3_element import O3Element
+from base.o3_standard_value import O3StandardValue
+from base.o3_element import O3Element
 import warnings
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_key_element import O3KeyElement
+    from base.o3_key_element import O3KeyElement
 
 
 class O3Attribute(O3Element):
@@ -77,9 +77,10 @@ class O3Attribute(O3Element):
         -------
         None
         """
-        for i, item in enumerate(self.standard_values_list):
-            if 'Reference System' in item.value_name or 'Current ICD standard' in item.value_name:
-                self.standard_values_list.pop(i)
+        self.standard_values_list = [
+            item for item in self.standard_values_list
+            if 'Reference System' not in item.value_name and 'Current ICD standard' not in item.value_name
+        ]
 
     def __clean_value_data_types(self) -> None:
         """

@@ -1,10 +1,14 @@
+import logging
+
 from api.data_model import O3DataModel
 from sql.data_model_to_sql.table_generator import KeyElementTableCreator, StandardListTableCreator, \
     LookupTableCreator, PatientIdentifierHash
 from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
-from src.helpers.enums import SupportedSQLServers
+from helpers.enums import SupportedSQLServers
 from sql.connection.mssql import MSSQLConnection
 from helpers.enums import ServerToConnect
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 
 def create_key_element_tables(model: O3DataModel,
@@ -171,10 +175,10 @@ def test_names_in_relationships(subject: str, predicate: str, model: O3DataModel
     """
     for _, ke in model.key_elements.items():
         if ke.string_code not in subject:
-            print(f"String Code {ke.string_code} not in sub table")
+            logging.info(f"String Code {ke.string_code} not in sub table")
 
         if ke.string_code not in predicate:
-            print(f"String Code {ke.string_code} not in predicate table")
+            logging.info(f"String Code {ke.string_code} not in predicate table")
 
 
 def foreign_key_constraints(model: O3DataModel, sql_type: SupportedSQLServers) -> list[str]:
@@ -249,18 +253,14 @@ if __name__ == "__main__":
     location: str = '../Sql_Commands/test.txt'
 
     o3_db = MSSQLConnection.create_connection(ServerToConnect.O3)
-    o3_connection = o3_db.connection()
     aura_db = MSSQLConnection.create_connection(ServerToConnect.Aura)
 
     from sql.aria_integration.patient import Patient
     pat = Patient(aura_db.connection())
     for row in pat.get_data():
-        print(row)
-        print()
+        logging.info(row)
 
     # write_sql_to_text(location, [v for _, v in tables.items()], write_mode='w')
     # write_sql_to_text(location, insert_commands, write_mode='a')
     # write_sql_to_text(location, fk_commands, write_mode='a')
-
-    print()
 

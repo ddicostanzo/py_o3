@@ -1,4 +1,4 @@
-from src.helpers.enums import SupportedSQLServers
+from helpers.enums import SupportedSQLServers
 
 sql_data_types = {SupportedSQLServers.MSSQL: {"Boolean": "bit",
                                               "Binary": "varbinary",

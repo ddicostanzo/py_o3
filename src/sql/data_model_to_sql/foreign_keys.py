@@ -1,11 +1,12 @@
 from __future__ import annotations
-from src.helpers.test_sql_server_type import check_sql_server_type
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from helpers.test_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.base.o3_relationship import O3Relationship
-    from src.helpers.enums import SupportedSQLServers
+    from base.o3_relationship import O3Relationship
+    from helpers.enums import SupportedSQLServers
 
 
 class ForeignKeysConstraints:
@@ -25,14 +26,14 @@ class ForeignKeysConstraints:
             the SQL server type to generate the commands
         """
         if not check_sql_server_type(sql_server_type):
-            raise Exception("Unsupported SQL Server Type")
+            raise ValueError("Unsupported SQL Server Type")
 
         self._relationship = relationship
         self.sql_server_type = sql_server_type
         self.subject_element = relationship.subject_element
-        self.subject_table_name = relationship.subject_element.replace(' ', '')
+        self.subject_table_name = leave_only_letters_numbers_or_underscore(relationship.subject_element)
         self.predicate_element = relationship.predicate_element
-        self.predicate_table_name = self.predicate_element.replace(' ', '')
+        self.predicate_table_name = leave_only_letters_numbers_or_underscore(self.predicate_element)
         self.relationship_category = relationship.relationship_category
         self.cardinality = relationship.cardinality
         self.fk_name = f'fk_{self.subject_table_name}_{self.predicate_table_name}'
@@ -58,8 +59,8 @@ class ForeignKeysConstraints:
             str
                 the command body
         """
-        return (f"FOREIGN KEY ({self.predicate_element}Id) "
-                f"REFERENCES {self.predicate_table_name} ({self.predicate_element}Id)")
+        return (f"FOREIGN KEY ({self.predicate_table_name}Id) "
+                f"REFERENCES {self.predicate_table_name} ({self.predicate_table_name}Id)")
 
     @staticmethod
     def __command_suffix() -> str:

@@ -1,11 +1,8 @@
 from __future__ import annotations
-from src.helpers.test_sql_server_type import check_sql_server_type
-from src.sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from src.helpers.enums import SupportedSQLServers
+from helpers.enums import SupportedSQLServers
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from helpers.test_sql_server_type import check_sql_server_type
+from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 
 
 def add_column_sql_command(table: str, column_name: str, column_type: str,
@@ -32,7 +29,7 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
             the alter table command to add a column to a table
     """
     if not check_sql_server_type(sql_server_type):
-        raise Exception("Unsupported SQL Server Type")
+        raise ValueError("Unsupported SQL Server Type")
 
     _data_types = list(sql_data_types[sql_server_type].values())
 
@@ -40,6 +37,9 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
         raise TypeError(f"Column type {column_type} does not exist in specified types")
 
     _null = "NULL" if nullable else "NOT NULL"
+
+    table = leave_only_letters_numbers_or_underscore(table)
+    column_name = leave_only_letters_numbers_or_underscore(column_name)
 
     _statement = f"ALTER TABLE {table} ADD COLUMN {column_name} {column_type} {_null};"
 
@@ -65,10 +65,10 @@ def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_
             the alter table command to add a foreign key column to a table
     """
     if not check_sql_server_type(sql_server_type):
-        raise Exception("Unsupported SQL Server Type")
+        raise ValueError("Unsupported SQL Server Type")
 
     _int_type = ""
-    if sql_server_type == "MSSQL":
+    if sql_server_type == SupportedSQLServers.MSSQL:
         _int_type = "INT"
     else:
         _int_type = "INTEGER"
