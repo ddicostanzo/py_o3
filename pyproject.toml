@@ -1,6 +1,6 @@
 [build-system]
 requires = ["hatchling"]
-build-backend = "hatchling.backends"
+build-backend = "hatchling.build"
 
 [project]
 name = "py-o3"
@@ -14,6 +14,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

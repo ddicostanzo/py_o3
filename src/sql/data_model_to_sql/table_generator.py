@@ -294,7 +294,7 @@ class StandardListTableCreator(CustomTable):
                 "numeric_code": "NumericCode text NOT NULL",
                 "active_flag": "ActiveFlag boolean NOT NULL DEFAULT 1",
                 "unique_constraint": "Unique(NumericCode)",
-                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {self.table_name} "
+                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {table_name} "
                           f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
             }
 

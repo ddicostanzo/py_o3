@@ -10,7 +10,7 @@ class TestAddColumnSQLCommand:
             "Patient", "Age", "int", nullable=True,
             sql_server_type=SupportedSQLServers.MSSQL,
         )
-        assert result == "ALTER TABLE Patient ADD COLUMN Age int NULL;"
+        assert result == "ALTER TABLE Patient ADD Age int NULL;"
 
     def test_psql_generates_valid_statement(self):
         result = add_column_sql_command(
@@ -69,22 +69,16 @@ class TestAddColumnSQLCommand:
 
 
 class TestAddForeignKeyColumnSQLCommand:
-    def test_mssql_case_mismatch_raises_type_error(self):
-        """Known bug: add_foreign_key_column_sql_command passes 'INT' (uppercase)
-        but sql_data_types has 'int' (lowercase), causing a TypeError.
-        This test documents the current behavior before the fix is applied."""
-        with pytest.raises(TypeError, match="Column type INT does not exist"):
-            add_foreign_key_column_sql_command(
-                "Patient", "DoctorId",
-                sql_server_type=SupportedSQLServers.MSSQL,
-            )
+    def test_mssql_generates_int_column(self):
+        result = add_foreign_key_column_sql_command(
+            "Patient", "DoctorId",
+            sql_server_type=SupportedSQLServers.MSSQL,
+        )
+        assert result == "ALTER TABLE Patient ADD DoctorId int NOT NULL;"
 
-    def test_psql_case_mismatch_raises_type_error(self):
-        """Known bug: add_foreign_key_column_sql_command passes 'INTEGER' (uppercase)
-        but sql_data_types has 'integer' (lowercase), causing a TypeError.
-        This test documents the current behavior before the fix is applied."""
-        with pytest.raises(TypeError, match="Column type INTEGER does not exist"):
-            add_foreign_key_column_sql_command(
-                "Patient", "DoctorId",
-                sql_server_type=SupportedSQLServers.PSQL,
-            )
+    def test_psql_generates_integer_column(self):
+        result = add_foreign_key_column_sql_command(
+            "Patient", "DoctorId",
+            sql_server_type=SupportedSQLServers.PSQL,
+        )
+        assert result == "ALTER TABLE Patient ADD COLUMN DoctorId integer NOT NULL;"

@@ -41,7 +41,10 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
     table = leave_only_letters_numbers_or_underscore(table)
     column_name = leave_only_letters_numbers_or_underscore(column_name)
 
-    _statement = f"ALTER TABLE {table} ADD COLUMN {column_name} {column_type} {_null};"
+    if sql_server_type == SupportedSQLServers.MSSQL:
+        _statement = f"ALTER TABLE {table} ADD {column_name} {column_type} {_null};"
+    else:
+        _statement = f"ALTER TABLE {table} ADD COLUMN {column_name} {column_type} {_null};"
 
     return _statement
 
@@ -69,9 +72,9 @@ def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_
 
     _int_type = ""
     if sql_server_type == SupportedSQLServers.MSSQL:
-        _int_type = "INT"
+        _int_type = "int"
     else:
-        _int_type = "INTEGER"
+        _int_type = "integer"
 
     return add_column_sql_command(table, column_name, _int_type, nullable=False, sql_server_type=sql_server_type)
 
