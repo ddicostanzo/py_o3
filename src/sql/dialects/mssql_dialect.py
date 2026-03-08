@@ -61,6 +61,10 @@ class MSSQLDialect:
         return (f"CREATE NONCLUSTERED INDEX {index_name} ON {table_name} "
                 f"({column}) INCLUDE ({includes});\n")
 
+    @property
+    def on_delete_restrict(self) -> str:
+        return "NO ACTION"
+
     def alter_table_add_column(self, table: str, col_name: str, col_type: str, nullable: str) -> str:
         return f'ALTER TABLE {table} ADD {col_name} {col_type} {nullable};'
 

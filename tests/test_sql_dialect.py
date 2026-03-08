@@ -85,6 +85,9 @@ class TestMSSQLDialect:
         assert "(Col1)" in result
         assert "INCLUDE (Col2, Col3)" in result
 
+    def test_on_delete_restrict_returns_no_action(self):
+        assert self.dialect.on_delete_restrict == "NO ACTION"
+
 
 class TestPSQLDialect:
     """Tests for PSQLDialect implementation."""
@@ -160,6 +163,9 @@ class TestPSQLDialect:
         assert "CREATE INDEX IX_Test ON MyTable" in result
         assert "(Col1)" in result
         assert "INCLUDE (Col2, Col3)" in result
+
+    def test_on_delete_restrict_returns_restrict(self):
+        assert self.dialect.on_delete_restrict == "RESTRICT"
 
 
 class TestGetDialectFactory:

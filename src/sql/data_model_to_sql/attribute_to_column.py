@@ -161,9 +161,9 @@ class AttributeToSQLColumn:
 
     def __set_binary_data_type(self) -> None:
         """
-        If the value data type of the attribute is set to DICOM, set the column_data_type to Binary
+        If the value data type of the attribute is set to DICOM or Binary, set the column_data_type to Binary
         """
-        if "dicom" in self.attribute.value_data_type.lower():
+        if "dicom" in self.attribute.value_data_type.lower() or self.attribute.value_data_type == "Binary":
             self.column_data_type = "Binary"
 
     def __set_int_data_type(self) -> None:

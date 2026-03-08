@@ -59,6 +59,10 @@ class PSQLDialect:
         return (f"CREATE INDEX {index_name} ON {table_name} "
                 f"({column}) INCLUDE ({includes});\n")
 
+    @property
+    def on_delete_restrict(self) -> str:
+        return "RESTRICT"
+
     def alter_table_add_column(self, table: str, col_name: str, col_type: str, nullable: str) -> str:
         return f'ALTER TABLE {table} ADD COLUMN {col_name} {col_type} {nullable};'
 

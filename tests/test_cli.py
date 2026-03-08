@@ -86,6 +86,7 @@ class TestMainErrorHandling:
             assert result == 1
             captured = capsys.readouterr()
             assert "Error:" in captured.err
+            assert "Failed to parse input schema" in captured.err
         finally:
             os.unlink(path)
 
@@ -121,3 +122,46 @@ class TestMainIntegration:
             result = main(["-i", _SCHEMA_PATH, "-o", nested, "--clean"])
             assert result == 0
             assert os.path.exists(nested)
+
+    @pytest.mark.skipif(
+        not os.path.exists(_SCHEMA_PATH),
+        reason="Schema file O3_20250128.json not available in Resources/"
+    )
+    def test_include_lookup_generates_insert_commands(self):
+        with tempfile.NamedTemporaryFile(suffix='.sql', delete=False) as f:
+            output_path = f.name
+
+        try:
+            result = main([
+                "-i", _SCHEMA_PATH, "-o", output_path,
+                "-s", "psql", "--clean", "--include-lookup",
+            ])
+            assert result == 0
+            with open(output_path) as f:
+                content = f.read()
+            assert "StandardValuesLookup" in content
+            assert "INSERT INTO" in content
+        finally:
+            os.unlink(output_path)
+
+    @pytest.mark.skipif(
+        not os.path.exists(_SCHEMA_PATH),
+        reason="Schema file O3_20250128.json not available in Resources/"
+    )
+    def test_include_patient_hash_generates_table(self):
+        with tempfile.NamedTemporaryFile(suffix='.sql', delete=False) as f:
+            output_path = f.name
+
+        try:
+            result = main([
+                "-i", _SCHEMA_PATH, "-o", output_path,
+                "-s", "psql", "--clean", "--include-patient-hash",
+            ])
+            assert result == 0
+            with open(output_path) as f:
+                content = f.read()
+            assert "PatientIdentifierHash" in content
+            assert "MRNHash" in content
+            assert "FOREIGN KEY" in content
+        finally:
+            os.unlink(output_path)

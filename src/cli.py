@@ -70,14 +70,22 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
-    try:
-        server_map = {
-            "mssql": SupportedSQLServers.MSSQL,
-            "psql": SupportedSQLServers.PSQL,
-        }
-        sql_type = server_map[args.server]
+    server_map = {
+        "mssql": SupportedSQLServers.MSSQL,
+        "psql": SupportedSQLServers.PSQL,
+    }
+    sql_type = server_map[args.server]
 
+    try:
         model = create_model(args.input, clean=args.clean)
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+    except (json.JSONDecodeError, KeyError) as e:
+        print(f"Error: Failed to parse input schema: {e}", file=sys.stderr)
+        return 1
+
+    try:
         tables = create_tables(model, sql_type, args.phi_allowed)
 
         all_commands: list[str] = [v for v in tables.values()]
@@ -103,11 +111,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"SQL written to {args.output}")
 
         return 0
-    except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        return 1
-    except (json.JSONDecodeError, KeyError) as e:
-        print(f"Error: Failed to parse input schema: {e}", file=sys.stderr)
+    except (ValueError, TypeError) as e:
+        print(f"Error during SQL generation: {e}", file=sys.stderr)
         return 1
     except OSError as e:
         print(f"Error: {e}", file=sys.stderr)

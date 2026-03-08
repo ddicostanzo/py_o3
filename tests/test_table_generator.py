@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
@@ -74,6 +74,16 @@ class TestSQLTableBase:
     def test_invalid_server_type_raises(self):
         with pytest.raises(ValueError):
             SQLTable("INVALID")
+
+    def test_unknown_dialect_name_raises(self):
+        mock_dialect = MagicMock()
+        type(mock_dialect).name = PropertyMock(return_value="MySQL")
+        type(mock_dialect).type_map = PropertyMock(return_value={})
+        type(mock_dialect).string_type = PropertyMock(return_value="text")
+        type(mock_dialect).integer_type = PropertyMock(return_value="int")
+        type(mock_dialect).boolean_type = PropertyMock(return_value="boolean")
+        with pytest.raises(ValueError, match="Unknown dialect name"):
+            SQLTable(mock_dialect)
 
 
 class TestCustomTable:
@@ -200,10 +210,14 @@ class TestPatientIdentifierHash:
         assert "MRNHash" in sql
         assert "MRN " not in sql
 
-    def test_foreign_key_uses_restrict_not_cascade_on_delete(self):
+    def test_mssql_foreign_key_uses_no_action_on_delete(self):
         table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")
-        assert "ON DELETE RESTRICT" in table.foreign_key
+        assert "ON DELETE NO ACTION" in table.foreign_key
         assert "ON DELETE CASCADE" not in table.foreign_key
+
+    def test_psql_foreign_key_uses_restrict_on_delete(self):
+        table = PatientIdentifierHash(SupportedSQLServers.PSQL, "PatientHash")
+        assert "ON DELETE RESTRICT" in table.foreign_key
 
     def test_foreign_key_uses_cascade_on_update(self):
         table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")

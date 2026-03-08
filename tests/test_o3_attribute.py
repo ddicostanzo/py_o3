@@ -158,6 +158,53 @@ class TestCleanValueDataTypes:
             # Note: if standard_values_list is empty and type is valid, it stays as-is
 
 
+class TestCleanUnrecognizedDataTypeWarning:
+    """Tests for warning on unrecognized data types after cleaning."""
+
+    def test_warns_on_completely_unknown_type(self):
+        item_dict = _make_attr_dict(
+            ValueDataType="ComplexNumber",
+            ValueName="SomeField",
+            StandardValuesList=[],
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            attr = _make_attribute(item_dict)
+            unrecognized_warnings = [
+                x for x in w if "unrecognized data type" in str(x.message)
+            ]
+            assert len(unrecognized_warnings) == 1
+            assert "ComplexNumber" in str(unrecognized_warnings[0].message)
+        assert attr.value_data_type == "ComplexNumber"
+
+    def test_no_warning_for_recognized_types(self):
+        for dt in ["Boolean", "Binary", "Date", "Decimal", "Integer", "String"]:
+            item_dict = _make_attr_dict(ValueDataType=dt, StandardValuesList=[])
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                _make_attribute(item_dict)
+                unrecognized_warnings = [
+                    x for x in w if "unrecognized data type" in str(x.message)
+                ]
+                assert len(unrecognized_warnings) == 0, f"Unexpected warning for {dt}"
+
+    def test_dicom_image_cleaned_to_binary_no_warning(self):
+        """DICOM Image should be cleaned to Binary without warning."""
+        item_dict = _make_attr_dict(
+            ValueDataType="DICOM Image",
+            ValueName="DICOM Image",
+            StandardValuesList=[],
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            attr = _make_attribute(item_dict)
+            unrecognized_warnings = [
+                x for x in w if "unrecognized data type" in str(x.message)
+            ]
+            assert len(unrecognized_warnings) == 0
+        assert attr.value_data_type == "Binary"
+
+
 class TestCleanDisabled:
     """When clean=False, no normalization happens."""
 

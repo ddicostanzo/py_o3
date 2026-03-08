@@ -352,6 +352,40 @@ class TestColumnCreationText:
 # ---------------------------------------------------------------------------
 # Unsupported SQL server type
 # ---------------------------------------------------------------------------
+class TestUnresolvableDataType:
+    """Completely unrecognizable data type should raise ValueError."""
+
+    def test_unresolvable_data_type_raises(self):
+        attr = _make_attribute(
+            value_data_type="ComplexNumber",
+            value_name="SomeField",
+            standard_values_list=[],
+            reference_system="",
+        )
+        with pytest.raises(ValueError, match="Could not determine SQL data type"):
+            AttributeToSQLColumn(attr, False, SupportedSQLServers.MSSQL)
+
+    def test_error_message_includes_attribute_name(self):
+        attr = _make_attribute(
+            value_data_type="Quaternion",
+            value_name="RotationField",
+            standard_values_list=[],
+            reference_system="",
+        )
+        with pytest.raises(ValueError, match="RotationField"):
+            AttributeToSQLColumn(attr, False, SupportedSQLServers.PSQL)
+
+    def test_error_message_includes_data_type(self):
+        attr = _make_attribute(
+            value_data_type="Quaternion",
+            value_name="RotationField",
+            standard_values_list=[],
+            reference_system="",
+        )
+        with pytest.raises(ValueError, match="Quaternion"):
+            AttributeToSQLColumn(attr, False, SupportedSQLServers.PSQL)
+
+
 class TestUnsupportedSQLServer:
     """Unsupported SQL server type should raise an error."""
 

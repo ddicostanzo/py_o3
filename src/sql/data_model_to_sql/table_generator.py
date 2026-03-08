@@ -398,7 +398,7 @@ class PatientIdentifierHash(CustomTable):
         self.foreign_key = (f'ALTER TABLE {self.table_name} '
                             f'ADD CONSTRAINT fk_{self.table_name}_Patient '
                             f'FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) '
-                            f'ON DELETE RESTRICT ON UPDATE CASCADE;')
+                            f'ON DELETE {self.dialect.on_delete_restrict} ON UPDATE CASCADE;')
 
 
 if __name__ == "__main__":

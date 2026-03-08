@@ -46,7 +46,7 @@ class O3Attribute(O3Element):
         self.allow_null_values: str = item_dict['AllowNullValues']
         self.value_example: str = item_dict['ValueExample']
 
-        if kwargs.get('clean', True):
+        if kwargs.get('clean', False):
             self.__check_reference_system(item_dict)
             self.__clean_standard_values_list()
             self.__clean_value_data_types()
@@ -106,6 +106,8 @@ class O3Attribute(O3Element):
                 self.value_data_type = "Integer"
             if self.value_data_type == "Numeric":
                 self.value_data_type = "Decimal"
+            if "dicom" in self.value_data_type.lower():
+                self.value_data_type = "Binary"
             if "Date" in self.value_name:
                 self.value_data_type = "Date"
             if self.value_data_type == "string":

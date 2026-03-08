@@ -42,7 +42,7 @@ class Datatable:
             with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
                 yield from cursor.execute(self.query)
         except pyodbc.Error as e:
-            raise pyodbc.Error(
+            raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"
             ) from e
 
@@ -51,7 +51,7 @@ class Datatable:
             with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
                 rows = cursor.execute(self.query).fetchmany(num_results)
         except pyodbc.Error as e:
-            raise pyodbc.Error(
+            raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"
             ) from e
 

@@ -152,6 +152,21 @@ class SQLDialect(Protocol):
         """
         ...
 
+    @property
+    def on_delete_restrict(self) -> str:
+        """
+        The ON DELETE action equivalent to RESTRICT for this dialect.
+
+        MSSQL does not support RESTRICT; use NO ACTION instead (semantically equivalent).
+        PostgreSQL supports RESTRICT directly.
+
+        Returns
+        -------
+        str
+            the ON DELETE clause
+        """
+        ...
+
     def alter_table_add_column(self, table: str, col_name: str, col_type: str, nullable: str) -> str:
         """
         Generate an ALTER TABLE ADD COLUMN statement.

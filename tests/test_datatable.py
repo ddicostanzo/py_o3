@@ -4,8 +4,14 @@ import logging
 import sys
 from unittest.mock import MagicMock
 
-# Mock pyodbc before importing Datatable
-sys.modules.setdefault('pyodbc', MagicMock())
+import pytest
+
+# Mock pyodbc before importing Datatable, with a real Error class
+_mock_pyodbc = sys.modules.get('pyodbc')
+if _mock_pyodbc is None or isinstance(_mock_pyodbc, MagicMock):
+    _mock_pyodbc = MagicMock()
+    _mock_pyodbc.Error = type('Error', (Exception,), {})
+    sys.modules['pyodbc'] = _mock_pyodbc
 
 from sql.aria_integration.queried_datatable import Datatable
 
@@ -79,6 +85,49 @@ class TestGetDataReturnsList:
         dt = Datatable(mock_conn, str(query_file))
         result = dt._get_data(num_results=5)
         assert isinstance(result, list)
+
+
+class TestDataGeneratorErrorWrapping:
+    """Test that _data_generator wraps pyodbc errors with query context."""
+
+    def test_data_generator_wraps_error_with_query_path(self, tmp_path):
+        pyodbc = sys.modules['pyodbc']
+        query_file = tmp_path / "bad.sql"
+        query_file.write_text("SELECT bad_query")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = pyodbc.Error("Test DB error")
+        mock_conn.cursor.return_value = mock_cursor
+        mock_conn.__enter__ = MagicMock(return_value=mock_conn)
+        mock_conn.__exit__ = MagicMock(return_value=False)
+        mock_cursor.__enter__ = MagicMock(return_value=mock_cursor)
+        mock_cursor.__exit__ = MagicMock(return_value=False)
+
+        dt = Datatable(mock_conn, str(query_file))
+        gen = dt._data_generator()
+        with pytest.raises(RuntimeError, match="bad.sql"):
+            next(gen)
+
+
+class TestDataRowsErrorWrapping:
+    """Test that _data_rows wraps pyodbc errors with query context."""
+
+    def test_data_rows_wraps_error_with_query_path(self, tmp_path):
+        pyodbc = sys.modules['pyodbc']
+        query_file = tmp_path / "bad.sql"
+        query_file.write_text("SELECT bad_query")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.side_effect = pyodbc.Error("Test DB error")
+        mock_conn.cursor.return_value = mock_cursor
+        mock_conn.__enter__ = MagicMock(return_value=mock_conn)
+        mock_conn.__exit__ = MagicMock(return_value=False)
+        mock_cursor.__enter__ = MagicMock(return_value=mock_cursor)
+        mock_cursor.__exit__ = MagicMock(return_value=False)
+
+        dt = Datatable(mock_conn, str(query_file))
+        with pytest.raises(RuntimeError, match="bad.sql"):
+            dt._data_rows(10)
 
 
 class TestGetDataLogging:
