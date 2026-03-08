@@ -50,16 +50,21 @@ class ETLRunner:
         self,
         output_dir: str,
         entry_points: list[str] | None = None,
+        date_basis: str | None = None,
+        lookback_days: int | None = None,
     ) -> None:
         """Write extract + load SQL to files in output_dir."""
         os.makedirs(output_dir, exist_ok=True)
 
         if entry_points:
             queries = [
-                self.__extractor.generate_query(ep) for ep in entry_points
+                self.__extractor.generate_query(ep, date_basis, lookback_days)
+                for ep in entry_points
             ]
         else:
-            queries = self.__extractor.generate_all_queries()
+            queries = self.__extractor.generate_all_queries(
+                date_basis, lookback_days
+            )
 
         errors: list[str] = []
         for query in queries:

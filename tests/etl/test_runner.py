@@ -68,6 +68,25 @@ class TestExportSql:
             files = os.listdir(tmpdir)
             assert len(files) == 1
 
+    def test_export_sql_forwards_date_params(self):
+        ext = _mock_extractor()
+        runner = ETLRunner(ext, _mock_loader())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runner.export_sql(
+                tmpdir,
+                entry_points=["billing"],
+                date_basis="service",
+                lookback_days=30,
+            )
+        ext.generate_query.assert_called_once_with("billing", "service", 30)
+
+    def test_export_sql_forwards_date_params_all_entries(self):
+        ext = _mock_extractor()
+        runner = ETLRunner(ext, _mock_loader())
+        with tempfile.TemporaryDirectory() as tmpdir:
+            runner.export_sql(tmpdir, date_basis="service", lookback_days=60)
+        ext.generate_all_queries.assert_called_once_with("service", 60)
+
     def test_export_sql_error_isolation(self):
         ldr = MagicMock(spec=Loader)
         ldr.generate_insert.side_effect = ValueError("bad column map")
