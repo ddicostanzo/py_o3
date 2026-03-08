@@ -316,3 +316,4 @@ Sql_Commands/
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python,venv
 .grepai/
+.worktrees/
