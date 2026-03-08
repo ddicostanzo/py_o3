@@ -6,6 +6,7 @@ from etl.manifest import SemanticManifest
 from etl.registry import ModelRegistry
 from etl.mapping.match_engine import MatchEngine
 from etl.mapping.mapping_store import CrosswalkEntry, MappingStore
+from api.data_model import O3DataModel
 
 
 class Crosswalk:
@@ -15,7 +16,7 @@ class Crosswalk:
         self,
         manifest: SemanticManifest,
         registry: ModelRegistry,
-        o3_model,
+        o3_model: O3DataModel,
         match_engine: MatchEngine | None = None,
         min_confidence: float = 0.5,
     ):

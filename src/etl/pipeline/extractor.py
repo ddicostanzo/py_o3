@@ -83,7 +83,11 @@ class Extractor:
         ]
 
         if not model_entries:
-            model_entries = relevant
+            raise ValueError(
+                f"No crosswalk entries match entry point '{entry_point}' "
+                f"(model='{model_name}', base_table='{base_table}'). "
+                f"Check the crosswalk or registry configuration."
+            )
 
         # Determine which dimension joins are needed
         needed_joins: list[JoinSpec] = []

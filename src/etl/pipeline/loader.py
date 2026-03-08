@@ -8,6 +8,7 @@ from etl.mapping.mapping_store import CrosswalkEntry
 from etl.pipeline.extractor import ExtractQuery
 from helpers.enums import SupportedSQLServers
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from api.data_model import O3DataModel
 
 
 @dataclass
@@ -25,7 +26,7 @@ class Loader:
     def __init__(
         self,
         crosswalk: list[CrosswalkEntry],
-        o3_model,
+        o3_model: O3DataModel,
         sql_server_type: SupportedSQLServers,
     ):
         self.__crosswalk = crosswalk

@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from etl.mapping.mapping_store import CrosswalkEntry
 from etl.manifest import SemanticManifest
+from api.data_model import O3DataModel
 
 
 @dataclass(frozen=True)
@@ -101,7 +102,7 @@ class LineageBuilder:
         self,
         crosswalk: list[CrosswalkEntry],
         manifest: SemanticManifest,
-        o3_model,
+        o3_model: O3DataModel,
     ):
         self.__crosswalk = crosswalk
         self.__manifest = manifest

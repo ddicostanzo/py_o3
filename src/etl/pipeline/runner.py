@@ -139,6 +139,10 @@ class ETLRunner:
             self.__connection.commit()
         except Exception as e:
             result.errors.append(str(e))
+            try:
+                self.__connection.rollback()
+            except Exception:
+                pass
 
         result.duration_seconds = time.time() - ep_start
         return result

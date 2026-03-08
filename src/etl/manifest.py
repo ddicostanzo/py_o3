@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from functools import cached_property
 
 
 @dataclass
@@ -71,7 +72,7 @@ class DWHTable:
             ],
         )
 
-    @property
+    @cached_property
     def columns_by_name(self) -> dict[str, Column]:
         return {c.name: c for c in self.columns}
 
@@ -126,7 +127,7 @@ class SemanticManifest:
     models: list[ConceptualModel]
     summary: dict
 
-    @property
+    @cached_property
     def models_by_name(self) -> dict[str, ConceptualModel]:
         return {m.name: m for m in self.models}
 

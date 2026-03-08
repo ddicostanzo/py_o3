@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from dataclasses import asdict
-
 from etl.lineage.lineage_builder import LineageGraph, LineageNode
 
 
@@ -77,9 +75,6 @@ class LineageReport:
         edges_by_element: dict[str, list] = defaultdict(list)
         for edge in self.__graph.edges:
             if edge.target.node_type == "target":
-                edges_by_element[edge.target.table].append(edge)
-            elif edge.source.node_type == "transform":
-                # Transform -> target edge: group by target
                 edges_by_element[edge.target.table].append(edge)
 
         # Mapped attributes table per key element

@@ -121,10 +121,19 @@ class TestGenerateQuery:
         assert "30" in query.sql
 
     def test_denied_columns_excluded(self):
-        entries = [_make_entry(dwh_column="PatientSSN", model_alias="PatientSSN")]
+        entries = [
+            _make_entry(dwh_column="PatientSSN", model_alias="PatientSSN"),
+            _make_entry(),  # valid entry so query still generates
+        ]
         extractor = Extractor(entries, _make_manifest(), _make_registry())
         query = extractor.generate_query("billing")
         assert "PatientSSN" not in query.sql
+
+    def test_no_matching_entries_raises(self):
+        entries = [_make_entry(dwh_column="PatientSSN", model_alias="PatientSSN")]
+        extractor = Extractor(entries, _make_manifest(), _make_registry())
+        with pytest.raises(ValueError, match="No crosswalk entries"):
+            extractor.generate_query("billing")
 
     def test_invalid_entry_point_raises(self):
         extractor = Extractor([_make_entry()], _make_manifest(), _make_registry())
