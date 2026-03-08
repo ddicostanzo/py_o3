@@ -1,19 +1,22 @@
-"""Tests for Datatable class with mocked pyodbc."""
+"""Tests for Datatable class and query path resolution with mocked pyodbc."""
 
 import logging
+import os
 import sys
 from unittest.mock import MagicMock
 
 import pytest
 
-# Mock pyodbc before importing Datatable, with a real Error class
-_mock_pyodbc = sys.modules.get('pyodbc')
-if _mock_pyodbc is None or isinstance(_mock_pyodbc, MagicMock):
+# Mock pyodbc before importing Datatable, with a real Error class.
+# Only create the mock if pyodbc is not already in sys.modules — this avoids
+# re-creating the Error class when multiple test files run in the same process.
+if 'pyodbc' not in sys.modules:
     _mock_pyodbc = MagicMock()
     _mock_pyodbc.Error = type('Error', (Exception,), {})
     sys.modules['pyodbc'] = _mock_pyodbc
 
-from sql.aria_integration.queried_datatable import Datatable
+from sql.aria_integration.queried_datatable import Datatable, _resolve_query_path
+import sql.aria_integration.queried_datatable as datatable_module
 
 
 class TestDatatableInit:
@@ -142,3 +145,94 @@ class TestGetDataLogging:
             dt._get_data(num_results=None)
 
         assert any("Executing query" in record.message for record in caplog.records)
+
+
+class TestParameterizedExecution:
+    """Test that params are forwarded to cursor.execute."""
+
+    def test_generator_forwards_params_to_execute(self, tmp_path):
+        query_file = tmp_path / "test.sql"
+        query_file.write_text("SELECT * FROM t WHERE id = ?")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.return_value = iter([("row1",)])
+        mock_conn.cursor.return_value = mock_cursor
+
+        dt = Datatable(mock_conn, str(query_file))
+        gen = dt._data_generator(params=("abc",))
+        list(gen)
+
+        mock_cursor.execute.assert_called_once_with(dt.query, ("abc",))
+
+    def test_generator_without_params_calls_execute_without_params(self, tmp_path):
+        query_file = tmp_path / "test.sql"
+        query_file.write_text("SELECT 1")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.return_value = iter([])
+        mock_conn.cursor.return_value = mock_cursor
+
+        dt = Datatable(mock_conn, str(query_file))
+        gen = dt._data_generator(params=None)
+        list(gen)
+
+        mock_cursor.execute.assert_called_once_with(dt.query)
+
+    def test_data_rows_forwards_params_to_execute(self, tmp_path):
+        query_file = tmp_path / "test.sql"
+        query_file.write_text("SELECT * FROM t WHERE id = ?")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.return_value.fetchmany.return_value = [("row1",)]
+        mock_conn.cursor.return_value = mock_cursor
+
+        dt = Datatable(mock_conn, str(query_file))
+        dt._data_rows(10, params=("xyz",))
+
+        mock_cursor.execute.assert_called_once_with(dt.query, ("xyz",))
+
+    def test_get_data_passes_params_through(self, tmp_path):
+        query_file = tmp_path / "test.sql"
+        query_file.write_text("SELECT * FROM t WHERE id = ?")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_cursor.execute.return_value.fetchmany.return_value = [("row1",)]
+        mock_conn.cursor.return_value = mock_cursor
+
+        dt = Datatable(mock_conn, str(query_file))
+        dt._get_data(num_results=5, params=("val",))
+
+        mock_cursor.execute.assert_called_once_with(dt.query, ("val",))
+
+
+class TestResolveQueryPath:
+    """Test the _resolve_query_path helper function."""
+
+    def test_resolves_existing_file(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        queries_dir.mkdir()
+        (queries_dir / "Aura").mkdir()
+        query_file = queries_dir / "Aura" / "test.sql"
+        query_file.write_text("SELECT 1")
+
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
+        result = _resolve_query_path("Aura/test.sql")
+        assert result == str(query_file)
+
+    def test_returns_absolute_path(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        queries_dir.mkdir()
+        query_file = queries_dir / "test.sql"
+        query_file.write_text("SELECT 1")
+
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
+        result = _resolve_query_path("test.sql")
+        assert os.path.isabs(result)
+
+    def test_raises_file_not_found_for_missing_file(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        queries_dir.mkdir()
+
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
+        with pytest.raises(FileNotFoundError, match="Query file not found"):
+            _resolve_query_path("nonexistent.sql")

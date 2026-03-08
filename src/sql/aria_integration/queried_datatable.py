@@ -3,9 +3,36 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Generator, Iterable
+from pathlib import Path
 
 import pyodbc
 from pyodbc import Connection
+
+_QUERIES_DIR = Path(__file__).resolve().parent.parent / "queries"
+
+
+def _resolve_query_path(relative_path: str) -> str:
+    """Resolve a query file path relative to the sql/queries/ directory.
+
+    Parameters
+    ----------
+    relative_path : str
+        Path relative to the queries directory (e.g., 'Aura/patient.sql')
+
+    Returns
+    -------
+    str
+        Absolute path to the query file
+
+    Raises
+    ------
+    FileNotFoundError
+        If the resolved path does not exist
+    """
+    resolved = _QUERIES_DIR / relative_path
+    if not resolved.is_file():
+        raise FileNotFoundError(f"Query file not found: {resolved}")
+    return str(resolved)
 
 
 class Datatable:
@@ -32,26 +59,36 @@ class Datatable:
         with open(query_location) as query:
             self.query = query.read()
 
-    def _get_data(self, num_results: int = None) -> Iterable[pyodbc.Row] | Generator[pyodbc.Row, None, None]:
+    def _get_data(
+        self,
+        num_results: int = None,
+        params: tuple = None,
+    ) -> Iterable[pyodbc.Row] | Generator[pyodbc.Row, None, None]:
         logging.info(f"Executing query from {self.query_location}")
         if num_results is None:
-            return self._data_generator()
+            return self._data_generator(params)
         else:
-            return self._data_rows(num_results)
+            return self._data_rows(num_results, params)
 
-    def _data_generator(self):
+    def _data_generator(self, params: tuple = None):
         try:
             cursor = self.connection.cursor()
-            yield from cursor.execute(self.query)
+            if params is not None:
+                yield from cursor.execute(self.query, params)
+            else:
+                yield from cursor.execute(self.query)
         except pyodbc.Error as e:
             raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"
             ) from e
 
-    def _data_rows(self, num_results: int):
+    def _data_rows(self, num_results: int, params: tuple = None):
         try:
             cursor = self.connection.cursor()
-            rows = cursor.execute(self.query).fetchmany(num_results)
+            if params is not None:
+                rows = cursor.execute(self.query, params).fetchmany(num_results)
+            else:
+                rows = cursor.execute(self.query).fetchmany(num_results)
         except pyodbc.Error as e:
             raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"
