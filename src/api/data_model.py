@@ -1,3 +1,4 @@
+"""O3 data model parser that reads the O3 JSON schema into Python objects."""
 from __future__ import annotations
 from collections.abc import Iterator
 
@@ -35,8 +36,11 @@ class O3DataModel:
         """
         super().__init__()
 
-        path: Path = pathlib.Path.joinpath(pathlib.Path.cwd(), json_file)
-        path.absolute()
+        json_path = pathlib.Path(json_file)
+        if json_path.is_absolute():
+            path: Path = json_path
+        else:
+            path: Path = pathlib.Path.cwd() / json_file
 
         if not path.exists():
             raise FileNotFoundError(f"Path not found: {path}")
@@ -49,13 +53,44 @@ class O3DataModel:
         self.key_elements: dict[str, O3KeyElement] = {}
         self.__standard_value_lists: Optional[dict[str, list[O3StandardValue]]] = None
         self.__value_data_types: Optional[set[str]] = None
-        self.__sql_data_types: Optional[set[str]] = None
         self.__value_priority: Optional[set[str]] = None
         self.__reference_system_for_standard_values: Optional[set[str]] = None
         self.__allow_nulls: Optional[set[str]] = None
 
         self.__json_to_dictionary()
         self.__create_key_elements(**kwargs)
+
+    @classmethod
+    def from_dict(cls, data: list[dict], **kwargs) -> "O3DataModel":
+        """
+        Create an O3DataModel from an in-memory list of dictionaries,
+        bypassing the filesystem.
+
+        Parameters
+        ----------
+        data : list[dict]
+            the JSON-parsed list of key element dictionaries
+        kwargs
+            clean: bool
+                attempts to clean common errors in the typed data of the key element and
+                its attributes
+
+        Returns
+        -------
+        O3DataModel
+            the instantiated data model
+        """
+        instance = object.__new__(cls)
+        instance.json_file = None
+        instance.json_obj = data
+        instance.key_elements = {}
+        instance._O3DataModel__standard_value_lists = None
+        instance._O3DataModel__value_data_types = None
+        instance._O3DataModel__value_priority = None
+        instance._O3DataModel__reference_system_for_standard_values = None
+        instance._O3DataModel__allow_nulls = None
+        instance._O3DataModel__create_key_elements(**kwargs)
+        return instance
 
     def __json_to_dictionary(self) -> None:
         """
@@ -100,7 +135,7 @@ class O3DataModel:
         O3KeyElement
             Key elements from the instantiated model
         """
-        for _, ke in self.key_elements.items():
+        for ke in self.key_elements.values():
             yield ke
 
     def __attribute_generator(self) -> Iterator[O3Attribute]:
@@ -116,25 +151,6 @@ class O3DataModel:
             for ele_attr in ke.list_attributes:
                 yield ele_attr
 
-    def __read_property_from_attribute(self, collection, attribute_name) -> None:
-        """
-        Adds the properties from the attributes of each key element to the passed set
-
-        Parameters
-        ----------
-        collection: set[str]
-            the set to add the properties to
-        attribute_name: str
-            the name of the attribute to pass to the set
-
-        Returns
-        -------
-            None
-        """
-        for ke in self.__key_element_generator():
-            for ele_attr in ke.list_attributes:
-                collection.add(getattr(ele_attr, attribute_name))
-
     def __read_standard_values(self) -> None:
         """
         Reads the standard value lists from the attributes of each key element and adds to a dictionary
@@ -148,62 +164,27 @@ class O3DataModel:
             if len(ele_attr.standard_values_list) > 0:
                 self.__standard_value_lists[ele_attr.value_name] = ele_attr.standard_values_list
 
-    def __read_value_data_types(self) -> None:
+    def __collect_all_attribute_properties(self) -> None:
         """
-        Reads the value data types from the attributes of each key element and adds to the appropriate set
+        Iterates all attributes once and populates all attribute property caches simultaneously.
 
         Returns
         -------
             None
         """
+        if self.__value_data_types is not None:
+            return
+
         self.__value_data_types = set()
-        self.__read_property_from_attribute(self.__value_data_types, 'value_data_type')
-
-    def __read_sql_data_types(self) -> None:
-        """
-        Reads the sql data types from the attributes of each key element and adds to the appropriate set
-
-        Returns
-        -------
-            None
-        """
-        self.__sql_data_types = set()
-        self.__read_property_from_attribute(self.__sql_data_types, 'sql_data_type')
-
-    def __read_value_priority(self) -> None:
-        """
-        Reads the value priority from the attributes of each key element and adds to the appropriate set
-
-        Returns
-        -------
-            None
-        """
         self.__value_priority = set()
-        self.__read_property_from_attribute(self.__value_priority, 'value_priority')
-
-    def __read_reference_system_for_standard_values(self) -> None:
-        """
-        Reads the reference system for standard values from the attributes of each key element
-        and adds to the appropriate set
-
-        Returns
-        -------
-            None
-        """
         self.__reference_system_for_standard_values = set()
-        self.__read_property_from_attribute(self.__reference_system_for_standard_values,
-                                            'reference_system_for_values')
-
-    def __read_allow_nulls(self) -> None:
-        """
-        Reads the allow nulls from the attributes of each key element and adds to the appropriate set
-
-        Returns
-        -------
-            None
-        """
         self.__allow_nulls = set()
-        self.__read_property_from_attribute(self.__allow_nulls, 'allow_null_values')
+
+        for ele_attr in self.__attribute_generator():
+            self.__value_data_types.add(ele_attr.value_data_type)
+            self.__value_priority.add(ele_attr.value_priority)
+            self.__reference_system_for_standard_values.add(ele_attr.reference_system_for_values)
+            self.__allow_nulls.add(ele_attr.allow_null_values)
 
     @property
     def standard_value_lists(self) -> dict[str, list[O3StandardValue]]:
@@ -212,7 +193,7 @@ class O3DataModel:
 
         Returns
         -------
-            dict[str, list[str]]
+            dict[str, list[O3StandardValue]]
                 A dictionary of the standard value lists with name of the list as the key and items as the value
         """
         if self.__standard_value_lists is None:
@@ -231,24 +212,9 @@ class O3DataModel:
                 the unique value data types as a set
         """
         if self.__value_data_types is None:
-            self.__read_value_data_types()
+            self.__collect_all_attribute_properties()
 
         return self.__value_data_types
-
-    @property
-    def sql_data_types(self) -> set[str]:
-        """
-        Retrieves all unique sql data types for the model.
-
-        Returns
-        -------
-            set[str]
-                the unique sql data types as a set
-        """
-        if self.__sql_data_types is None:
-            self.__read_sql_data_types()
-
-        return self.__sql_data_types
 
     @property
     def value_priority(self) -> set[str]:
@@ -261,7 +227,7 @@ class O3DataModel:
                 the unique value priorities as a set
         """
         if self.__value_priority is None:
-            self.__read_value_priority()
+            self.__collect_all_attribute_properties()
 
         return self.__value_priority
 
@@ -276,7 +242,7 @@ class O3DataModel:
                 the reference systems for standard values as a set
         """
         if self.__reference_system_for_standard_values is None:
-            self.__read_reference_system_for_standard_values()
+            self.__collect_all_attribute_properties()
 
         return self.__reference_system_for_standard_values
 
@@ -291,7 +257,7 @@ class O3DataModel:
                 the unique allow null values as a set
         """
         if self.__allow_nulls is None:
-            self.__read_allow_nulls()
+            self.__collect_all_attribute_properties()
 
         return self.__allow_nulls
 

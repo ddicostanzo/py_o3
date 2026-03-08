@@ -1,3 +1,5 @@
+"""Mapping of O3 data types to SQL column types per server (deprecated, use SQLDialect.type_map)."""
+# Deprecated: prefer SQLDialect.type_map. This dict is maintained for backward compatibility.
 from helpers.enums import SupportedSQLServers
 
 sql_data_types = {SupportedSQLServers.MSSQL: {"Boolean": "bit",

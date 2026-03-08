@@ -132,34 +132,34 @@ class TestKeyElementTableCreator:
 
     def test_sql_table_includes_identity_column(self):
         ke = self._mock_key_element(string_code="Patient")
-        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke)
-        sql = creator.sql_table(phi_allowed=False)
+        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke, phi_allowed=False)
+        sql = creator.sql_table()
         assert "PatientId SERIAL PRIMARY KEY" in sql
 
     def test_sql_table_includes_history_columns(self):
         ke = self._mock_key_element(string_code="Patient")
-        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke)
-        sql = creator.sql_table(phi_allowed=False)
+        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke, phi_allowed=False)
+        sql = creator.sql_table()
         assert "HistoryUser" in sql
         assert "HistoryDateTime" in sql
 
     def test_sql_table_creates_table_statement(self):
         ke = self._mock_key_element(string_code="Patient")
-        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke)
-        sql = creator.sql_table(phi_allowed=False)
+        creator = KeyElementTableCreator(SupportedSQLServers.PSQL, ke, phi_allowed=False)
+        sql = creator.sql_table()
         assert sql.startswith("CREATE TABLE Patient")
 
     def test_mssql_sql_table_has_system_versioning(self):
         ke = self._mock_key_element(string_code="Patient")
-        creator = KeyElementTableCreator(SupportedSQLServers.MSSQL, ke)
-        sql = creator.sql_table(phi_allowed=False)
+        creator = KeyElementTableCreator(SupportedSQLServers.MSSQL, ke, phi_allowed=False)
+        sql = creator.sql_table()
         assert "SYSTEM_VERSIONING" in sql
         assert "PatientHistory" in sql
 
     def test_mssql_identity_uses_int_identity(self):
         ke = self._mock_key_element(string_code="Patient")
-        creator = KeyElementTableCreator(SupportedSQLServers.MSSQL, ke)
-        sql = creator.sql_table(phi_allowed=False)
+        creator = KeyElementTableCreator(SupportedSQLServers.MSSQL, ke, phi_allowed=False)
+        sql = creator.sql_table()
         assert "PatientId INT IDENTITY(1, 1) NOT NULL PRIMARY KEY" in sql
 
 
@@ -185,3 +185,30 @@ class TestPatientIdentifierHash:
         assert "FOREIGN KEY" in table.foreign_key
         assert "PatientId" in table.foreign_key
         assert "Patient" in table.foreign_key
+
+    def test_column_named_mrnhash_not_mrn(self):
+        table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")
+        sql = table.sql_table()
+        assert "MRNHash" in sql
+        assert "MRN " not in sql
+        assert "MRN\t" not in sql
+
+    def test_psql_column_named_mrnhash_not_mrn(self):
+        table = PatientIdentifierHash(SupportedSQLServers.PSQL, "PatientHash")
+        sql = table.sql_table()
+        assert "MRNHash" in sql
+        assert "MRN " not in sql
+
+    def test_foreign_key_uses_restrict_not_cascade_on_delete(self):
+        table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")
+        assert "ON DELETE RESTRICT" in table.foreign_key
+        assert "ON DELETE CASCADE" not in table.foreign_key
+
+    def test_foreign_key_uses_cascade_on_update(self):
+        table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")
+        assert "ON UPDATE CASCADE" in table.foreign_key
+
+    def test_static_columns_key_is_mrnhash(self):
+        table = PatientIdentifierHash(SupportedSQLServers.MSSQL, "PatientHash")
+        assert "MRNHash" in table.static_columns
+        assert "MRN" not in table.static_columns

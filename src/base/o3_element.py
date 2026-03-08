@@ -1,3 +1,6 @@
+"""Base class for O3 ontology entities parsed from JSON."""
+
+
 class O3Element:
     """
     The base class for O3 key elements and attributes.
@@ -12,16 +15,23 @@ class O3Element:
         item_dict: dict
             The JSON dictionary containing the O3 element data.
         """
-        self.value_name = item_dict['ValueName']
-        self.value_type = item_dict['ValueType']
-        self.string_code = item_dict['StringCode']
-        self.numeric_code = item_dict['NumericCode']
-        self.definition = item_dict['Definition']
-        self.value_priority = item_dict['ValuePriority']
-        self.more_than_one_value_allowed = item_dict['MoreThanOneValueAllowed']
-        self.sct_id = item_dict['SCTID']
-        self.ncitc = item_dict['NCITC']
-        self.ncimt = item_dict['NCIMT']
+        try:
+            self.value_name = item_dict['ValueName']
+            self.value_type = item_dict['ValueType']
+            self.string_code = item_dict['StringCode']
+            self.numeric_code = item_dict['NumericCode']
+            self.definition = item_dict['Definition']
+            self.value_priority = item_dict['ValuePriority']
+            self.more_than_one_value_allowed = item_dict['MoreThanOneValueAllowed']
+            self.sct_id = item_dict['SCTID']
+            self.ncitc = item_dict['NCITC']
+            self.ncimt = item_dict['NCIMT']
+        except KeyError as e:
+            key = e.args[0]
+            raise KeyError(
+                f"Missing key '{key}' while parsing O3 element "
+                f"'{item_dict.get('ValueName', 'unknown')}'"
+            ) from e
 
     def __str__(self):
         return self.value_name

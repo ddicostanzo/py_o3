@@ -1,4 +1,5 @@
-SELECT
+-- Production usage should add WHERE clauses to limit results to specific patients
+SELECT TOP 100
 
 dp.PatientId,
 dp.PatientLastName,

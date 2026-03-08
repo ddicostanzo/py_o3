@@ -1,5 +1,7 @@
+"""Base class for executing parameterized SQL queries via pyodbc."""
 from __future__ import annotations
 
+import logging
 from contextlib import closing
 from typing import Iterable, Generator
 
@@ -8,12 +10,28 @@ from pyodbc import Connection
 
 
 class Datatable:
+    """
+    Base class for parameterized SQL query execution via pyodbc.
+
+    Reads a SQL query from a file and provides generator-based and
+    batch retrieval methods for query results.
+
+    Parameters
+    ----------
+    connection : pyodbc.Connection
+        an active pyodbc connection to the target database
+    query_location : str
+        the file path to the SQL query to execute
+    """
+
     def __init__(self, connection: Connection, query_location: str):
         self.connection = connection
+        self.query_location = query_location
         with open(query_location, 'r') as query:
             self.query = query.read()
 
     def _get_data(self, num_results: int = None) -> Iterable[pyodbc.Row] | Generator[pyodbc.Row, None, None]:
+        logging.info(f"Executing query from {self.query_location}")
         if num_results is None:
             return self._data_generator()
         else:

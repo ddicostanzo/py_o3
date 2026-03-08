@@ -303,6 +303,7 @@ pip-selfcheck.json
 
 # Environment variable files (all variants)
 .env.*
+!.env.example
 
 # Certificate and key files
 *.pem
@@ -314,3 +315,4 @@ pip-selfcheck.json
 Sql_Commands/
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python,venv
+.grepai/

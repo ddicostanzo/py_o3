@@ -1,6 +1,7 @@
+"""Foreign key constraint generation from O3 relationships."""
 from __future__ import annotations
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from helpers.test_sql_server_type import check_sql_server_type
+from helpers.validate_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
 
@@ -14,7 +15,8 @@ class ForeignKeysConstraints:
     The class to instantiate foreign keys constraints.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: "SupportedSQLServers"):
+    def __init__(self, relationship: "O3Relationship", sql_server_type: "SupportedSQLServers",
+                 on_delete: str = "RESTRICT"):
         """
         Instantiate foreign keys constraints from an O3 relationship.
 
@@ -24,12 +26,15 @@ class ForeignKeysConstraints:
             the relationship to create the foriegn keys constraints
         sql_server_type: SupportedSQLServers
             the SQL server type to generate the commands
+        on_delete: str
+            the ON DELETE action to use (default: "RESTRICT")
         """
         if not check_sql_server_type(sql_server_type):
             raise ValueError("Unsupported SQL Server Type")
 
         self._relationship = relationship
         self.sql_server_type = sql_server_type
+        self._on_delete = on_delete
         self.subject_element = relationship.subject_element
         self.subject_table_name = leave_only_letters_numbers_or_underscore(relationship.subject_element)
         self.predicate_element = relationship.predicate_element
@@ -62,17 +67,16 @@ class ForeignKeysConstraints:
         return (f"FOREIGN KEY ({self.predicate_table_name}Id) "
                 f"REFERENCES {self.predicate_table_name} ({self.predicate_table_name}Id)")
 
-    @staticmethod
-    def __command_suffix() -> str:
+    def __command_suffix(self) -> str:
         """
-        The SQL command suffix including the update and delete cascade commands.
+        The SQL command suffix including the update and delete action commands.
 
         Returns
         -------
             str
                 the SQL command suffix
         """
-        return f"ON DELETE CASCADE ON UPDATE CASCADE"
+        return f"ON DELETE {self._on_delete} ON UPDATE CASCADE"
 
     @property
     def column_creation_text(self) -> str:

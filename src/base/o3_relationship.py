@@ -1,3 +1,6 @@
+"""O3 relationship linking subject and predicate key elements."""
+
+
 class O3Relationship:
     """
     The O3 relationship class.
