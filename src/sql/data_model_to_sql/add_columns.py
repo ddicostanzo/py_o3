@@ -1,14 +1,14 @@
 """Functions to generate ALTER TABLE ADD COLUMN SQL commands."""
 from __future__ import annotations
+
 from helpers.enums import SupportedSQLServers
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from helpers.validate_sql_server_type import check_sql_server_type
-from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 from sql.dialects import get_dialect
 
 
 def add_column_sql_command(table: str, column_name: str, column_type: str,
-                           nullable: bool, sql_server_type: "SupportedSQLServers") -> str:
+                           nullable: bool, sql_server_type: SupportedSQLServers) -> str:
     """
     Creates the SQL command to add a column to a table.
 
@@ -33,9 +33,9 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
     if not check_sql_server_type(sql_server_type):
         raise ValueError("Unsupported SQL Server Type")
 
-    _data_types = list(sql_data_types[sql_server_type].values())
+    dialect = get_dialect(sql_server_type)
 
-    if column_type not in _data_types:
+    if column_type not in dialect.type_map.values():
         raise TypeError(f"Column type {column_type} does not exist in specified types")
 
     _null = "NULL" if nullable else "NOT NULL"
@@ -43,11 +43,10 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
     table = leave_only_letters_numbers_or_underscore(table)
     column_name = leave_only_letters_numbers_or_underscore(column_name)
 
-    dialect = get_dialect(sql_server_type)
     return dialect.alter_table_add_column(table, column_name, column_type, _null)
 
 
-def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: "SupportedSQLServers") -> str:
+def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: SupportedSQLServers) -> str:
     """
     Creates the SQL command to add a foreign key column to a table.
 

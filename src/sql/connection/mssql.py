@@ -1,9 +1,10 @@
 """MSSQL database connection management using pyodbc and .env configuration."""
 import warnings
 
-from dotenv import dotenv_values
-from helpers.enums import ServerToConnect, SQLAuthentication
 import pyodbc
+from dotenv import dotenv_values
+
+from helpers.enums import ServerToConnect, SQLAuthentication
 
 _REQUIRED_KEYS = ['DRIVER', 'SERVER', 'DATABASE', 'SCHEMA', 'AUTH', 'USERID', 'PASSWORD']
 
@@ -73,6 +74,10 @@ class MSSQLConnection:
                 UserWarning,
                 stacklevel=2,
             )
+
+    def __repr__(self) -> str:
+        return (f"MSSQLConnection(host={self.host!r}, database={self.database!r}, "
+                f"schema={self.schema!r}, auth={self.authentication.value!r})")
 
     def __connection_string(self) -> dict[str, str]:
         if self.authentication == SQLAuthentication.SQL:

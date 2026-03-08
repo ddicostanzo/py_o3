@@ -1,11 +1,11 @@
 """O3 attribute representing a property of a key element with data type and standard values."""
 from __future__ import annotations
 
-from base.o3_standard_value import O3StandardValue
-from base.o3_element import O3Element
 import warnings
-
 from typing import TYPE_CHECKING
+
+from base.o3_element import O3Element
+from base.o3_standard_value import O3StandardValue
 
 if TYPE_CHECKING:
     from base.o3_key_element import O3KeyElement
@@ -20,7 +20,7 @@ class O3Attribute(O3Element):
         {'Boolean', 'Binary', 'Date', 'Decimal', 'Integer', 'String'}
     )
 
-    def __init__(self, key_element: "O3KeyElement", item_dict: dict, **kwargs):
+    def __init__(self, key_element: O3KeyElement, item_dict: dict, **kwargs):
         """
         Instantiates an O3Attribute object using the parent key element and dictionary containing the attribute.
 
@@ -36,7 +36,7 @@ class O3Attribute(O3Element):
         """
         super().__init__(item_dict)
 
-        self.key_element: "O3KeyElement" = key_element
+        self.key_element: O3KeyElement = key_element
         self.value_data_type: str = item_dict['ValueDataType']
         self.standard_values_use: str = item_dict['StandardValuesUse']
         self.standard_values_list: list[O3StandardValue] = [O3StandardValue(self.key_element,
@@ -99,7 +99,7 @@ class O3Attribute(O3Element):
 
         if len(self.standard_values_list) == 0 and self.value_data_type == "":
             self.value_data_type = "String"
-            warnings.warn(f"Setting value data type to string for attribute: {self.value_name}.", UserWarning)
+            warnings.warn(f"Setting value data type to string for attribute: {self.value_name}.", UserWarning, stacklevel=2)
 
         if self.value_data_type not in self._POSSIBLE_VALUE_DATA_TYPES:
             if self.value_data_type == "Int":

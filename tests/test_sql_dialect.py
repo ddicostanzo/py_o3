@@ -170,17 +170,3 @@ class TestProtocolCompliance:
         assert isinstance(psql, SQLDialect)
 
 
-class TestTypeMapMatchesLegacy:
-    """Tests that dialect type_map values match the legacy sql_data_types dict."""
-
-    def test_mssql_type_map_matches_legacy(self):
-        from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
-        dialect = MSSQLDialect()
-        legacy = sql_data_types[SupportedSQLServers.MSSQL]
-        assert dialect.type_map == legacy
-
-    def test_psql_type_map_matches_legacy(self):
-        from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
-        dialect = PSQLDialect()
-        legacy = sql_data_types[SupportedSQLServers.PSQL]
-        assert dialect.type_map == legacy

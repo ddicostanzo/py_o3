@@ -47,6 +47,18 @@ class PSQLDialect:
     def table_suffix(self, table_name: str) -> str:
         return ';'
 
+    def string_type_short(self, max_length: int = 256) -> str:
+        return "text"
+
+    def unique_constraint(self, constraint_name: str, column: str) -> str:
+        return f"Unique({column})"
+
+    def create_index(self, index_name: str, table_name: str, column: str,
+                     include_columns: list[str]) -> str:
+        includes = ", ".join(include_columns)
+        return (f"CREATE INDEX {index_name} ON {table_name} "
+                f"({column}) INCLUDE ({includes});\n")
+
     def alter_table_add_column(self, table: str, col_name: str, col_type: str, nullable: str) -> str:
         return f'ALTER TABLE {table} ADD COLUMN {col_name} {col_type} {nullable};'
 

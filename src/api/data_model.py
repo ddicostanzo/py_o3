@@ -1,18 +1,19 @@
 """O3 data model parser that reads the O3 JSON schema into Python objects."""
 from __future__ import annotations
+
+import json
+import pathlib
 from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from base.o3_attribute import O3Attribute
 from base.o3_key_element import O3KeyElement
-import json
-import pathlib
-
-from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from base.o3_key_element import O3KeyElement
     from base.o3_standard_value import O3StandardValue
-    from pathlib import Path
 
 
 class O3DataModel:
@@ -62,14 +63,14 @@ class O3DataModel:
         name-mangled attribute names.
         """
         self.key_elements: dict[str, O3KeyElement] = {}
-        self.__standard_value_lists: Optional[dict[str, list[O3StandardValue]]] = None
-        self.__value_data_types: Optional[set[str]] = None
-        self.__value_priority: Optional[set[str]] = None
-        self.__reference_system_for_standard_values: Optional[set[str]] = None
-        self.__allow_nulls: Optional[set[str]] = None
+        self.__standard_value_lists: dict[str, list[O3StandardValue]] | None = None
+        self.__value_data_types: set[str] | None = None
+        self.__value_priority: set[str] | None = None
+        self.__reference_system_for_standard_values: set[str] | None = None
+        self.__allow_nulls: set[str] | None = None
 
     @classmethod
-    def from_dict(cls, data: list[dict], **kwargs) -> "O3DataModel":
+    def from_dict(cls, data: list[dict], **kwargs) -> O3DataModel:
         """
         Create an O3DataModel from an in-memory list of dictionaries,
         bypassing the filesystem.
@@ -103,7 +104,7 @@ class O3DataModel:
         -------
         None
         """
-        with open(self.json_file, 'r') as file:
+        with open(self.json_file) as file:
             _json_text = file.read()
             # The O3 JSON contains escape characters with the Unicode encoded +.
             # This removes those and provides "Other" as a category.
@@ -138,8 +139,7 @@ class O3DataModel:
         O3KeyElement
             Key elements from the instantiated model
         """
-        for ke in self.key_elements.values():
-            yield ke
+        yield from self.key_elements.values()
 
     def __attribute_generator(self) -> Iterator[O3Attribute]:
         """
@@ -151,8 +151,7 @@ class O3DataModel:
             the O3Attribute objects from the instantiated model
         """
         for ke in self.__key_element_generator():
-            for ele_attr in ke.list_attributes:
-                yield ele_attr
+            yield from ke.list_attributes
 
     def __read_standard_values(self) -> None:
         """

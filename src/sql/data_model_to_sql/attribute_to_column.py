@@ -1,13 +1,12 @@
 """Mapping of O3 attributes to SQL column definitions with data type resolution."""
 from __future__ import annotations
+
 import warnings
-
-from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
-from helpers.enums import SupportedSQLServers
-from sql.dialects import get_dialect
-
 from typing import TYPE_CHECKING
+
+from helpers.enums import SupportedSQLServers
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from sql.dialects import get_dialect
 
 if TYPE_CHECKING:
     from base.o3_attribute import O3Attribute
@@ -30,7 +29,7 @@ class AttributeToSQLColumn:
     The class that handles conversion of O3 attributes to SQL columns.
     """
 
-    def __init__(self, attribute: "O3Attribute", phi_allowed: bool, sql_server_type: SupportedSQLServers):
+    def __init__(self, attribute: O3Attribute, phi_allowed: bool, sql_server_type: SupportedSQLServers):
         """
         Instantiates the object that will convert the Attribute to a SQL column.
 
@@ -117,7 +116,7 @@ class AttributeToSQLColumn:
             self.column_nullable = 'NULL' if self.allow_phi else 'NOT NULL'
 
         if self.column_nullable is None:
-            warnings.warn(f"No SQL nullable field set using logic. Defaulting to NULL for {self}")
+            warnings.warn(f"No SQL nullable field set using logic. Defaulting to NULL for {self}", stacklevel=2)
             self.column_nullable = 'NULL'
 
     def __set_date_for_iso8601(self) -> None:
@@ -157,7 +156,7 @@ class AttributeToSQLColumn:
         """
         If the value data type of the attribute is of type "String" set the column_data_type to String
         """
-        if "string" == self.attribute.value_data_type.lower():
+        if self.attribute.value_data_type.lower() == "string":
             self.column_data_type = "String"
 
     def __set_binary_data_type(self) -> None:
@@ -178,7 +177,7 @@ class AttributeToSQLColumn:
         """
         If the attribute value data type is set to Boolean, set the column_data_type to Boolean
         """
-        if "boolean" == self.attribute.value_data_type.lower():
+        if self.attribute.value_data_type.lower() == "boolean":
             self.column_data_type = "Boolean"
 
     def __set_decimal_data_type(self) -> None:

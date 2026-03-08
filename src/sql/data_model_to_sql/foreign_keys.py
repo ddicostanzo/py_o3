@@ -1,9 +1,10 @@
 """Foreign key constraint generation from O3 relationships."""
 from __future__ import annotations
-from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from helpers.validate_sql_server_type import check_sql_server_type
 
 from typing import TYPE_CHECKING
+
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from helpers.validate_sql_server_type import check_sql_server_type
 
 if TYPE_CHECKING:
     from base.o3_relationship import O3Relationship
@@ -15,7 +16,7 @@ class ForeignKeysConstraints:
     The class to instantiate foreign keys constraints.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: "SupportedSQLServers",
+    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers,
                  on_delete: str = "RESTRICT"):
         """
         Instantiate foreign keys constraints from an O3 relationship.

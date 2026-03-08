@@ -1,11 +1,15 @@
 """Entry point script demonstrating O3 model parsing and SQL generation workflow."""
 import logging
 
-from api.workflow import (create_model, create_tables, create_standard_value_lookup_table,
-                          foreign_key_constraints, write_sql_to_text)
-from sql.data_model_to_sql.table_generator import LookupTableCreator, PatientIdentifierHash
-from helpers.enums import SupportedSQLServers, ServerToConnect
+from api.workflow import (
+    create_model,
+    create_standard_value_lookup_table,
+    create_tables,
+    foreign_key_constraints,
+)
+from helpers.enums import ServerToConnect, SupportedSQLServers
 from sql.connection.mssql import MSSQLConnection
+from sql.data_model_to_sql.table_generator import LookupTableCreator, PatientIdentifierHash
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -16,7 +20,7 @@ if __name__ == "__main__":
     clean_file: bool = True
     o3_model = create_model(file_location=o3_schema, clean=clean_file)
     # sub, pred, cat = get_table_names_from_relationships(o3_model)
-    # test_names_in_relationships(sub, pred, model)
+    # validate_names_in_relationships(sub, pred, model)
 
     sql_server_type: SupportedSQLServers = SupportedSQLServers.MSSQL
     is_phi_allowed: bool = True

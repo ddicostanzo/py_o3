@@ -1,10 +1,8 @@
 """Tests for Datatable class with mocked pyodbc."""
 
-import sys
 import logging
+import sys
 from unittest.mock import MagicMock
-
-import pytest
 
 # Mock pyodbc before importing Datatable
 sys.modules.setdefault('pyodbc', MagicMock())

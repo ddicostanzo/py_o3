@@ -1,12 +1,13 @@
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import MagicMock, PropertyMock
 
 from helpers.enums import SupportedSQLServers
 from sql.data_model_to_sql.table_generator import (
-    SQLTable,
     CustomTable,
     KeyElementTableCreator,
     PatientIdentifierHash,
+    SQLTable,
 )
 
 

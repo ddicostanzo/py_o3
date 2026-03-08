@@ -1,17 +1,18 @@
 """SQL table generators for O3 key elements, standard value lists, and custom tables."""
 from __future__ import annotations
 
-from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
-                                    leave_letters_numbers_spaces_underscores_dashes)
+from typing import TYPE_CHECKING
+
 from helpers.enums import SupportedSQLServers
-from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
-from sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
-                                                          InstanceRelationshipToColumn)
+from helpers.string_helpers import (
+    leave_letters_numbers_spaces_underscores_dashes,
+    leave_only_letters_numbers_or_underscore,
+)
 from helpers.validate_sql_server_type import check_sql_server_type
+from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
+from sql.data_model_to_sql.relationship_to_column import ChildRelationshipToColumn, InstanceRelationshipToColumn
 from sql.dialect import SQLDialect
 from sql.dialects import get_dialect
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from base.o3_key_element import O3KeyElement
@@ -117,7 +118,7 @@ class KeyElementTableCreator(SQLTable):
     The class that creates a SQL table for an O3 Key Element.
     """
 
-    def __init__(self, sql_server_type: SupportedSQLServers, key_element: "O3KeyElement",
+    def __init__(self, sql_server_type: SupportedSQLServers, key_element: O3KeyElement,
                  phi_allowed: bool = False):
         """
         The instantiation of the Key Element Table Creator class that takes the Key Element and SQL type to use
@@ -247,7 +248,7 @@ class StandardListTableCreator(CustomTable):
     Base class to create Standard List tables
     """
 
-    def __init__(self, sql_server_type: SupportedSQLServers, title: str, items: list["O3StandardValue"]):
+    def __init__(self, sql_server_type: SupportedSQLServers, title: str, items: list[O3StandardValue]):
         """
         Instantiates a new Standard List Table Creator class used for generating a table for the standard value lists
 
@@ -265,21 +266,17 @@ class StandardListTableCreator(CustomTable):
         dialect = get_dialect(sql_server_type)
 
         static_columns = {
-            "key_element": f"KeyElement {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
-            "attribute": f"Attribute {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
-            "standard_value_item": f"StandardValueItemName {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
-            "numeric_code": f"NumericCode {dialect.string_type if dialect.name == 'PSQL' else 'varchar(32)'} NOT NULL",
+            "key_element": f"KeyElement {dialect.string_type_short(256)} NOT NULL",
+            "attribute": f"Attribute {dialect.string_type_short(256)} NOT NULL",
+            "standard_value_item": f"StandardValueItemName {dialect.string_type_short(256)} NOT NULL",
+            "numeric_code": f"NumericCode {dialect.string_type_short(32)} NOT NULL",
             "active_flag": f"ActiveFlag {dialect.boolean_type} NOT NULL DEFAULT 1",
+            "unique_constraint": dialect.unique_constraint("AK_NumericCode", "NumericCode"),
+            "index": dialect.create_index(
+                "IX_StandardValueLookup_NumericCode", table_name,
+                "NumericCode", ["KeyElement", "Attribute"],
+            ),
         }
-
-        if sql_server_type == SupportedSQLServers.MSSQL:
-            static_columns["unique_constraint"] = "CONSTRAINT AK_NumericCode Unique(NumericCode)"
-            static_columns["index"] = (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {table_name} "
-                                       f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
-        else:
-            static_columns["unique_constraint"] = "Unique(NumericCode)"
-            static_columns["index"] = (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {table_name} "
-                                       f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
 
         super().__init__(sql_server_type, title, static_columns)
 
@@ -337,7 +334,7 @@ class LookupTableCreator(StandardListTableCreator):
     An inherited class that generates a single lookup table for all standard value lists.
     """
 
-    def __init__(self, sql_server_type: SupportedSQLServers, items: list["O3StandardValue"]):
+    def __init__(self, sql_server_type: SupportedSQLServers, items: list[O3StandardValue]):
         """
         Instantiates a new Lookup Table class used for generating a table for the standard value lists
 

@@ -1,11 +1,12 @@
 """Mapping of O3 relationships to SQL foreign key column definitions."""
 from __future__ import annotations
-from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from helpers.validate_sql_server_type import check_sql_server_type
-from helpers.enums import SupportedSQLServers
-from sql.dialects import get_dialect
 
 from typing import TYPE_CHECKING
+
+from helpers.enums import SupportedSQLServers
+from helpers.string_helpers import leave_only_letters_numbers_or_underscore
+from helpers.validate_sql_server_type import check_sql_server_type
+from sql.dialects import get_dialect
 
 if TYPE_CHECKING:
     from base.o3_relationship import O3Relationship
@@ -20,7 +21,7 @@ class RelationshipToColumn:
     nullable constraint.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers,
+    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers,
                  element_field: str, nullable: str):
         """
         Instantiates a relationship column using the relationship and SQL server type.
@@ -90,7 +91,7 @@ class ChildRelationshipToColumn(RelationshipToColumn):
     The Child Relationship column adds the primary key from the predicate element to the subject element's table.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
+    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers):
         """
         Instantiates a child relationship column using the relationship and SQL server type.
 
@@ -110,7 +111,7 @@ class InstanceRelationshipToColumn(RelationshipToColumn):
     The Instance Relationship column adds the primary key from the subject element.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
+    def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers):
         """
         Instantiates an instance relationship column using the relationship and SQL server type.
 

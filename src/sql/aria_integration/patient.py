@@ -1,5 +1,6 @@
 """Patient data query executor for the Aria data warehouse."""
 from pyodbc import Connection
+
 from sql.aria_integration.queried_datatable import Datatable
 
 

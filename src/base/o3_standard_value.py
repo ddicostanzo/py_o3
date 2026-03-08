@@ -1,5 +1,6 @@
 """O3 standard value representing an enumerated allowed value for an attribute."""
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,7 +13,7 @@ class O3StandardValue:
     The O3 standard value class.
     """
 
-    def __init__(self, key_element: "O3KeyElement", attrib: "O3Attribute", item: str):
+    def __init__(self, key_element: O3KeyElement, attrib: O3Attribute, item: str):
         self.key_element = key_element
         self.attribute = attrib
         parts = item.split('{')

@@ -7,12 +7,12 @@ import pytest
 
 from api.data_model import O3DataModel
 from helpers.enums import SupportedSQLServers
+from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 from sql.data_model_to_sql.table_generator import (
     KeyElementTableCreator,
-    StandardListTableCreator,
     LookupTableCreator,
+    StandardListTableCreator,
 )
-from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 
 _JSON_PATH = pathlib.Path(__file__).parent.parent / 'src' / 'Resources' / 'O3_20250128_Fixed.json'
 
@@ -63,7 +63,7 @@ class TestFromDict:
     """Test O3DataModel.from_dict() classmethod."""
 
     def test_from_dict_creates_same_key_elements(self):
-        with open(_JSON_PATH, 'r') as f:
+        with open(_JSON_PATH) as f:
             text = f.read()
             text = text.replace('(\\u002B Other)', 'Other')
             text = text.replace('(\\u002BOther)', 'Other')
@@ -74,7 +74,7 @@ class TestFromDict:
         assert "Patient" in model.key_elements
 
     def test_from_dict_json_file_is_none(self):
-        with open(_JSON_PATH, 'r') as f:
+        with open(_JSON_PATH) as f:
             text = f.read()
             text = text.replace('(\\u002B Other)', 'Other')
             text = text.replace('(\\u002BOther)', 'Other')

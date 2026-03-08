@@ -92,6 +92,66 @@ class SQLDialect(Protocol):
         """
         ...
 
+    def string_type_short(self, max_length: int = 256) -> str:
+        """
+        A bounded string type for columns with known maximum lengths.
+
+        For MSSQL this returns varchar(max_length), for PSQL this returns text
+        (PostgreSQL does not benefit from bounded varchar).
+
+        Parameters
+        ----------
+        max_length : int
+            the maximum character length (used by MSSQL, ignored by PSQL)
+
+        Returns
+        -------
+        str
+            the bounded string type
+        """
+        ...
+
+    def unique_constraint(self, constraint_name: str, column: str) -> str:
+        """
+        Generate a UNIQUE constraint clause for a CREATE TABLE statement.
+
+        Parameters
+        ----------
+        constraint_name : str
+            the constraint name (used by MSSQL, ignored by PSQL)
+        column : str
+            the column to constrain
+
+        Returns
+        -------
+        str
+            the unique constraint clause
+        """
+        ...
+
+    def create_index(self, index_name: str, table_name: str, column: str,
+                     include_columns: list[str]) -> str:
+        """
+        Generate a CREATE INDEX statement.
+
+        Parameters
+        ----------
+        index_name : str
+            the index name
+        table_name : str
+            the table to index
+        column : str
+            the indexed column
+        include_columns : list[str]
+            columns to include in the index
+
+        Returns
+        -------
+        str
+            the CREATE INDEX statement
+        """
+        ...
+
     def alter_table_add_column(self, table: str, col_name: str, col_type: str, nullable: str) -> str:
         """
         Generate an ALTER TABLE ADD COLUMN statement.

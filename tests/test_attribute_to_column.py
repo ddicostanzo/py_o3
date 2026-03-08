@@ -1,16 +1,13 @@
 """Tests for AttributeToSQLColumn class."""
 
 import warnings
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock
 
 from helpers.enums import SupportedSQLServers
 from sql.data_model_to_sql.attribute_to_column import (
     AttributeToSQLColumn,
-    _ALWAYS_NULLABLE,
-    _ALWAYS_NOT_NULL,
-    _PHI_DEPENDENT,
 )
 
 

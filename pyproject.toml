@@ -6,17 +6,67 @@ build-backend = "hatchling.build"
 name = "py-o3"
 version = "0.1.0"
 description = "A simple library with limited dependencies to instantiate the O3 data model from the JSON schema."
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
+keywords = ["oncology", "o3", "sql", "schema", "medical-physics", "aapm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Typing :: Typed",
+]
 dependencies = [
     "pyodbc>=4.0",
     "python-dotenv>=1.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/ddicostanzo/py_o3"
+
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "ruff>=0.8"]
+
+[project.scripts]
+py-o3 = "cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "SIM108", # use ternary operator (readability preference)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_datatable.py" = ["E402"]
+"tests/test_mssql_connection.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api", "base", "helpers", "sql"]

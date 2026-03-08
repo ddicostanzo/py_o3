@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Generator, Iterable
 from contextlib import closing
-from typing import Iterable, Generator
 
 import pyodbc
 from pyodbc import Connection
@@ -27,7 +27,7 @@ class Datatable:
     def __init__(self, connection: Connection, query_location: str):
         self.connection = connection
         self.query_location = query_location
-        with open(query_location, 'r') as query:
+        with open(query_location) as query:
             self.query = query.read()
 
     def _get_data(self, num_results: int = None) -> Iterable[pyodbc.Row] | Generator[pyodbc.Row, None, None]:
@@ -38,15 +38,12 @@ class Datatable:
             return self._data_rows(num_results)
 
     def _data_generator(self):
-        with closing(self.connection) as conn:
-            with closing(conn.cursor()) as cursor:
-                for row in cursor.execute(self.query):
-                    yield row
+        with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
+            yield from cursor.execute(self.query)
 
     def _data_rows(self, num_results: int):
-        with closing(self.connection) as conn:
-            with closing(conn.cursor()) as cursor:
-                rows = cursor.execute(self.query).fetchmany(num_results)
+        with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
+            rows = cursor.execute(self.query).fetchmany(num_results)
 
         return rows
 

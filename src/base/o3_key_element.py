@@ -1,8 +1,8 @@
 """O3 key element representing a top-level ontology entity with attributes and relationships."""
 from functools import cached_property
 
-from base.o3_element import O3Element
 from base.o3_attribute import O3Attribute
+from base.o3_element import O3Element
 from base.o3_relationship import O3Relationship
 
 
@@ -78,9 +78,9 @@ class O3KeyElement(O3Element):
         """
         _child_of_relationships = []
         for this_relationship in self.relationships:
-            if this_relationship.relationship_category == "ChildElement-Of":
-                if this_relationship.subject_element == self.string_code:
-                    _child_of_relationships.append(this_relationship)
+            if (this_relationship.relationship_category == "ChildElement-Of"
+                    and this_relationship.subject_element == self.string_code):
+                _child_of_relationships.append(this_relationship)
 
         return _child_of_relationships
 
@@ -97,9 +97,9 @@ class O3KeyElement(O3Element):
         """
         _instance_of_relationships = []
         for this_relationship in self.relationships:
-            if this_relationship.relationship_category == "InstanceAssociated-with":
-                if this_relationship.predicate_element == self.string_code:
-                    _instance_of_relationships.append(this_relationship)
+            if (this_relationship.relationship_category == "InstanceAssociated-with"
+                    and this_relationship.predicate_element == self.string_code):
+                _instance_of_relationships.append(this_relationship)
 
         return _instance_of_relationships
 

@@ -4,15 +4,18 @@ from __future__ import annotations
 import logging
 
 from api.data_model import O3DataModel
-from sql.data_model_to_sql.table_generator import (KeyElementTableCreator, StandardListTableCreator,
-                                                    LookupTableCreator, PatientIdentifierHash)
-from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
 from helpers.enums import SupportedSQLServers
+from sql.data_model_to_sql.foreign_keys import ForeignKeysConstraints
+from sql.data_model_to_sql.table_generator import (
+    KeyElementTableCreator,
+    LookupTableCreator,
+    StandardListTableCreator,
+)
 
 
 def create_key_element_tables(model: O3DataModel,
                               sql_type: SupportedSQLServers,
-                              phi_allowed: bool) -> dict:
+                              phi_allowed: bool) -> dict[str, str]:
     """
     Creates the sql commands for the given data model, sql type, and PHI flag
 
@@ -37,7 +40,7 @@ def create_key_element_tables(model: O3DataModel,
 
 
 def create_individual_standard_value_tables(model: O3DataModel,
-                                            sql_type: SupportedSQLServers,) -> dict:
+                                            sql_type: SupportedSQLServers) -> dict[str, str]:
 
     """
     Creates individual tables for each standard value list in the model
@@ -85,7 +88,7 @@ def create_standard_value_lookup_table(model: O3DataModel,
     return LookupTableCreator(sql_type, items)
 
 
-def create_tables(model: O3DataModel, sql_type: SupportedSQLServers, phi_allowed: bool) -> dict:
+def create_tables(model: O3DataModel, sql_type: SupportedSQLServers, phi_allowed: bool) -> dict[str, str]:
     """
     Parses the O3 model to create the necessary tables for database instantiation
 
@@ -155,9 +158,9 @@ def get_table_names_from_relationships(model: O3DataModel) -> tuple[set[str], se
     return subject_names, predicate_names, relationship_categories
 
 
-def test_names_in_relationships(subject: str, predicate: str, model: O3DataModel) -> None:
+def validate_names_in_relationships(subject: str, predicate: str, model: O3DataModel) -> None:
     """
-    Tests the key elements in the table names to be sure they exist
+    Validates the key elements in the table names to be sure they exist
 
     Parameters
     ----------
@@ -166,7 +169,7 @@ def test_names_in_relationships(subject: str, predicate: str, model: O3DataModel
     predicate: str
         the predicate table name
     model: O3DataModel
-        the model to test the tables against
+        the model to validate the tables against
 
     Returns
     -------
