@@ -170,6 +170,24 @@ class TestConceptualModel:
         assert cm.selects[0].alias == "PatientId"
 
 
+class TestLoadSemanticManifestValidation:
+    def test_missing_tables_key_raises(self, tmp_path):
+        schema = tmp_path / "schema.json"
+        models = tmp_path / "models.json"
+        schema.write_text(json.dumps({"summary": {}}))
+        models.write_text(json.dumps({"models": []}))
+        with pytest.raises(ValueError, match="missing required 'tables' key"):
+            load_semantic_manifest(str(schema), str(models))
+
+    def test_missing_models_key_raises(self, tmp_path):
+        schema = tmp_path / "schema.json"
+        models = tmp_path / "models.json"
+        schema.write_text(json.dumps({"tables": {}}))
+        models.write_text(json.dumps({"summary": {}}))
+        with pytest.raises(ValueError, match="missing required 'models' key"):
+            load_semantic_manifest(str(schema), str(models))
+
+
 class TestLoadSemanticManifest:
     def test_load_from_files(self):
         if not os.path.exists(SCHEMA_PATH) or not os.path.exists(MODELS_PATH):

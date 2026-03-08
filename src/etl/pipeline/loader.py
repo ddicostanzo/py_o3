@@ -122,10 +122,13 @@ class Loader:
         if target_elements:
             element_name = sorted(target_elements)[0]
             ke = self.__o3_model.key_elements.get(element_name)
-            if ke:
-                table_name = leave_only_letters_numbers_or_underscore(ke.string_code)
-            else:
-                table_name = leave_only_letters_numbers_or_underscore(element_name)
+            if ke is None:
+                raise ValueError(
+                    f"Crosswalk references O3 key element '{element_name}' "
+                    f"which does not exist in the data model. "
+                    f"Available: {list(self.__o3_model.key_elements.keys())}"
+                )
+            table_name = leave_only_letters_numbers_or_underscore(ke.string_code)
         else:
             raise ValueError(
                 "No O3 key elements found in the extract query's mapped columns."

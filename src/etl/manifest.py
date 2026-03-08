@@ -142,13 +142,23 @@ def load_semantic_manifest(
     with open(models_path, encoding="utf-8") as f:
         models_data = json.load(f)
 
+    if "tables" not in schema_data:
+        raise ValueError(
+            f"Schema file '{schema_path}' is missing required 'tables' key."
+        )
+
+    if "models" not in models_data:
+        raise ValueError(
+            f"Models file '{models_path}' is missing required 'models' key."
+        )
+
     tables = {
         full_name: DWHTable.from_dict(full_name, table_data)
-        for full_name, table_data in schema_data.get("tables", {}).items()
+        for full_name, table_data in schema_data["tables"].items()
     }
 
     models = [
-        ConceptualModel.from_dict(m) for m in models_data.get("models", [])
+        ConceptualModel.from_dict(m) for m in models_data["models"]
     ]
 
     summary = models_data.get("summary", schema_data.get("summary", {}))

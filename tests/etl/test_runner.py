@@ -68,6 +68,14 @@ class TestExportSql:
             files = os.listdir(tmpdir)
             assert len(files) == 1
 
+    def test_export_sql_error_isolation(self):
+        ldr = MagicMock(spec=Loader)
+        ldr.generate_insert.side_effect = ValueError("bad column map")
+        runner = ETLRunner(_mock_extractor(), ldr)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with pytest.raises(RuntimeError, match="failed during export"):
+                runner.export_sql(tmpdir)
+
 
 class TestRunDryRun:
     def test_dry_run_returns_result_without_executing(self):

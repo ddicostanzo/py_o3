@@ -61,21 +61,34 @@ class ETLRunner:
         else:
             queries = self.__extractor.generate_all_queries()
 
+        errors: list[str] = []
         for query in queries:
-            load_cmd = self.__loader.generate_insert(query)
-            filename = f"{query.entry_point}_etl.sql"
-            filepath = os.path.join(output_dir, filename)
+            try:
+                load_cmd = self.__loader.generate_insert(query)
+                filename = f"{query.entry_point}_etl.sql"
+                filepath = os.path.join(output_dir, filename)
 
-            with open(filepath, "w", encoding="utf-8") as f:
-                f.write(f"-- ETL: {query.entry_point}\n")
-                f.write(f"-- Model: {query.model_name}\n")
-                f.write(f"-- Base Table: {query.base_table}\n")
-                f.write(f"-- Date Key: {query.date_key}\n\n")
-                f.write("-- ===== EXTRACT =====\n\n")
-                f.write(query.sql)
-                f.write("\n\n-- ===== LOAD =====\n\n")
-                f.write(load_cmd.sql)
-                f.write("\n")
+                with open(filepath, "w", encoding="utf-8") as f:
+                    f.write(f"-- ETL: {query.entry_point}\n")
+                    f.write(f"-- Model: {query.model_name}\n")
+                    f.write(f"-- Base Table: {query.base_table}\n")
+                    f.write(f"-- Date Key: {query.date_key}\n\n")
+                    f.write("-- ===== EXTRACT =====\n\n")
+                    f.write(query.sql)
+                    f.write("\n\n-- ===== LOAD =====\n\n")
+                    f.write(load_cmd.sql)
+                    f.write("\n")
+            except Exception as e:
+                errors.append(
+                    f"Export failed for '{query.entry_point}': "
+                    f"{type(e).__name__}: {e}"
+                )
+
+        if errors:
+            raise RuntimeError(
+                f"{len(errors)} entry point(s) failed during export:\n"
+                + "\n".join(errors)
+            )
 
     def run(
         self,
@@ -139,8 +152,9 @@ class ETLRunner:
             result.duration_seconds = time.time() - ep_start
             return result
 
+        load_cmd = self.__loader.generate_insert(query)
+
         try:
-            load_cmd = self.__loader.generate_insert(query)
             cursor.execute(load_cmd.sql)
             result.rows_loaded = cursor.rowcount
             self.__connection.commit()

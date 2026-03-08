@@ -164,10 +164,23 @@ class Extractor:
         lookback_days: int | None = None,
     ) -> list[ExtractQuery]:
         """Generate extract queries for all entry points."""
-        return [
-            self.generate_query(ep, date_basis, lookback_days)
-            for ep in self.__registry.entry_points
-        ]
+        results = []
+        errors = []
+        for ep in self.__registry.entry_points:
+            try:
+                results.append(self.generate_query(ep, date_basis, lookback_days))
+            except Exception as e:
+                errors.append(
+                    f"Entry point '{ep}': {type(e).__name__}: {e}"
+                )
+
+        if errors:
+            raise RuntimeError(
+                f"{len(errors)} entry point(s) failed during query generation:\n"
+                + "\n".join(errors)
+            )
+
+        return results
 
 
 if __name__ == "__main__":

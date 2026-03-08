@@ -56,8 +56,13 @@ class LineageReport:
             ],
             "coverage": self.coverage_summary(),
         }
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        except OSError as e:
+            raise OSError(
+                f"Failed to write lineage JSON to '{path}': {e}"
+            ) from e
 
     def to_markdown(self, path: str) -> None:
         """Write a human-readable markdown lineage report."""
@@ -109,8 +114,13 @@ class LineageReport:
                 lines.append(f"- {node.table}.{node.column}")
             lines.append("")
 
-        with open(path, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+        except OSError as e:
+            raise OSError(
+                f"Failed to write lineage markdown to '{path}': {e}"
+            ) from e
 
 
 if __name__ == "__main__":

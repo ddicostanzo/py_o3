@@ -157,3 +157,9 @@ class TestGenerateAllQueries:
         queries = extractor.generate_all_queries()
         assert len(queries) == 1
         assert queries[0].entry_point == "billing"
+
+    def test_error_includes_entry_point_context(self):
+        entries = [_make_entry(dwh_column="PatientSSN", model_alias="PatientSSN")]
+        extractor = Extractor(entries, _make_manifest(), _make_registry())
+        with pytest.raises(RuntimeError, match="entry point.*failed"):
+            extractor.generate_all_queries()
