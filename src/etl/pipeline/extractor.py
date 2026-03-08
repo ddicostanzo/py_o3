@@ -158,10 +158,14 @@ class Extractor:
             columns_mapped=model_entries,
         )
 
-    def generate_all_queries(self) -> list[ExtractQuery]:
+    def generate_all_queries(
+        self,
+        date_basis: str | None = None,
+        lookback_days: int | None = None,
+    ) -> list[ExtractQuery]:
         """Generate extract queries for all entry points."""
         return [
-            self.generate_query(ep)
+            self.generate_query(ep, date_basis, lookback_days)
             for ep in self.__registry.entry_points
         ]
 

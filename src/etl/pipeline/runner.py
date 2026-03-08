@@ -100,7 +100,9 @@ class ETLRunner:
                 for ep in entry_points
             ]
         else:
-            queries = self.__extractor.generate_all_queries()
+            queries = self.__extractor.generate_all_queries(
+                date_basis, lookback_days
+            )
 
         for query in queries:
             ep_result = self.__run_entry_point(query, dry_run)
