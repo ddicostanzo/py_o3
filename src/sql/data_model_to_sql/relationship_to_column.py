@@ -48,7 +48,7 @@ class RelationshipToColumn:
         self._nullable = nullable
 
     @property
-    def __column_name(self) -> str:
+    def _column_name(self) -> str:
         """
         The column name after being parsed to remove spaces and special characters.
 
@@ -61,7 +61,7 @@ class RelationshipToColumn:
         return f"{leave_only_letters_numbers_or_underscore(element_value)}Id"
 
     @property
-    def __column_type(self) -> str:
+    def _column_type(self) -> str:
         """
         The column type depending on the SQL version being used.
 
@@ -82,7 +82,7 @@ class RelationshipToColumn:
             str
                 the full SQL command
         """
-        return f"{self.__column_name} {self.__column_type} {self._nullable}"
+        return f"{self._column_name} {self._column_type} {self._nullable}"
 
 
 class ChildRelationshipToColumn(RelationshipToColumn):

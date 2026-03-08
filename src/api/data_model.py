@@ -50,15 +50,23 @@ class O3DataModel:
 
         self.json_file: Path = path
         self.json_obj: dict = {}
+        self._init_caches()
+
+        self.__json_to_dictionary()
+        self.__create_key_elements(**kwargs)
+
+    def _init_caches(self) -> None:
+        """
+        Initialize the lazy property caches and key_elements dict.
+        Shared by __init__ and from_dict to avoid duplicating
+        name-mangled attribute names.
+        """
         self.key_elements: dict[str, O3KeyElement] = {}
         self.__standard_value_lists: Optional[dict[str, list[O3StandardValue]]] = None
         self.__value_data_types: Optional[set[str]] = None
         self.__value_priority: Optional[set[str]] = None
         self.__reference_system_for_standard_values: Optional[set[str]] = None
         self.__allow_nulls: Optional[set[str]] = None
-
-        self.__json_to_dictionary()
-        self.__create_key_elements(**kwargs)
 
     @classmethod
     def from_dict(cls, data: list[dict], **kwargs) -> "O3DataModel":
@@ -83,12 +91,7 @@ class O3DataModel:
         instance = object.__new__(cls)
         instance.json_file = None
         instance.json_obj = data
-        instance.key_elements = {}
-        instance._O3DataModel__standard_value_lists = None
-        instance._O3DataModel__value_data_types = None
-        instance._O3DataModel__value_priority = None
-        instance._O3DataModel__reference_system_for_standard_values = None
-        instance._O3DataModel__allow_nulls = None
+        instance._init_caches()
         instance._O3DataModel__create_key_elements(**kwargs)
         return instance
 
