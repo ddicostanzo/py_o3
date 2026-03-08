@@ -14,11 +14,20 @@ def _mock_relationship(subject="Patient", predicate="Diagnosis", category="Child
 
 
 class TestForeignKeysConstraintsDefaults:
-    """Tests for ForeignKeysConstraints default behavior."""
+    """Tests for ForeignKeysConstraints default behavior.
 
-    def test_default_on_delete_is_restrict(self):
+    The default on_delete uses the dialect's on_delete_restrict property:
+    MSSQL → NO ACTION, PSQL → RESTRICT.
+    """
+
+    def test_mssql_default_on_delete_is_no_action(self):
         rel = _mock_relationship()
         fk = ForeignKeysConstraints(rel, SupportedSQLServers.MSSQL)
+        assert "ON DELETE NO ACTION" in fk.column_creation_text
+
+    def test_psql_default_on_delete_is_restrict(self):
+        rel = _mock_relationship()
+        fk = ForeignKeysConstraints(rel, SupportedSQLServers.PSQL)
         assert "ON DELETE RESTRICT" in fk.column_creation_text
 
     def test_default_on_update_is_cascade(self):

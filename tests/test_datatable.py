@@ -76,11 +76,6 @@ class TestGetDataReturnsList:
         mock_cursor = MagicMock()
         mock_cursor.execute.return_value.fetchmany.return_value = [("row1",), ("row2",)]
         mock_conn.cursor.return_value = mock_cursor
-        # Make closing work with context manager
-        mock_conn.__enter__ = MagicMock(return_value=mock_conn)
-        mock_conn.__exit__ = MagicMock(return_value=False)
-        mock_cursor.__enter__ = MagicMock(return_value=mock_cursor)
-        mock_cursor.__exit__ = MagicMock(return_value=False)
 
         dt = Datatable(mock_conn, str(query_file))
         result = dt._get_data(num_results=5)
@@ -98,10 +93,6 @@ class TestDataGeneratorErrorWrapping:
         mock_cursor = MagicMock()
         mock_cursor.execute.side_effect = pyodbc.Error("Test DB error")
         mock_conn.cursor.return_value = mock_cursor
-        mock_conn.__enter__ = MagicMock(return_value=mock_conn)
-        mock_conn.__exit__ = MagicMock(return_value=False)
-        mock_cursor.__enter__ = MagicMock(return_value=mock_cursor)
-        mock_cursor.__exit__ = MagicMock(return_value=False)
 
         dt = Datatable(mock_conn, str(query_file))
         gen = dt._data_generator()
@@ -120,10 +111,6 @@ class TestDataRowsErrorWrapping:
         mock_cursor = MagicMock()
         mock_cursor.execute.side_effect = pyodbc.Error("Test DB error")
         mock_conn.cursor.return_value = mock_cursor
-        mock_conn.__enter__ = MagicMock(return_value=mock_conn)
-        mock_conn.__exit__ = MagicMock(return_value=False)
-        mock_cursor.__enter__ = MagicMock(return_value=mock_cursor)
-        mock_cursor.__exit__ = MagicMock(return_value=False)
 
         dt = Datatable(mock_conn, str(query_file))
         with pytest.raises(RuntimeError, match="bad.sql"):

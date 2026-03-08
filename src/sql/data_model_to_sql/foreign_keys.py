@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from helpers.validate_sql_server_type import check_sql_server_type
+from sql.dialects import get_dialect
 
 if TYPE_CHECKING:
     from base.o3_relationship import O3Relationship
@@ -17,7 +18,7 @@ class ForeignKeysConstraints:
     """
 
     def __init__(self, relationship: O3Relationship, sql_server_type: SupportedSQLServers,
-                 on_delete: str = "RESTRICT"):
+                 on_delete: str | None = None):
         """
         Instantiate foreign keys constraints from an O3 relationship.
 
@@ -27,15 +28,16 @@ class ForeignKeysConstraints:
             the relationship to create the foriegn keys constraints
         sql_server_type: SupportedSQLServers
             the SQL server type to generate the commands
-        on_delete: str
-            the ON DELETE action to use (default: "RESTRICT")
+        on_delete: str | None
+            the ON DELETE action to use; defaults to the dialect's restrict equivalent
         """
         if not check_sql_server_type(sql_server_type):
             raise ValueError("Unsupported SQL Server Type")
 
+        dialect = get_dialect(sql_server_type)
         self._relationship = relationship
         self.sql_server_type = sql_server_type
-        self._on_delete = on_delete
+        self._on_delete = on_delete if on_delete is not None else dialect.on_delete_restrict
         self.subject_element = relationship.subject_element
         self.subject_table_name = leave_only_letters_numbers_or_underscore(relationship.subject_element)
         self.predicate_element = relationship.predicate_element

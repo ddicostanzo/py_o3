@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Generator, Iterable
-from contextlib import closing
 
 import pyodbc
 from pyodbc import Connection
@@ -15,6 +14,9 @@ class Datatable:
 
     Reads a SQL query from a file and provides generator-based and
     batch retrieval methods for query results.
+
+    The caller is responsible for managing the connection lifecycle.
+    This class does not close or otherwise manage the provided connection.
 
     Parameters
     ----------
@@ -39,8 +41,8 @@ class Datatable:
 
     def _data_generator(self):
         try:
-            with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
-                yield from cursor.execute(self.query)
+            cursor = self.connection.cursor()
+            yield from cursor.execute(self.query)
         except pyodbc.Error as e:
             raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"
@@ -48,8 +50,8 @@ class Datatable:
 
     def _data_rows(self, num_results: int):
         try:
-            with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
-                rows = cursor.execute(self.query).fetchmany(num_results)
+            cursor = self.connection.cursor()
+            rows = cursor.execute(self.query).fetchmany(num_results)
         except pyodbc.Error as e:
             raise RuntimeError(
                 f"Error executing query from '{self.query_location}': {e}"

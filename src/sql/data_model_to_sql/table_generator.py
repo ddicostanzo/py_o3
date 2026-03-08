@@ -276,7 +276,7 @@ class StandardListTableCreator(CustomTable):
             "attribute": f"Attribute {dialect.string_type_short(256)} NOT NULL",
             "standard_value_item": f"StandardValueItemName {dialect.string_type_short(256)} NOT NULL",
             "numeric_code": f"NumericCode {dialect.string_type_short(32)} NOT NULL",
-            "active_flag": f"ActiveFlag {dialect.boolean_type} NOT NULL DEFAULT 1",
+            "active_flag": f"ActiveFlag {dialect.boolean_type} NOT NULL {dialect.boolean_default_true}",
             "unique_constraint": dialect.unique_constraint("AK_NumericCode", "NumericCode"),
             "index": dialect.create_index(
                 "IX_StandardValueLookup_NumericCode", table_name,

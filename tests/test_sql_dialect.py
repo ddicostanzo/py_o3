@@ -88,6 +88,9 @@ class TestMSSQLDialect:
     def test_on_delete_restrict_returns_no_action(self):
         assert self.dialect.on_delete_restrict == "NO ACTION"
 
+    def test_boolean_default_true(self):
+        assert self.dialect.boolean_default_true == "DEFAULT 1"
+
 
 class TestPSQLDialect:
     """Tests for PSQLDialect implementation."""
@@ -166,6 +169,9 @@ class TestPSQLDialect:
 
     def test_on_delete_restrict_returns_restrict(self):
         assert self.dialect.on_delete_restrict == "RESTRICT"
+
+    def test_boolean_default_true(self):
+        assert self.dialect.boolean_default_true == "DEFAULT TRUE"
 
 
 class TestGetDialectFactory:

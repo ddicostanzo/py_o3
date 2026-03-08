@@ -62,6 +62,10 @@ class MSSQLDialect:
                 f"({column}) INCLUDE ({includes});\n")
 
     @property
+    def boolean_default_true(self) -> str:
+        return "DEFAULT 1"
+
+    @property
     def on_delete_restrict(self) -> str:
         return "NO ACTION"
 

@@ -153,6 +153,20 @@ class SQLDialect(Protocol):
         ...
 
     @property
+    def boolean_default_true(self) -> str:
+        """
+        The SQL literal for a boolean TRUE default value.
+
+        MSSQL uses ``DEFAULT 1`` (bit type), PostgreSQL uses ``DEFAULT TRUE``.
+
+        Returns
+        -------
+        str
+            the DEFAULT clause for a boolean true value
+        """
+        ...
+
+    @property
     def on_delete_restrict(self) -> str:
         """
         The ON DELETE action equivalent to RESTRICT for this dialect.

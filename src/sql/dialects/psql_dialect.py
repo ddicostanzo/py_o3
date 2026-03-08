@@ -60,6 +60,10 @@ class PSQLDialect:
                 f"({column}) INCLUDE ({includes});\n")
 
     @property
+    def boolean_default_true(self) -> str:
+        return "DEFAULT TRUE"
+
+    @property
     def on_delete_restrict(self) -> str:
         return "RESTRICT"
 
