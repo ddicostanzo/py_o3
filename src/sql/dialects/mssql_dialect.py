@@ -12,16 +12,14 @@ class MSSQLDialect:
     def name(self) -> str:
         return "MSSQL"
 
-    @property
-    def type_map(self) -> dict[str, str]:
-        return {
-            "Boolean": "bit",
-            "Binary": "varbinary",
-            "Date": "datetime2",
-            "Decimal": "decimal(19,9)",
-            "Integer": "int",
-            "String": "varchar(max)",
-        }
+    type_map: dict[str, str] = {
+        "Boolean": "bit",
+        "Binary": "varbinary",
+        "Date": "datetime2",
+        "Decimal": "decimal(19,9)",
+        "Integer": "int",
+        "String": "varchar(max)",
+    }
 
     @property
     def string_type(self) -> str:

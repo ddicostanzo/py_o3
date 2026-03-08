@@ -12,16 +12,14 @@ class PSQLDialect:
     def name(self) -> str:
         return "PSQL"
 
-    @property
-    def type_map(self) -> dict[str, str]:
-        return {
-            "Boolean": "boolean",
-            "Binary": "bytea",
-            "Date": "timestamptz",
-            "Decimal": "numeric(19,9)",
-            "Integer": "integer",
-            "String": "text",
-        }
+    type_map: dict[str, str] = {
+        "Boolean": "boolean",
+        "Binary": "bytea",
+        "Date": "timestamptz",
+        "Decimal": "numeric(19,9)",
+        "Integer": "integer",
+        "String": "text",
+    }
 
     @property
     def string_type(self) -> str:

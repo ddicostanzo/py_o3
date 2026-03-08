@@ -233,8 +233,7 @@ def write_sql_to_text(file_location: str, commands: list[str], write_mode: str =
         raise ValueError(f"write_mode must be 'w' or 'a', got {write_mode!r}")
 
     with open(file_location, write_mode) as file:
-        for command in commands:
-            file.writelines(command)
+        file.write(''.join(commands))
 
 
 if __name__ == "__main__":

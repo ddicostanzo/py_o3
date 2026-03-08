@@ -18,10 +18,8 @@ class SQLDialect(Protocol):
         """The name of the SQL dialect (e.g., 'MSSQL', 'PSQL')."""
         ...
 
-    @property
-    def type_map(self) -> dict[str, str]:
-        """Mapping of O3 data types to SQL column types for this dialect."""
-        ...
+    type_map: dict[str, str]
+    """Mapping of O3 data types to SQL column types for this dialect."""
 
     @property
     def string_type(self) -> str:
