@@ -1,3 +1,4 @@
+"""SQL table generators for O3 key elements, standard value lists, and custom tables."""
 from __future__ import annotations
 
 from helpers.string_helpers import (leave_only_letters_numbers_or_underscore,
@@ -6,7 +7,9 @@ from helpers.enums import SupportedSQLServers
 from sql.data_model_to_sql.attribute_to_column import AttributeToSQLColumn
 from sql.data_model_to_sql.relationship_to_column import (ChildRelationshipToColumn,
                                                           InstanceRelationshipToColumn)
-from helpers.test_sql_server_type import check_sql_server_type
+from helpers.validate_sql_server_type import check_sql_server_type
+from sql.dialect import SQLDialect
+from sql.dialects import get_dialect
 
 from typing import TYPE_CHECKING
 
@@ -21,23 +24,29 @@ class SQLTable:
     and attributes to use to create the SQL command.
     """
 
-    def __init__(self, sql_server_type: SupportedSQLServers):
+    def __init__(self, sql_server_type: SupportedSQLServers | SQLDialect):
         """
         Instantiates a new instance of the SQLTable class.
 
         Parameters
         ----------
-        sql_server_type: SupportedSQLServers
-            the SQL server type to use
+        sql_server_type: SupportedSQLServers | SQLDialect
+            the SQL server type to use, or a pre-built SQLDialect instance
         """
 
-        if not check_sql_server_type(sql_server_type):
-            raise ValueError("Unsupported SQL Server Type")
+        if isinstance(sql_server_type, SQLDialect):
+            self.dialect = sql_server_type
+            self.sql_server_type = (SupportedSQLServers.MSSQL
+                                    if self.dialect.name == "MSSQL"
+                                    else SupportedSQLServers.PSQL)
+        else:
+            if not check_sql_server_type(sql_server_type):
+                raise ValueError("Unsupported SQL Server Type")
+            self.sql_server_type = sql_server_type
+            self.dialect = get_dialect(sql_server_type)
 
         self.table_name = None
         self.columns = []
-
-        self.sql_server_type = sql_server_type
 
     @property
     def table_prefix(self) -> str:
@@ -63,11 +72,7 @@ class SQLTable:
             str
                 the table creation suffix
         """
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            # return f''
-            return f'WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.{self.table_name}History));\n'
-        else:
-            return ";"
+        return self.dialect.table_suffix(self.table_name)
 
     @property
     def identity_column(self) -> str:
@@ -79,10 +84,7 @@ class SQLTable:
             str
                 the identity column of the table as "{self.table_name}Id
         """
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'{self.table_name}Id INT IDENTITY(1, 1) NOT NULL PRIMARY KEY'
-        else:
-            return f'{self.table_name}Id SERIAL PRIMARY KEY'
+        return self.dialect.identity_column(self.table_name)
 
     @property
     def history_timestamp_column(self) -> str:
@@ -95,12 +97,7 @@ class SQLTable:
                 for MSSQL, the columns ValidFrom, ValidTo, and PERIOD FOR SYSTEM_TIME are generated. For PSQL,
                 a single column of "HistoryDateTime" is generated.
         """
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return (f'ValidFrom datetime2 GENERATED ALWAYS AS ROW Start,\n'
-                    f'ValidTo datetime2 GENERATED ALWAYS AS ROW End,\n'
-                    f'PERIOD FOR SYSTEM_TIME(ValidFrom, ValidTo)')
-        else:
-            return f'HistoryDateTime timestamptz DEFAULT CURRENT_TIMESTAMP'
+        return self.dialect.history_timestamp_columns()
 
     @property
     def history_user_column(self) -> str:
@@ -112,10 +109,7 @@ class SQLTable:
             str
                 the column to store the last user who modified the data
         """
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return f'HistoryUser varchar(max) NOT NULL'
-        else:
-            return f'HistoryUser text NOT NULL'
+        return self.dialect.history_user_column()
 
 
 class KeyElementTableCreator(SQLTable):
@@ -123,7 +117,8 @@ class KeyElementTableCreator(SQLTable):
     The class that creates a SQL table for an O3 Key Element.
     """
 
-    def __init__(self, sql_server_type: SupportedSQLServers, key_element: "O3KeyElement"):
+    def __init__(self, sql_server_type: SupportedSQLServers, key_element: "O3KeyElement",
+                 phi_allowed: bool = False):
         """
         The instantiation of the Key Element Table Creator class that takes the Key Element and SQL type to use
         as the basis.
@@ -134,28 +129,26 @@ class KeyElementTableCreator(SQLTable):
             the SQL server type to use
         key_element: O3KeyElement
             the O3 Key Element to use
+        phi_allowed: bool
+            the flag to identify if the system is allowed to store PHI or not
         """
         super().__init__(sql_server_type)
 
         self.key_element = key_element
+        self.phi_allowed = phi_allowed
         self.table_name = leave_only_letters_numbers_or_underscore(self.key_element.string_code)
 
-    def _create_attribute_columns(self, phi_allowed: bool) -> None:
+    def _create_attribute_columns(self) -> None:
         """
         Creates instances of the Attribute to SQL Column class for each attribute in the
         key element.
-
-        Parameters
-        ----------
-        phi_allowed: bool
-            the flag to identify if the system is allowed to store PHI or not
 
         Returns
         -------
             None
         """
         for this_attr in self.key_element.list_attributes:
-            self.columns.append(AttributeToSQLColumn(this_attr, phi_allowed, self.sql_server_type))
+            self.columns.append(AttributeToSQLColumn(this_attr, self.phi_allowed, self.sql_server_type))
 
     def _create_foreign_key_columns(self) -> None:
         """
@@ -183,36 +176,24 @@ class KeyElementTableCreator(SQLTable):
             _col_sql = InstanceRelationshipToColumn(this_rel, self.sql_server_type)
             self.columns.append(_col_sql)
 
-    def _create_columns(self, phi_allowed: bool) -> None:
+    def _create_columns(self) -> None:
         """
         Create the columns for the given Key Element
-
-        Parameters
-        ----------
-        phi_allowed : bool
-            the flag to identify if the system is allowed to store PHI or not
 
         Returns
         -------
             None
         """
         self._create_foreign_key_columns()
-        self._create_attribute_columns(phi_allowed)
+        self._create_attribute_columns()
 
         # Instance Of columns could have an intermediary table ActInstToProcCode style
         # self._create_instance_based_columns()
 
-    def sql_table(self, phi_allowed: bool, **kwargs) -> str:
+    def sql_table(self) -> str:
         """
         Using the data provided by the Key Element, Attributes, and Relationships,
         generates the text to allow the creation of the SQL table
-
-        Parameters
-        ----------
-        phi_allowed: bool
-            the flag to identify if the system is allowed to store PHI or not
-        kwargs
-            None currently configured
 
         Returns
         -------
@@ -220,7 +201,7 @@ class KeyElementTableCreator(SQLTable):
                 the table creation text that contains all columns that should be stored
         """
         if len(self.columns) == 0:
-            self._create_columns(phi_allowed)
+            self._create_columns()
 
         _column_sql_text = [x.column_creation_text for x in self.columns]
         _column_sql_text.insert(0, self.identity_column)
@@ -232,6 +213,13 @@ class KeyElementTableCreator(SQLTable):
 
 
 class CustomTable(SQLTable):
+    """
+    A SQL table defined by static column definitions rather than O3 key elements.
+
+    Serves as the base class for tables with manually specified columns,
+    such as standard value lookup tables and patient identifier mapping tables.
+    """
+
     def __init__(self, sql_server_type: SupportedSQLServers, title: str, static_columns: dict[str, str]):
         super().__init__(sql_server_type)
         self.table_name = leave_only_letters_numbers_or_underscore(title)
@@ -274,29 +262,24 @@ class StandardListTableCreator(CustomTable):
         """
 
         table_name = leave_only_letters_numbers_or_underscore(title)
+        dialect = get_dialect(sql_server_type)
+
+        static_columns = {
+            "key_element": f"KeyElement {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
+            "attribute": f"Attribute {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
+            "standard_value_item": f"StandardValueItemName {dialect.string_type if dialect.name == 'PSQL' else 'varchar(256)'} NOT NULL",
+            "numeric_code": f"NumericCode {dialect.string_type if dialect.name == 'PSQL' else 'varchar(32)'} NOT NULL",
+            "active_flag": f"ActiveFlag {dialect.boolean_type} NOT NULL DEFAULT 1",
+        }
 
         if sql_server_type == SupportedSQLServers.MSSQL:
-            static_columns = {
-                "key_element": "KeyElement varchar(256) NOT NULL",
-                "attribute": "Attribute varchar(256) NOT NULL",
-                "standard_value_item": "StandardValueItemName varchar(256) NOT NULL",
-                "numeric_code": "NumericCode varchar(32) NOT NULL",
-                "active_flag": "ActiveFlag bit NOT NULL DEFAULT 1",
-                "unique_constraint": "CONSTRAINT AK_NumericCode Unique(NumericCode)",
-                "index": (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {table_name} "
-                          f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
-            }
+            static_columns["unique_constraint"] = "CONSTRAINT AK_NumericCode Unique(NumericCode)"
+            static_columns["index"] = (f"CREATE NONCLUSTERED INDEX IX_StandardValueLookup_NumericCode ON {table_name} "
+                                       f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
         else:
-            static_columns = {
-                "key_element": "KeyElement text NOT NULL",
-                "attribute": "Attribute text NOT NULL",
-                "standard_value_item": "StandardValueItemName text NOT NULL",
-                "numeric_code": "NumericCode text NOT NULL",
-                "active_flag": "ActiveFlag boolean NOT NULL DEFAULT 1",
-                "unique_constraint": "Unique(NumericCode)",
-                "index": (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {table_name} "
-                          f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
-            }
+            static_columns["unique_constraint"] = "Unique(NumericCode)"
+            static_columns["index"] = (f"CREATE INDEX idx_StandardValueLookup_NumericCode ON {table_name} "
+                                       f"(NumericCode) INCLUDE (KeyElement, Attribute);\n")
 
         super().__init__(sql_server_type, title, static_columns)
 
@@ -312,9 +295,15 @@ class StandardListTableCreator(CustomTable):
                         self.static_columns["unique_constraint"]
                         ]
 
-    def insert_commands(self) -> list[str]:
+    def insert_commands(self, batch_size: int = 100) -> list[str]:
         """
-        Generates the insert commands for the standard value list items.
+        Generates multi-row insert commands for the standard value list items,
+        batched into groups for efficiency.
+
+        Parameters
+        ----------
+        batch_size: int
+            the number of rows per INSERT statement (default 100)
 
         Returns
         -------
@@ -323,18 +312,23 @@ class StandardListTableCreator(CustomTable):
         """
         _commands = [self.static_columns["index"]]
 
+        _rows = []
         for x in self.items:
             _ke_code = leave_only_letters_numbers_or_underscore(x.key_element.string_code)
             _attr_code = leave_only_letters_numbers_or_underscore(x.attribute.string_code)
             _value_name = leave_letters_numbers_spaces_underscores_dashes(x.value_name)
             _numeric_code = leave_only_letters_numbers_or_underscore(str(x.numeric_code))
-            _commands.append(f"INSERT INTO {self.table_name} (KeyElement, Attribute, StandardValueItemName, "
-                             f"NumericCode, HistoryUser) "
-                             f"VALUES ('{_ke_code}', '{_attr_code}', "
-                             f"'{_value_name}', "
-                             f"'{_numeric_code}', 'db_creation');\n")
+            _rows.append(f"('{_ke_code}', '{_attr_code}', '{_value_name}', "
+                         f"'{_numeric_code}', 'db_creation')")
 
-        _commands += "\n"
+        _insert_prefix = (f"INSERT INTO {self.table_name} (KeyElement, Attribute, "
+                          f"StandardValueItemName, NumericCode, HistoryUser) VALUES\n")
+
+        for i in range(0, len(_rows), batch_size):
+            _batch = _rows[i:i + batch_size]
+            _commands.append(_insert_prefix + ",\n".join(_batch) + ";\n")
+
+        _commands.append("\n")
         return _commands
 
 
@@ -358,10 +352,18 @@ class LookupTableCreator(StandardListTableCreator):
 
 
 class PatientIdentifierHash(CustomTable):
+    """
+    Table for mapping patient identifiers to anonymized values.
+
+    The MRNHash column stores a hashed representation of the MRN.
+    The MRN must be hashed at the application layer before insertion
+    into this table — plaintext MRNs must never be stored.
+    """
+
     def __init__(self, sql_server_type: SupportedSQLServers, table_name: str):
         """
         Instantiates a new Patient Identifier Hash Table Creator class used for generating
-        a table for the mapping MRNs to different anonymized values
+        a table for the mapping MRN hashes to different anonymized values
 
         Parameters
         ----------
@@ -371,26 +373,20 @@ class PatientIdentifierHash(CustomTable):
             the table name
         """
 
-        if sql_server_type == SupportedSQLServers.MSSQL:
-            static_columns = {
-                "PatientId": "PatientId int NOT NULL",
-                "MRN": "MRN varchar(max) NOT NULL",
-                "AnonPatID": "AnonPatID varchar(max) NOT NULL",
-                "SetName": "SetName varchar(max) NOT NULL",
-            }
-        else:
-            static_columns = {
-                "PatientId": "PatientId text NOT NULL",
-                "MRN": "MRN text NOT NULL",
-                "AnonPatID": "AnonPatID text NOT NULL",
-                "SetName": "SetName text NOT NULL",
-            }
+        dialect = get_dialect(sql_server_type)
+
+        static_columns = {
+            "PatientId": f"PatientId {dialect.integer_type} NOT NULL",
+            "MRNHash": f"MRNHash {dialect.string_type} NOT NULL",
+            "AnonPatID": f"AnonPatID {dialect.string_type} NOT NULL",
+            "SetName": f"SetName {dialect.string_type} NOT NULL",
+        }
 
         super().__init__(sql_server_type, table_name, static_columns)
 
         self.columns = [self.identity_column,
                         self.static_columns["PatientId"],
-                        self.static_columns["MRN"],
+                        self.static_columns["MRNHash"],
                         self.static_columns["AnonPatID"],
                         self.static_columns["SetName"],
                         self.history_user_column,
@@ -399,7 +395,7 @@ class PatientIdentifierHash(CustomTable):
         self.foreign_key = (f'ALTER TABLE {self.table_name} '
                             f'ADD CONSTRAINT fk_{self.table_name}_Patient '
                             f'FOREIGN KEY (PatientId) REFERENCES Patient (PatientId) '
-                            f'ON DELETE CASCADE ON UPDATE CASCADE;')
+                            f'ON DELETE RESTRICT ON UPDATE CASCADE;')
 
 
 if __name__ == "__main__":

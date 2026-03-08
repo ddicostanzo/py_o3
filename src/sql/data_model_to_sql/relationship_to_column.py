@@ -1,7 +1,9 @@
+"""Mapping of O3 relationships to SQL foreign key column definitions."""
 from __future__ import annotations
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from helpers.test_sql_server_type import check_sql_server_type
+from helpers.validate_sql_server_type import check_sql_server_type
 from helpers.enums import SupportedSQLServers
+from sql.dialects import get_dialect
 
 from typing import TYPE_CHECKING
 
@@ -9,21 +11,31 @@ if TYPE_CHECKING:
     from base.o3_relationship import O3Relationship
 
 
-class ChildRelationshipToColumn:
+class RelationshipToColumn:
     """
-    The Child Relationship column adds the primary key from the predicate element to the subject element's table.
+    Base class for relationship-based SQL column generation.
+
+    Maps an O3 relationship to a foreign key column definition,
+    using a configurable element field for the column name and
+    nullable constraint.
     """
 
-    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
+    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers,
+                 element_field: str, nullable: str):
         """
-        Instantiates a child relationship column using the relationship and SQL server type.
+        Instantiates a relationship column using the relationship and SQL server type.
 
         Parameters
         ----------
-        relationship: O3Relationship
+        relationship : O3Relationship
             the relationship to create the column from
-        sql_server_type:SupportedSQLServers
+        sql_server_type : SupportedSQLServers
             the SQL server type
+        element_field : str
+            the attribute name on the relationship to use for the column name
+            (e.g., "predicate_element" or "subject_element")
+        nullable : str
+            the nullable constraint (e.g., "NOT NULL" or "NULL")
         """
         super().__init__()
         if not check_sql_server_type(sql_server_type):
@@ -31,9 +43,12 @@ class ChildRelationshipToColumn:
 
         self.relationship = relationship
         self.sql_server_type = sql_server_type
+        self.dialect = get_dialect(sql_server_type)
+        self._element_field = element_field
+        self._nullable = nullable
 
     @property
-    def __column_name(self) -> str:
+    def _column_name(self) -> str:
         """
         The column name after being parsed to remove spaces and special characters.
 
@@ -42,10 +57,11 @@ class ChildRelationshipToColumn:
             str
                 the column name
         """
-        return f"{leave_only_letters_numbers_or_underscore(self.relationship.predicate_element)}Id"
+        element_value = getattr(self.relationship, self._element_field)
+        return f"{leave_only_letters_numbers_or_underscore(element_value)}Id"
 
     @property
-    def __column_type(self) -> str:
+    def _column_type(self) -> str:
         """
         The column type depending on the SQL version being used.
 
@@ -54,10 +70,7 @@ class ChildRelationshipToColumn:
             str
                 either INT or INTEGER depending on the SQL version being used.
         """
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return "INT"
-        else:
-            return "INTEGER"
+        return self.dialect.integer_type.upper()
 
     @property
     def column_creation_text(self) -> str:
@@ -69,32 +82,47 @@ class ChildRelationshipToColumn:
             str
                 the full SQL command
         """
-        return f"{self.__column_name} {self.__column_type} NOT NULL"
+        return f"{self._column_name} {self._column_type} {self._nullable}"
 
 
-class InstanceRelationshipToColumn:
+class ChildRelationshipToColumn(RelationshipToColumn):
+    """
+    The Child Relationship column adds the primary key from the predicate element to the subject element's table.
+    """
+
     def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
-        super().__init__()
-        if not check_sql_server_type(sql_server_type):
-            raise ValueError("Unsupported SQL Server Type")
+        """
+        Instantiates a child relationship column using the relationship and SQL server type.
 
-        self.relationship = relationship
-        self.sql_server_type = sql_server_type
+        Parameters
+        ----------
+        relationship : O3Relationship
+            the relationship to create the column from
+        sql_server_type : SupportedSQLServers
+            the SQL server type
+        """
+        super().__init__(relationship, sql_server_type,
+                         element_field="predicate_element", nullable="NOT NULL")
 
-    @property
-    def __column_name(self):
-        return f"{leave_only_letters_numbers_or_underscore(self.relationship.subject_element)}Id"
 
-    @property
-    def __column_type(self):
-        if self.sql_server_type == SupportedSQLServers.MSSQL:
-            return "INT"
-        else:
-            return "INTEGER"
+class InstanceRelationshipToColumn(RelationshipToColumn):
+    """
+    The Instance Relationship column adds the primary key from the subject element.
+    """
 
-    @property
-    def column_creation_text(self):
-        return f"{self.__column_name} {self.__column_type} NULL"
+    def __init__(self, relationship: "O3Relationship", sql_server_type: SupportedSQLServers):
+        """
+        Instantiates an instance relationship column using the relationship and SQL server type.
+
+        Parameters
+        ----------
+        relationship : O3Relationship
+            the relationship to create the column from
+        sql_server_type : SupportedSQLServers
+            the SQL server type
+        """
+        super().__init__(relationship, sql_server_type,
+                         element_field="subject_element", nullable="NULL")
 
 
 if __name__ == "__main__":

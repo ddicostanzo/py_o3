@@ -1,3 +1,4 @@
+"""O3 standard value representing an enumerated allowed value for an attribute."""
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -14,10 +15,11 @@ class O3StandardValue:
     def __init__(self, key_element: "O3KeyElement", attrib: "O3Attribute", item: str):
         self.key_element = key_element
         self.attribute = attrib
-        self.numeric_code = item.split('{')[-1].replace('{', '').replace('}', '')
+        parts = item.split('{')
+        self.numeric_code = parts[-1].replace('{', '').replace('}', '')
         if ';' in self.numeric_code:
             self.numeric_code = self.numeric_code.split(';')[0].strip()
-        self.value_name = ' '.join([x.strip() for x in item.split('{')[:-1]])
+        self.value_name = ' '.join([x.strip() for x in parts[:-1]])
 
     def __str__(self):
         return self.value_name

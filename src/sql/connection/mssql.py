@@ -1,6 +1,11 @@
+"""MSSQL database connection management using pyodbc and .env configuration."""
+import warnings
+
 from dotenv import dotenv_values
 from helpers.enums import ServerToConnect, SQLAuthentication
 import pyodbc
+
+_REQUIRED_KEYS = ['DRIVER', 'SERVER', 'DATABASE', 'SCHEMA', 'AUTH', 'USERID', 'PASSWORD']
 
 
 class MSSQLConnection:
@@ -26,22 +31,48 @@ class MSSQLConnection:
             server and .env file.
         """
         if sql_server == ServerToConnect.O3:
+            # Strip the "O3_" prefix from .env keys (e.g., "O3_SERVER" -> "SERVER")
+            # so the config dict uses generic key names for the constructor
             return cls({k.split('_')[1]: v for k, v in dotenv_values().items() if 'O3' in k})
         elif sql_server == ServerToConnect.Aura:
+            # Strip the "AURA_" prefix from .env keys (e.g., "AURA_DATABASE" -> "DATABASE")
             return cls({k.split('_')[1]: v for k, v in dotenv_values().items() if 'AURA' in k})
         else:
             raise ValueError("Provided server not supported.")
 
     def __init__(self, config):
-        self.__driver = config['DRIVER']
-        self.host = config['SERVER']
-        self.database = config['DATABASE']
-        self.schema = config['SCHEMA']
-        self.authentication = SQLAuthentication(config['AUTH'].upper())
-        self.__user = config['USERID']
-        self.__password = config['PASSWORD']
-        self.trust_server_cert = config['TRUSTSERVERCERTIFICATE']
-        self.encrypt = config['ENCRYPT']
+        try:
+            self.__driver = config['DRIVER']
+            self.host = config['SERVER']
+            self.database = config['DATABASE']
+            self.schema = config['SCHEMA']
+            self.authentication = SQLAuthentication(config['AUTH'].upper())
+            self.__user = config['USERID']
+            self.__password = config['PASSWORD']
+        except KeyError as e:
+            raise ValueError(
+                f"Missing required config key {e}. "
+                f"Required keys are: {', '.join(_REQUIRED_KEYS)}. "
+                f"Keys must be prefixed with O3_* or AURA_* in the .env file "
+                f"(e.g., O3_DRIVER, AURA_SERVER)."
+            ) from e
+
+        self.encrypt = config.get('ENCRYPT', 'yes')
+        self.trust_server_cert = config.get('TRUSTSERVERCERTIFICATE', 'no')
+
+        if self.encrypt != 'yes':
+            warnings.warn(
+                "Encrypt is not set to 'yes'. Connection may not be secure.",
+                UserWarning,
+                stacklevel=2,
+            )
+        if self.trust_server_cert == 'yes':
+            warnings.warn(
+                "TrustServerCertificate is set to 'yes'. "
+                "Server certificate will not be validated.",
+                UserWarning,
+                stacklevel=2,
+            )
 
     def __connection_string(self) -> dict[str, str]:
         if self.authentication == SQLAuthentication.SQL:

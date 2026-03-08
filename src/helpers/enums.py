@@ -1,3 +1,4 @@
+"""Enumerations for supported SQL servers, connection targets, and authentication types."""
 from enum import Enum
 
 
@@ -7,18 +8,6 @@ class SupportedSQLServers(Enum):
     """
     MSSQL = 1
     PSQL = 2
-
-
-class SQLColumnDataTypes(Enum):
-    """
-    This class holds the supported data types for each column in O3
-    """
-    Boolean = 1
-    Binary = 2
-    Date = 3
-    Decimal = 4
-    Integer = 5
-    String = 6
 
 
 class ServerToConnect(Enum):

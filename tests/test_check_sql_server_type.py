@@ -1,7 +1,7 @@
 import pytest
 
 from helpers.enums import SupportedSQLServers
-from helpers.test_sql_server_type import check_sql_server_type
+from helpers.validate_sql_server_type import check_sql_server_type
 
 
 class TestCheckSQLServerType:

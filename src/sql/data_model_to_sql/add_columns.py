@@ -1,8 +1,10 @@
+"""Functions to generate ALTER TABLE ADD COLUMN SQL commands."""
 from __future__ import annotations
 from helpers.enums import SupportedSQLServers
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
-from helpers.test_sql_server_type import check_sql_server_type
+from helpers.validate_sql_server_type import check_sql_server_type
 from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
+from sql.dialects import get_dialect
 
 
 def add_column_sql_command(table: str, column_name: str, column_type: str,
@@ -41,12 +43,8 @@ def add_column_sql_command(table: str, column_name: str, column_type: str,
     table = leave_only_letters_numbers_or_underscore(table)
     column_name = leave_only_letters_numbers_or_underscore(column_name)
 
-    if sql_server_type == SupportedSQLServers.MSSQL:
-        _statement = f"ALTER TABLE {table} ADD {column_name} {column_type} {_null};"
-    else:
-        _statement = f"ALTER TABLE {table} ADD COLUMN {column_name} {column_type} {_null};"
-
-    return _statement
+    dialect = get_dialect(sql_server_type)
+    return dialect.alter_table_add_column(table, column_name, column_type, _null)
 
 
 def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_type: "SupportedSQLServers") -> str:
@@ -70,11 +68,8 @@ def add_foreign_key_column_sql_command(table: str, column_name: str, sql_server_
     if not check_sql_server_type(sql_server_type):
         raise ValueError("Unsupported SQL Server Type")
 
-    _int_type = ""
-    if sql_server_type == SupportedSQLServers.MSSQL:
-        _int_type = "int"
-    else:
-        _int_type = "integer"
+    dialect = get_dialect(sql_server_type)
+    _int_type = dialect.integer_type
 
     return add_column_sql_command(table, column_name, _int_type, nullable=False, sql_server_type=sql_server_type)
 

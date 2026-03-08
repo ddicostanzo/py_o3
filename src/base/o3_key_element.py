@@ -1,3 +1,4 @@
+"""O3 key element representing a top-level ontology entity with attributes and relationships."""
 from functools import cached_property
 
 from base.o3_element import O3Element
@@ -24,22 +25,37 @@ class O3KeyElement(O3Element):
                 provides an avenue to attempt to clean common errors in the typed data of the key element and
                 its attributes
         """
-        super().__init__(item_dict['keyelementdetail'])
+        try:
+            super().__init__(item_dict['keyelementdetail'])
+        except KeyError as e:
+            key = e.args[0]
+            raise KeyError(
+                f"Missing key '{key}' while parsing key element "
+                f"'{item_dict.get('KeyElementName', 'unknown')}'"
+            ) from e
 
-        self.key_element_name = item_dict['KeyElementName']
-        self.is_longitudinal_key_element = item_dict['keyelementdetail']['IsLongitudinalKeyElement']
+        try:
+            self.key_element_name = item_dict['KeyElementName']
+            self.is_longitudinal_key_element = item_dict['keyelementdetail']['IsLongitudinalKeyElement']
 
-        self.list_attributes = []
-        for this_attr in item_dict['list_attributes']:
-            self.list_attributes.append(O3Attribute(self, this_attr, **kwargs))
+            self.list_attributes = []
+            for this_attr in item_dict['list_attributes']:
+                self.list_attributes.append(O3Attribute(self, this_attr, **kwargs))
 
-        self.dictionary_attributes = {x.value_name: x for x in self.list_attributes}
+            self.dictionary_attributes = {x.value_name: x for x in self.list_attributes}
 
-        self.relationships = []
-        for this_relationship in item_dict['list_relationships']:
-            if this_relationship["SubjectElement"] == "Subject Element":
-                continue
-            self.relationships.append(O3Relationship(this_relationship, **kwargs))
+            self.relationships = []
+            for this_relationship in item_dict['list_relationships']:
+                # Skip the header row that contains column labels rather than data
+                if this_relationship["SubjectElement"] == "Subject Element":
+                    continue
+                self.relationships.append(O3Relationship(this_relationship, **kwargs))
+        except KeyError as e:
+            key = e.args[0]
+            raise KeyError(
+                f"Missing key '{key}' while parsing key element "
+                f"'{item_dict.get('KeyElementName', 'unknown')}'"
+            ) from e
 
     def __str__(self):
         return self.key_element_name

@@ -1,14 +1,28 @@
+"""Mapping of O3 attributes to SQL column definitions with data type resolution."""
 from __future__ import annotations
 import warnings
 
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from sql.data_model_to_sql.sql_type_from_o3_data_type import sql_data_types
 from helpers.enums import SupportedSQLServers
+from sql.dialects import get_dialect
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from base.o3_attribute import O3Attribute
+
+_ALWAYS_NULLABLE = {'Yes', 'True', True, 'Yes, if diagnosis is for secondary cancer',
+                    'Yes, except when intervention is TURP'}
+_ALWAYS_NOT_NULL = {'No'}
+# Note: "alloing" is a known typo in the upstream O3 schema; both the typo and
+# the corrected spelling are included to handle either version.
+_PHI_DEPENDENT = {
+    # value -> (phi_allowed_result, phi_not_allowed_result)
+    'No for systems alloing PHI. Yes for systems not allowing PHI': ('NOT NULL', 'NULL'),
+    'No for systems allowing PHI. Yes for systems not allowing PHI': ('NOT NULL', 'NULL'),
+    'Yes for systems allowing PHI. No for systems not allowing PHI': ('NULL', 'NOT NULL'),
+}
 
 
 class AttributeToSQLColumn:
@@ -29,15 +43,19 @@ class AttributeToSQLColumn:
         sql_server_type: SupportedSQLServers
             the SQL server type
         """
-        if sql_server_type not in SupportedSQLServers:
-            raise KeyError(f"Provided SQL server {sql_server_type} is not supported. "
+        if not isinstance(sql_server_type, SupportedSQLServers):
+            raise ValueError(f"Provided SQL server {sql_server_type} is not supported. "
                            f"Only MSSQL and PSQL are supported.")
 
         self.attribute = attribute
         self.allow_phi = phi_allowed
         self.sql_server = sql_server_type
+        self.dialect = get_dialect(sql_server_type)
         self.column_data_type = None
         self.column_nullable = None
+        # Priority-ordered list of data type resolution methods. Each method checks
+        # a specific condition and sets self.column_data_type if matched. The first
+        # method to set a non-None value wins (see __set_data_types).
         self.__set_data_type_methods = [self.__set_date_for_iso8601,
                                         self.__set_standard_values_data_type,
                                         self.__set_empty_value_types,
@@ -71,42 +89,32 @@ class AttributeToSQLColumn:
         """
         The SQL column data type of this attribute
         """
-        data_types = sql_data_types[self.sql_server]
+        data_types = self.dialect.type_map
         return data_types[self.column_data_type]
 
     def __set_nullable(self) -> None:
         """
-        Sets the column's nullable flag based on different logic associated with PHI and the attribute setting
+        Sets the column's nullable flag based on different logic associated with PHI and the attribute setting.
+
+        Uses module-level mappings ``_ALWAYS_NULLABLE``, ``_ALWAYS_NOT_NULL``,
+        and ``_PHI_DEPENDENT`` for the main lookup, with explicit post-map
+        overrides for Patient_MRN and Patient_AnonPatID.
         """
-        if self.attribute.allow_null_values in ['Yes', 'True', True, 'Yes, if diagnosis is for secondary cancer',
-                                                'Yes, except when intervention is TURP']:
+        allow_val = self.attribute.allow_null_values
+
+        if allow_val in _ALWAYS_NULLABLE:
             self.column_nullable = 'NULL'
-
-        if self.attribute.allow_null_values in ['No']:
+        elif allow_val in _ALWAYS_NOT_NULL:
             self.column_nullable = 'NOT NULL'
+        elif allow_val in _PHI_DEPENDENT:
+            phi_result, non_phi_result = _PHI_DEPENDENT[allow_val]
+            self.column_nullable = phi_result if self.allow_phi else non_phi_result
 
-        if self.allow_phi:
-            if self.attribute.allow_null_values == 'No for systems alloing PHI. Yes for systems not allowing PHI':
-                self.column_nullable = 'NOT NULL'
-            if self.attribute.allow_null_values == 'No for systems allowing PHI. Yes for systems not allowing PHI':
-                self.column_nullable = 'NOT NULL'
-            if self.attribute.allow_null_values == 'Yes for systems allowing PHI. No for systems not allowing PHI':
-                self.column_nullable = 'NULL'
-            if self.attribute.string_code == 'Patient_MRN':
-                self.column_nullable = 'NOT NULL'
-            if self.attribute.string_code == 'Patient_AnonPatID':
-                self.column_nullable = 'NULL'
-        else:
-            if self.attribute.allow_null_values == 'No for systems alloing PHI. Yes for systems not allowing PHI':
-                self.column_nullable = 'NULL'
-            if self.attribute.allow_null_values == 'No for systems allowing PHI. Yes for systems not allowing PHI':
-                self.column_nullable = 'NULL'
-            if self.attribute.allow_null_values == 'Yes for systems allowing PHI. No for systems not allowing PHI':
-                self.column_nullable = 'NOT NULL'
-            if self.attribute.string_code == 'Patient_MRN':
-                self.column_nullable = 'NULL'
-            if self.attribute.string_code == 'Patient_AnonPatID':
-                self.column_nullable = 'NOT NULL'
+        # Patient_MRN / Patient_AnonPatID overrides: nullable flips based on PHI
+        if self.attribute.string_code == 'Patient_MRN':
+            self.column_nullable = 'NOT NULL' if self.allow_phi else 'NULL'
+        if self.attribute.string_code == 'Patient_AnonPatID':
+            self.column_nullable = 'NULL' if self.allow_phi else 'NOT NULL'
 
         if self.column_nullable is None:
             warnings.warn(f"No SQL nullable field set using logic. Defaulting to NULL for {self}")
