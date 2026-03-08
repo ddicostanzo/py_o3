@@ -38,6 +38,17 @@ class TestModelParsing:
             assert ke.string_code is not None
             assert len(ke.string_code) > 0
 
+    def test_string_code_index_populated(self, model):
+        assert len(model.key_elements_by_string_code) == len(model.key_elements)
+
+    def test_string_code_index_maps_correctly(self, model):
+        for code, ke in model.key_elements_by_string_code.items():
+            assert code == ke.string_code
+
+    def test_string_code_lookup_finds_patient(self, model):
+        assert "Patient" in model.key_elements_by_string_code
+        assert model.key_elements_by_string_code["Patient"].key_element_name == "Patient"
+
     def test_patient_key_element_exists(self, model):
         assert "Patient" in model.key_elements
 
@@ -72,6 +83,16 @@ class TestFromDict:
         model = O3DataModel.from_dict(data, clean=True)
         assert len(model.key_elements) > 0
         assert "Patient" in model.key_elements
+
+    def test_from_dict_string_code_index_populated(self):
+        with open(_JSON_PATH) as f:
+            text = f.read()
+            text = text.replace('(\\u002B Other)', 'Other')
+            text = text.replace('(\\u002BOther)', 'Other')
+            data = json.loads(text)
+
+        model = O3DataModel.from_dict(data, clean=True)
+        assert len(model.key_elements_by_string_code) == len(model.key_elements)
 
     def test_from_dict_json_file_is_none(self):
         with open(_JSON_PATH) as f:

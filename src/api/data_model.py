@@ -63,6 +63,7 @@ class O3DataModel:
         name-mangled attribute names.
         """
         self.key_elements: dict[str, O3KeyElement] = {}
+        self.key_elements_by_string_code: dict[str, O3KeyElement] = {}
         self.__standard_value_lists: dict[str, list[O3StandardValue]] | None = None
         self.__value_data_types: set[str] | None = None
         self.__value_priority: set[str] | None = None
@@ -129,6 +130,7 @@ class O3DataModel:
         for obj in self.json_obj:
             _element = O3KeyElement(obj, **kwargs)
             self.key_elements[_element.key_element_name] = _element
+            self.key_elements_by_string_code[_element.string_code] = _element
 
     def __key_element_generator(self) -> Iterator[O3KeyElement]:
         """
