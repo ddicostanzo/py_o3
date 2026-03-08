@@ -1,7 +1,9 @@
 """Patient information query executor for the Aria data warehouse."""
-from pyodbc import Connection
+from collections.abc import Generator, Iterable
 
-from sql.aria_integration.queried_datatable import Datatable, _resolve_query_path
+from pyodbc import Connection, Row
+
+from sql.aria_integration.queried_datatable import Datatable
 
 
 class PatientInformation(Datatable):
@@ -17,12 +19,14 @@ class PatientInformation(Datatable):
         An active pyodbc connection to the Aura data warehouse.
     """
 
-    _QUERY_FILE = 'Aura/patient_information.sql'
+    _QUERY_FILE: str = 'Aura/patient_information.sql'
 
     def __init__(self, connection: Connection):
-        super().__init__(connection, _resolve_query_path(self._QUERY_FILE))
+        super().__init__(connection, self._QUERY_FILE)
 
-    def get_data(self, mrn: str, num_results: int = None):
+    def get_data(
+        self, mrn: str, num_results: int | None = None
+    ) -> Iterable[Row] | Generator[Row, None, None]:
         """
         Execute the patient information query for a specific MRN.
 

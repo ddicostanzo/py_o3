@@ -1,7 +1,7 @@
 """Tests for PatientInformation class with mocked pyodbc."""
 
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -12,6 +12,7 @@ if 'pyodbc' not in sys.modules:
     _mock_pyodbc.Error = type('Error', (Exception,), {})
     sys.modules['pyodbc'] = _mock_pyodbc
 
+import sql.aria_integration.queried_datatable as datatable_module
 from sql.aria_integration.patient_information import PatientInformation
 
 
@@ -21,27 +22,30 @@ class TestPatientInformationInit:
     def test_query_file_constant(self):
         assert PatientInformation._QUERY_FILE == 'Aura/patient_information.sql'
 
-    @patch('sql.aria_integration.patient_information._resolve_query_path')
-    def test_uses_resolve_query_path(self, mock_resolve, tmp_path):
-        query_file = tmp_path / "patient_information.sql"
+    def test_resolves_query_path(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        (queries_dir / "Aura").mkdir(parents=True)
+        query_file = queries_dir / "Aura" / "patient_information.sql"
         query_file.write_text("SELECT 1 WHERE id = ?")
-        mock_resolve.return_value = str(query_file)
 
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
         mock_conn = MagicMock()
         pi = PatientInformation(mock_conn)
 
-        mock_resolve.assert_called_once_with('Aura/patient_information.sql')
+        assert pi.query_location == str(query_file)
         assert "?" in pi.query
 
 
 class TestPatientInformationGetData:
     """Tests for PatientInformation.get_data method."""
 
-    @patch('sql.aria_integration.patient_information._resolve_query_path')
-    def test_passes_mrn_as_params(self, mock_resolve, tmp_path):
-        query_file = tmp_path / "patient_information.sql"
-        query_file.write_text("SELECT * FROM t WHERE id = ?")
-        mock_resolve.return_value = str(query_file)
+    def test_passes_mrn_as_params(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        (queries_dir / "Aura").mkdir(parents=True)
+        (queries_dir / "Aura" / "patient_information.sql").write_text(
+            "SELECT * FROM t WHERE id = ?"
+        )
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
 
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -54,11 +58,13 @@ class TestPatientInformationGetData:
 
         mock_cursor.execute.assert_called_once_with(pi.query, ('12345',))
 
-    @patch('sql.aria_integration.patient_information._resolve_query_path')
-    def test_empty_mrn_raises_value_error(self, mock_resolve, tmp_path):
-        query_file = tmp_path / "patient_information.sql"
-        query_file.write_text("SELECT 1 WHERE id = ?")
-        mock_resolve.return_value = str(query_file)
+    def test_empty_mrn_raises_value_error(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        (queries_dir / "Aura").mkdir(parents=True)
+        (queries_dir / "Aura" / "patient_information.sql").write_text(
+            "SELECT 1 WHERE id = ?"
+        )
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
 
         mock_conn = MagicMock()
         pi = PatientInformation(mock_conn)
@@ -66,11 +72,13 @@ class TestPatientInformationGetData:
         with pytest.raises(ValueError, match="mrn must be a non-empty string"):
             pi.get_data('')
 
-    @patch('sql.aria_integration.patient_information._resolve_query_path')
-    def test_none_mrn_raises_value_error(self, mock_resolve, tmp_path):
-        query_file = tmp_path / "patient_information.sql"
-        query_file.write_text("SELECT 1 WHERE id = ?")
-        mock_resolve.return_value = str(query_file)
+    def test_none_mrn_raises_value_error(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        (queries_dir / "Aura").mkdir(parents=True)
+        (queries_dir / "Aura" / "patient_information.sql").write_text(
+            "SELECT 1 WHERE id = ?"
+        )
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
 
         mock_conn = MagicMock()
         pi = PatientInformation(mock_conn)
@@ -82,11 +90,13 @@ class TestPatientInformationGetData:
 class TestPatientInformationGetDataWithNumResults:
     """Tests for PatientInformation.get_data with num_results."""
 
-    @patch('sql.aria_integration.patient_information._resolve_query_path')
-    def test_forwards_num_results(self, mock_resolve, tmp_path):
-        query_file = tmp_path / "patient_information.sql"
-        query_file.write_text("SELECT * FROM t WHERE id = ?")
-        mock_resolve.return_value = str(query_file)
+    def test_forwards_num_results(self, tmp_path, monkeypatch):
+        queries_dir = tmp_path / "queries"
+        (queries_dir / "Aura").mkdir(parents=True)
+        (queries_dir / "Aura" / "patient_information.sql").write_text(
+            "SELECT * FROM t WHERE id = ?"
+        )
+        monkeypatch.setattr(datatable_module, "_QUERIES_DIR", queries_dir)
 
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
