@@ -1,7 +1,4 @@
--- Template query: @mrn must be set before execution.
--- Example: SET @mrn = 'your_mrn_value';
-DECLARE @mrn nvarchar(50);
-
+-- Parameterized query: pass (mrn,) as params.
 SELECT
 
 dp.PatientFullAddress,
@@ -11,7 +8,7 @@ pat.SpecialNeeds,
 pat_add.PostalCode
 
 FROM DWH.FactPatient fp
-INNER JOIN DWH.DimPatient dp ON dp.DimPatientID = fp.DimPatientID and dp.PatientId = @mrn
+INNER JOIN DWH.DimPatient dp ON dp.DimPatientID = fp.DimPatientID and dp.PatientId = ?
 INNER JOIN AuraStaging.dbo.Patient pat ON pat.PatientSer = dp.ctrPatientSer
 INNER JOIN AuraStaging.dbo.PatientAddress pa ON pa.PatientSer = pat.PatientSer and pa.PrimaryFlag = 1
 INNER JOIN AuraStaging.dbo.Address pat_add ON pat_add.AddressSer = pa.AddressSer
