@@ -2,24 +2,28 @@
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass, field
+from typing import Literal
 
 from etl.mapping.mapping_store import CrosswalkEntry
 from etl.manifest import SemanticManifest
 from api.data_model import O3DataModel
+
+NodeType = Literal["source", "transform", "target"]
 
 
 @dataclass(frozen=True)
 class LineageNode:
     """A node in the lineage graph: source, transform, or target."""
 
-    node_type: str  # "source" | "transform" | "target"
+    node_type: NodeType
     table: str
     column: str
     metadata: dict = field(default_factory=dict, hash=False, compare=False)
 
 
-@dataclass
+@dataclass(frozen=True)
 class LineageEdge:
     """A directed edge in the lineage graph."""
 
@@ -45,14 +49,19 @@ class LineageGraph:
             self.__reverse.setdefault(edge.target, []).append(edge)
 
     def trace_forward(self, source_table: str, source_column: str) -> list[LineageNode]:
-        """Find all target nodes reachable from a source column."""
+        """Find all target nodes reachable from a source column.
+
+        Uses frozen LineageNode equality — a new node with the same
+        (node_type, table, column) matches existing nodes because
+        metadata is excluded from comparison.
+        """
         start = LineageNode(node_type="source", table=source_table, column=source_column)
         visited: set[LineageNode] = set()
         targets: list[LineageNode] = []
-        queue = [start]
+        queue: deque[LineageNode] = deque([start])
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             if current in visited:
                 continue
             visited.add(current)
@@ -64,14 +73,17 @@ class LineageGraph:
         return targets
 
     def trace_backward(self, o3_element: str, o3_attribute: str) -> list[LineageNode]:
-        """Find all source nodes that feed an O3 attribute."""
+        """Find all source nodes that feed an O3 attribute.
+
+        Uses frozen LineageNode equality — see trace_forward docstring.
+        """
         target = LineageNode(node_type="target", table=o3_element, column=o3_attribute)
         visited: set[LineageNode] = set()
         sources: list[LineageNode] = []
-        queue = [target]
+        queue: deque[LineageNode] = deque([target])
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             if current in visited:
                 continue
             visited.add(current)

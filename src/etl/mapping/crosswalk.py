@@ -25,9 +25,7 @@ class Crosswalk:
         self.__o3_model = o3_model
         self.__engine = match_engine or MatchEngine()
         self.__min_confidence = min_confidence
-        self.__deny_list = set(
-            getattr(registry.field_policy_defaults, "deny_list", [])
-        )
+        self.__deny_list = set(registry.field_policy_defaults.deny_list)
 
     def generate_suggestions(self) -> list[CrosswalkEntry]:
         """Auto-suggest crosswalk entries by scoring all DWH columns against O3 attributes."""

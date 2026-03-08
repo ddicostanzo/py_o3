@@ -86,3 +86,25 @@ class TestRunLive:
         runner = ETLRunner(_mock_extractor(), _mock_loader())
         with pytest.raises(ValueError, match="connection"):
             runner.run(entry_points=["billing"], dry_run=False)
+
+    def test_extract_error_captured_with_context(self):
+        conn = MagicMock()
+        conn.cursor.return_value.execute.side_effect = RuntimeError("connection lost")
+        runner = ETLRunner(_mock_extractor(), _mock_loader(), connection=conn)
+        result = runner.run(entry_points=["billing"])
+        assert result.success is False
+        assert len(result.results[0].errors) == 1
+        assert "Extract failed" in result.results[0].errors[0]
+        assert "RuntimeError" in result.results[0].errors[0]
+
+    def test_load_error_triggers_rollback(self):
+        cursor = MagicMock()
+        cursor.execute.side_effect = [None, RuntimeError("insert failed")]
+        cursor.fetchall.return_value = [("row1",)]
+        conn = MagicMock()
+        conn.cursor.return_value = cursor
+        runner = ETLRunner(_mock_extractor(), _mock_loader(), connection=conn)
+        result = runner.run(entry_points=["billing"])
+        assert result.success is False
+        assert "Load failed" in result.results[0].errors[0]
+        conn.rollback.assert_called_once()

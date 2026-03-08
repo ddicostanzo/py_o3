@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from etl.mapping.mapping_store import CrosswalkEntry
 from etl.pipeline.extractor import ExtractQuery
-from helpers.enums import SupportedSQLServers
 from helpers.string_helpers import leave_only_letters_numbers_or_underscore
 from api.data_model import O3DataModel
 
@@ -21,27 +19,22 @@ class LoadCommand:
 
 
 class Loader:
-    """Generates INSERT/MERGE SQL for loading into O3 tables."""
+    """Generates INSERT/MERGE SQL for loading into O3 tables (MSSQL dialect)."""
 
     def __init__(
         self,
-        crosswalk: list[CrosswalkEntry],
         o3_model: O3DataModel,
-        sql_server_type: SupportedSQLServers,
     ):
-        self.__crosswalk = crosswalk
         self.__o3_model = o3_model
-        self.__sql_server_type = sql_server_type
 
     def generate_insert(self, extract: ExtractQuery) -> LoadCommand:
         """Generate an INSERT INTO ... SELECT statement."""
         column_map, target_table = self.__build_column_map(extract)
 
         if not column_map:
-            return LoadCommand(
-                target_table=target_table,
-                sql=f"-- No mapped columns for {target_table}",
-                column_map={},
+            raise ValueError(
+                f"No mapped columns for target table '{target_table}'. "
+                f"Check the crosswalk entries in the extract query."
             )
 
         o3_columns = ", ".join(f"[{col}]" for col in column_map.keys())
@@ -64,16 +57,21 @@ class Loader:
         column_map, target_table = self.__build_column_map(extract)
 
         if not column_map:
-            return LoadCommand(
-                target_table=target_table,
-                sql=f"-- No mapped columns for {target_table}",
-                column_map={},
+            raise ValueError(
+                f"No mapped columns for target table '{target_table}'. "
+                f"Check the crosswalk entries in the extract query."
+            )
+
+        missing_keys = [k for k in merge_key if k not in column_map]
+        if missing_keys:
+            raise ValueError(
+                f"Merge keys {missing_keys} not found in column map for "
+                f"{target_table}. Available: {list(column_map.keys())}"
             )
 
         on_clause = " AND ".join(
             f"target.[{k}] = source.[{column_map[k]}]"
             for k in merge_key
-            if k in column_map
         )
 
         update_cols = [
@@ -129,7 +127,9 @@ class Loader:
             else:
                 table_name = leave_only_letters_numbers_or_underscore(element_name)
         else:
-            table_name = "unknown"
+            raise ValueError(
+                "No O3 key elements found in the extract query's mapped columns."
+            )
 
         return column_map, table_name
 

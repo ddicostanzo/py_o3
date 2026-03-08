@@ -27,7 +27,10 @@ class ETLResult:
 
     results: list[EntryPointResult] = field(default_factory=list)
     total_duration: float = 0.0
-    success: bool = True
+
+    @property
+    def success(self) -> bool:
+        return all(len(r.errors) == 0 for r in self.results)
 
 
 class ETLRunner:
@@ -104,12 +107,10 @@ class ETLRunner:
             results.append(ep_result)
 
         total_duration = time.time() - start
-        success = all(len(r.errors) == 0 for r in results)
 
         return ETLResult(
             results=results,
             total_duration=total_duration,
-            success=success,
         )
 
     def __run_entry_point(
@@ -125,24 +126,34 @@ class ETLRunner:
 
         try:
             cursor = self.__connection.cursor()
-
-            # Extract
             cursor.execute(query.sql)
             rows = cursor.fetchall()
             result.rows_extracted = len(rows)
+        except Exception as e:
+            result.errors.append(
+                f"Extract failed for '{query.entry_point}': "
+                f"{type(e).__name__}: {e}"
+            )
+            result.duration_seconds = time.time() - ep_start
+            return result
 
-            # Load
+        try:
             load_cmd = self.__loader.generate_insert(query)
             cursor.execute(load_cmd.sql)
             result.rows_loaded = cursor.rowcount
-
             self.__connection.commit()
         except Exception as e:
-            result.errors.append(str(e))
+            result.errors.append(
+                f"Load failed for '{query.entry_point}': "
+                f"{type(e).__name__}: {e}"
+            )
             try:
                 self.__connection.rollback()
-            except Exception:
-                pass
+            except Exception as rollback_err:
+                result.errors.append(
+                    f"Rollback failed: {type(rollback_err).__name__}: "
+                    f"{rollback_err}"
+                )
 
         result.duration_seconds = time.time() - ep_start
         return result

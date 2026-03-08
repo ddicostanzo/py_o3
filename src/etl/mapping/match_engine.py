@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 # Prefixes stripped before name comparison
@@ -41,7 +41,7 @@ _TYPE_GROUPS: dict[str, set[str]] = {
         "vdt_datetime", "vdt_datetimestamp",
     },
     "boolean": {
-        "boolean", "bit", "binary",
+        "boolean", "bit",
         "vdt_flag_false_default",
     },
 }
@@ -53,14 +53,14 @@ for group, members in _TYPE_GROUPS.items():
         _TYPE_TO_GROUP[member] = group
 
 
-@dataclass
+@dataclass(frozen=True)
 class MatchCandidate:
     """A scored candidate mapping between a DWH source and an O3 attribute."""
 
     dwh_source: str
     o3_target: str
     score: float
-    signals: dict[str, float]
+    signals: dict[str, float] = field(hash=False)
 
 
 class MatchEngine:

@@ -11,7 +11,6 @@ from etl.lineage.lineage_report import LineageReport
 from etl.pipeline.extractor import Extractor
 from etl.pipeline.loader import Loader
 from etl.pipeline.runner import ETLRunner
-from helpers.enums import SupportedSQLServers
 
 
 RESOURCES = os.path.join(os.path.dirname(__file__), "Resources")
@@ -19,7 +18,7 @@ OUTPUT = os.path.join(os.path.dirname(__file__), "..", "Sql_Commands", "etl")
 CROSSWALK_PATH = os.path.join(RESOURCES, "crosswalk.json")
 
 
-def main():
+def main() -> None:
     # 1. Load data sources
     print("Loading O3 data model...")
     o3 = O3DataModel(os.path.join(RESOURCES, "O3_20250128_Fixed.json"), clean=True)
@@ -67,7 +66,7 @@ def main():
     print("Generating ETL SQL...")
     active_entries = [e for e in entries if e.is_active]
     extractor = Extractor(active_entries, manifest, registry)
-    loader = Loader(active_entries, o3, SupportedSQLServers.MSSQL)
+    loader = Loader(o3)
     runner = ETLRunner(extractor, loader)
     runner.export_sql(OUTPUT)
     print(f"  ETL SQL files written to {OUTPUT}")

@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, asdict
+from typing import Literal
+
+CrosswalkStatus = Literal["auto", "confirmed", "rejected", "manual"]
 
 
 @dataclass
@@ -18,7 +21,13 @@ class CrosswalkEntry:
     o3_key_element: str
     o3_attribute: str
     confidence: float
-    status: str  # "auto" | "confirmed" | "rejected" | "manual"
+    status: CrosswalkStatus
+
+    def __post_init__(self):
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError(
+                f"confidence must be in [0.0, 1.0], got {self.confidence}"
+            )
 
     @property
     def is_active(self) -> bool:
@@ -34,7 +43,17 @@ class CrosswalkEntry:
 
     @classmethod
     def from_dict(cls, data: dict) -> CrosswalkEntry:
-        return cls(**data)
+        return cls(
+            dwh_table=data["dwh_table"],
+            dwh_column=data["dwh_column"],
+            model_name=data.get("model_name"),
+            model_alias=data.get("model_alias"),
+            model_expr=data.get("model_expr"),
+            o3_key_element=data["o3_key_element"],
+            o3_attribute=data["o3_attribute"],
+            confidence=data["confidence"],
+            status=data["status"],
+        )
 
 
 @dataclass

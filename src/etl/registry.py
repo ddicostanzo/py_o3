@@ -5,20 +5,28 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from typing import Literal
 
 
-@dataclass
+@dataclass(frozen=True)
 class DateBasis:
     """Maps human-readable date basis names to DWH date key columns."""
 
-    enum: list[str]
+    valid_bases: tuple[str, ...]
     map: dict[str, str]
     default: str
+
+    def __post_init__(self):
+        if self.default not in self.map:
+            raise ValueError(
+                f"DateBasis default '{self.default}' not in map keys: "
+                f"{list(self.map.keys())}"
+            )
 
     @classmethod
     def from_dict(cls, data: dict) -> DateBasis:
         return cls(
-            enum=data["enum"],
+            valid_bases=tuple(data["enum"]),
             map=data["map"],
             default=data["default"],
         )
@@ -27,7 +35,8 @@ class DateBasis:
         """Return the DWH date key column for a given basis name."""
         if basis not in self.map:
             raise ValueError(
-                f"invalid date basis '{basis}'; valid options: {self.enum}"
+                f"invalid date basis '{basis}'; valid options: "
+                f"{list(self.valid_bases)}"
             )
         return self.map[basis]
 
@@ -54,7 +63,7 @@ class TimePolicy:
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class JoinSpec:
     """One allowed dimension join: fact.from_column → dimension.to_column."""
 
@@ -150,15 +159,22 @@ class DateRangePolicy:
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class QuerySafety:
     """Global safety constraints for generated queries."""
 
     select_only: bool
     default_row_limit: int
     max_row_limit: int
-    require_date_filter_for_tables: list[str]
-    cross_fact_joins: str
+    require_date_filter_for_tables: tuple[str, ...]
+    cross_fact_joins: Literal["disallow_unless_bridge", "allow"]
+
+    def __post_init__(self):
+        if self.default_row_limit > self.max_row_limit:
+            raise ValueError(
+                f"default_row_limit ({self.default_row_limit}) exceeds "
+                f"max_row_limit ({self.max_row_limit})"
+            )
 
     @classmethod
     def from_dict(cls, data: dict) -> QuerySafety:
@@ -166,8 +182,8 @@ class QuerySafety:
             select_only=data["selectOnly"],
             default_row_limit=data["defaultRowLimit"],
             max_row_limit=data["maxRowLimit"],
-            require_date_filter_for_tables=data.get(
-                "requireDateFilterForTables", []
+            require_date_filter_for_tables=tuple(
+                data.get("requireDateFilterForTables", [])
             ),
             cross_fact_joins=data.get("crossFactJoins", "disallow_unless_bridge"),
         )

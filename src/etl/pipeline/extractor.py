@@ -60,7 +60,12 @@ class Extractor:
         else:
             date_key = time_policy.default_date_key or ""
 
-        lookback = lookback_days or time_policy.default_lookback_days or 90
+        if lookback_days is not None:
+            lookback = lookback_days
+        elif time_policy.default_lookback_days is not None:
+            lookback = time_policy.default_lookback_days
+        else:
+            lookback = 90
 
         # Collect deny list
         deny = set(self.__registry.field_policy_defaults.deny_list)
@@ -110,9 +115,6 @@ class Extractor:
                 select_columns.append(f"  {entry.model_expr} AS [{alias}]")
             else:
                 select_columns.append(f"  base.[{entry.dwh_column}]")
-
-        if not select_columns:
-            select_columns = ["  base.*"]
 
         # Build SQL
         row_limit = self.__registry.global_policy.query_safety.default_row_limit

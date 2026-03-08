@@ -35,7 +35,7 @@ def _make_registry() -> ModelRegistry:
                 time_policy=TimePolicy(
                     default_date_key="DimDateID_FromDateOfService",
                     date_basis=DateBasis(
-                        enum=["service"],
+                        valid_bases=("service",),
                         map={"service": "DimDateID_FromDateOfService"},
                         default="service",
                     ),
@@ -56,7 +56,7 @@ def _make_registry() -> ModelRegistry:
                     default_date_key="DimDateID_FromDateOfService",
                     date_key_candidates=["DimDateID_FromDateOfService"],
                     date_basis=DateBasis(
-                        enum=["service"],
+                        valid_bases=("service",),
                         map={"service": "DimDateID_FromDateOfService"},
                         default="service",
                     ),
@@ -71,7 +71,7 @@ def _make_registry() -> ModelRegistry:
                 select_only=True,
                 default_row_limit=1000,
                 max_row_limit=100000,
-                require_date_filter_for_tables=["DWH.FactActivityBilling"],
+                require_date_filter_for_tables=("DWH.FactActivityBilling",),
                 cross_fact_joins="disallow_unless_bridge",
             ),
         ),
@@ -119,6 +119,11 @@ class TestGenerateQuery:
         extractor = Extractor([_make_entry()], _make_manifest(), _make_registry())
         query = extractor.generate_query("billing", lookback_days=30)
         assert "30" in query.sql
+
+    def test_lookback_days_zero_is_respected(self):
+        extractor = Extractor([_make_entry()], _make_manifest(), _make_registry())
+        query = extractor.generate_query("billing", lookback_days=0)
+        assert "-0" in query.sql
 
     def test_denied_columns_excluded(self):
         entries = [

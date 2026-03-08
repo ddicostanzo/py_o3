@@ -5,7 +5,6 @@ from etl.pipeline.loader import LoadCommand, Loader
 from etl.pipeline.extractor import ExtractQuery
 from etl.mapping.mapping_store import CrosswalkEntry
 from etl.registry import JoinSpec
-from helpers.enums import SupportedSQLServers
 
 
 def _make_entry(**overrides) -> CrosswalkEntry:
@@ -47,26 +46,37 @@ def _mock_o3_model():
 
 class TestGenerateInsert:
     def test_returns_load_command(self):
-        loader = Loader([_make_entry()], _mock_o3_model(), SupportedSQLServers.MSSQL)
+        loader = Loader(_mock_o3_model())
         cmd = loader.generate_insert(_make_extract_query())
         assert isinstance(cmd, LoadCommand)
         assert "INSERT" in cmd.sql
         assert "Patient" in cmd.target_table
 
     def test_column_map_populated(self):
-        loader = Loader([_make_entry()], _mock_o3_model(), SupportedSQLServers.MSSQL)
+        loader = Loader(_mock_o3_model())
         cmd = loader.generate_insert(_make_extract_query())
         assert "PatientIdentifier" in cmd.column_map
+
+    def test_empty_column_map_raises(self):
+        inactive_entry = _make_entry(status="rejected")
+        loader = Loader(_mock_o3_model())
+        with pytest.raises(ValueError, match="No O3 key elements"):
+            loader.generate_insert(_make_extract_query(entries=[inactive_entry]))
 
 
 class TestGenerateMerge:
     def test_returns_merge_command(self):
-        loader = Loader([_make_entry()], _mock_o3_model(), SupportedSQLServers.MSSQL)
+        loader = Loader(_mock_o3_model())
         cmd = loader.generate_merge(_make_extract_query(), merge_key=["PatientIdentifier"])
         assert isinstance(cmd, LoadCommand)
         assert "MERGE" in cmd.sql
 
     def test_merge_key_in_on_clause(self):
-        loader = Loader([_make_entry()], _mock_o3_model(), SupportedSQLServers.MSSQL)
+        loader = Loader(_mock_o3_model())
         cmd = loader.generate_merge(_make_extract_query(), merge_key=["PatientIdentifier"])
         assert "PatientIdentifier" in cmd.sql
+
+    def test_invalid_merge_key_raises(self):
+        loader = Loader(_mock_o3_model())
+        with pytest.raises(ValueError, match="Merge keys"):
+            loader.generate_merge(_make_extract_query(), merge_key=["NonexistentKey"])

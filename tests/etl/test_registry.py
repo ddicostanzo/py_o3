@@ -96,22 +96,26 @@ class TestDateBasis:
             "default": "service",
         }
         db = DateBasis.from_dict(data)
-        assert db.enum == ["service", "completed"]
+        assert db.valid_bases == ("service", "completed")
         assert db.map["service"] == "DimDateID_FromDateOfService"
         assert db.default == "service"
 
     def test_resolve_returns_mapped_key(self):
         db = DateBasis(
-            enum=["service"],
+            valid_bases=("service",),
             map={"service": "DimDateID_FromDateOfService"},
             default="service",
         )
         assert db.resolve("service") == "DimDateID_FromDateOfService"
 
     def test_resolve_invalid_raises(self):
-        db = DateBasis(enum=["service"], map={"service": "X"}, default="service")
+        db = DateBasis(valid_bases=("service",), map={"service": "X"}, default="service")
         with pytest.raises(ValueError, match="invalid"):
             db.resolve("nonexistent")
+
+    def test_invalid_default_raises(self):
+        with pytest.raises(ValueError, match="not in map"):
+            DateBasis(valid_bases=("a",), map={"a": "X"}, default="nonexistent")
 
 
 class TestTimePolicy:
@@ -203,3 +207,13 @@ class TestLoadModelRegistry:
         data = _make_minimal_registry()
         registry = ModelRegistry.from_dict(data)
         assert "PatientSSN" in registry.field_policy_defaults.deny_list
+
+    def test_query_safety_row_limit_validation(self):
+        with pytest.raises(ValueError, match="exceeds"):
+            QuerySafety(
+                select_only=True,
+                default_row_limit=200000,
+                max_row_limit=100000,
+                require_date_filter_for_tables=(),
+                cross_fact_joins="disallow_unless_bridge",
+            )
