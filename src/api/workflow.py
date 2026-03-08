@@ -78,8 +78,8 @@ def create_standard_value_lookup_table(model: O3DataModel,
         The sql server type to create the command for
     Returns
     -------
-        dict[str, str]
-            The dictionary with key of "StandardValueLookup" and value of the sql command
+        LookupTableCreator
+            The lookup table creator instance with methods to generate SQL table and INSERT commands
     """
     items: list = []
     for values in model.standard_value_lists.values():
@@ -158,16 +158,16 @@ def get_table_names_from_relationships(model: O3DataModel) -> tuple[set[str], se
     return subject_names, predicate_names, relationship_categories
 
 
-def validate_names_in_relationships(subject: str, predicate: str, model: O3DataModel) -> None:
+def validate_names_in_relationships(subject: set[str], predicate: set[str], model: O3DataModel) -> None:
     """
     Validates the key elements in the table names to be sure they exist
 
     Parameters
     ----------
-    subject: str
-        the subject table name
-    predicate: str
-        the predicate table name
+    subject: set[str]
+        the subject table names
+    predicate: set[str]
+        the predicate table names
     model: O3DataModel
         the model to validate the tables against
 
@@ -177,10 +177,10 @@ def validate_names_in_relationships(subject: str, predicate: str, model: O3DataM
     """
     for ke in model.key_elements.values():
         if ke.string_code not in subject:
-            logging.info(f"String Code {ke.string_code} not in sub table")
+            logging.warning(f"String Code {ke.string_code} not in subject table names")
 
         if ke.string_code not in predicate:
-            logging.info(f"String Code {ke.string_code} not in predicate table")
+            logging.warning(f"String Code {ke.string_code} not in predicate table names")
 
 
 def foreign_key_constraints(model: O3DataModel, sql_type: SupportedSQLServers) -> list[str]:
@@ -207,7 +207,7 @@ def foreign_key_constraints(model: O3DataModel, sql_type: SupportedSQLServers) -
     return _commands
 
 
-def write_sql_to_text(file_location: str, commands: list[str], **kwargs) -> None:
+def write_sql_to_text(file_location: str, commands: list[str], write_mode: str = 'a') -> None:
     """
     Writes the SQL command to text file
 
@@ -217,15 +217,22 @@ def write_sql_to_text(file_location: str, commands: list[str], **kwargs) -> None
         The file location to write the SQL command to
     commands: list[str]
         The SQL commands to write
-    kwargs
-        write_mode: str
-            The open function mode to use. Defaults to 'a' if not provided
+    write_mode: str
+        The open function mode to use. Must be 'w' or 'a' (default: 'a')
 
     Returns
     -------
     None
+
+    Raises
+    ------
+    ValueError
+        If write_mode is not 'w' or 'a'
     """
-    with open(file_location, kwargs.get('write_mode', 'a')) as file:
+    if write_mode not in ('w', 'a'):
+        raise ValueError(f"write_mode must be 'w' or 'a', got {write_mode!r}")
+
+    with open(file_location, write_mode) as file:
         for command in commands:
             file.writelines(command)
 

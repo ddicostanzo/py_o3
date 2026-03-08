@@ -32,8 +32,9 @@ def get_dialect(server_type: SupportedSQLServers) -> SQLDialect:
 
     if server_type == SupportedSQLServers.MSSQL:
         return MSSQLDialect()
-    else:
+    elif server_type == SupportedSQLServers.PSQL:
         return PSQLDialect()
+    raise ValueError(f"No dialect implementation for {server_type}")
 
 
 if __name__ == "__main__":

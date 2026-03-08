@@ -111,6 +111,14 @@ class O3Attribute(O3Element):
             if self.value_data_type == "string":
                 self.value_data_type = "String"
 
+            if self.value_data_type not in self._POSSIBLE_VALUE_DATA_TYPES:
+                warnings.warn(
+                    f"Attribute '{self.value_name}' has unrecognized data type "
+                    f"'{self.value_data_type}' after cleaning. SQL generation may fail.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
 
 if __name__ == "__main__":
     pass

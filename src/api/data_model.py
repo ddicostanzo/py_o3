@@ -54,7 +54,7 @@ class O3DataModel:
         self._init_caches()
 
         self.__json_to_dictionary()
-        self.__create_key_elements(**kwargs)
+        self._create_key_elements(**kwargs)
 
     def _init_caches(self) -> None:
         """
@@ -93,7 +93,7 @@ class O3DataModel:
         instance.json_file = None
         instance.json_obj = data
         instance._init_caches()
-        instance._O3DataModel__create_key_elements(**kwargs)
+        instance._create_key_elements(**kwargs)
         return instance
 
     def __json_to_dictionary(self) -> None:
@@ -112,7 +112,7 @@ class O3DataModel:
             _json_text = _json_text.replace('(\\u002BOther)', "Other")
             self.json_obj = json.loads(_json_text)
 
-    def __create_key_elements(self, **kwargs) -> None:
+    def _create_key_elements(self, **kwargs) -> None:
         """
         Reads and creates the O3 elements contained in the JSON dictionary
 

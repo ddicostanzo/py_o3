@@ -69,6 +69,22 @@ class TestMSSQLDialect:
         result = self.dialect.alter_table_add_column("Patient", "Name", "varchar(max)", "NOT NULL")
         assert result == "ALTER TABLE Patient ADD Name varchar(max) NOT NULL;"
 
+    def test_string_type_short_default(self):
+        assert self.dialect.string_type_short() == "varchar(256)"
+
+    def test_string_type_short_custom(self):
+        assert self.dialect.string_type_short(128) == "varchar(128)"
+
+    def test_unique_constraint(self):
+        result = self.dialect.unique_constraint("AK_Code", "CodeColumn")
+        assert result == "CONSTRAINT AK_Code Unique(CodeColumn)"
+
+    def test_create_index(self):
+        result = self.dialect.create_index("IX_Test", "MyTable", "Col1", ["Col2", "Col3"])
+        assert "CREATE NONCLUSTERED INDEX IX_Test ON MyTable" in result
+        assert "(Col1)" in result
+        assert "INCLUDE (Col2, Col3)" in result
+
 
 class TestPSQLDialect:
     """Tests for PSQLDialect implementation."""
@@ -128,6 +144,22 @@ class TestPSQLDialect:
     def test_alter_table_add_column_not_null(self):
         result = self.dialect.alter_table_add_column("Patient", "Name", "text", "NOT NULL")
         assert result == "ALTER TABLE Patient ADD COLUMN Name text NOT NULL;"
+
+    def test_string_type_short_returns_text(self):
+        assert self.dialect.string_type_short() == "text"
+
+    def test_string_type_short_ignores_max_length(self):
+        assert self.dialect.string_type_short(128) == "text"
+
+    def test_unique_constraint(self):
+        result = self.dialect.unique_constraint("AK_Code", "CodeColumn")
+        assert result == "Unique(CodeColumn)"
+
+    def test_create_index(self):
+        result = self.dialect.create_index("IX_Test", "MyTable", "Col1", ["Col2", "Col3"])
+        assert "CREATE INDEX IX_Test ON MyTable" in result
+        assert "(Col1)" in result
+        assert "INCLUDE (Col2, Col3)" in result
 
 
 class TestGetDialectFactory:

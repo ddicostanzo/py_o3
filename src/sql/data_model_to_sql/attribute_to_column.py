@@ -197,6 +197,13 @@ class AttributeToSQLColumn:
             if self.column_data_type is not None:
                 break
 
+        if self.column_data_type is None:
+            raise ValueError(
+                f"Could not determine SQL data type for attribute "
+                f"'{self.attribute.value_name}' with O3 data type "
+                f"'{self.attribute.value_data_type}'"
+            )
+
 
 if __name__ == "__main__":
     pass

@@ -37,9 +37,15 @@ class SQLTable:
 
         if isinstance(sql_server_type, SQLDialect):
             self.dialect = sql_server_type
-            self.sql_server_type = (SupportedSQLServers.MSSQL
-                                    if self.dialect.name == "MSSQL"
-                                    else SupportedSQLServers.PSQL)
+            if self.dialect.name == "MSSQL":
+                self.sql_server_type = SupportedSQLServers.MSSQL
+            elif self.dialect.name == "PSQL":
+                self.sql_server_type = SupportedSQLServers.PSQL
+            else:
+                raise ValueError(
+                    f"Unknown dialect name: {self.dialect.name!r}. "
+                    f"Expected 'MSSQL' or 'PSQL'."
+                )
         else:
             if not check_sql_server_type(sql_server_type):
                 raise ValueError("Unsupported SQL Server Type")

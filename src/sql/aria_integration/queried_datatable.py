@@ -38,12 +38,22 @@ class Datatable:
             return self._data_rows(num_results)
 
     def _data_generator(self):
-        with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
-            yield from cursor.execute(self.query)
+        try:
+            with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
+                yield from cursor.execute(self.query)
+        except pyodbc.Error as e:
+            raise pyodbc.Error(
+                f"Error executing query from '{self.query_location}': {e}"
+            ) from e
 
     def _data_rows(self, num_results: int):
-        with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
-            rows = cursor.execute(self.query).fetchmany(num_results)
+        try:
+            with closing(self.connection) as conn, closing(conn.cursor()) as cursor:
+                rows = cursor.execute(self.query).fetchmany(num_results)
+        except pyodbc.Error as e:
+            raise pyodbc.Error(
+                f"Error executing query from '{self.query_location}': {e}"
+            ) from e
 
         return rows
 

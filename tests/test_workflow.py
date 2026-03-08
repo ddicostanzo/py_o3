@@ -219,15 +219,28 @@ class TestWriteSqlToText:
             os.unlink(path)
 
 
-class TestCreateModel:
-    def test_create_model_with_valid_json(self):
-        schema_path = os.path.join(
-            os.path.dirname(__file__), '..', 'src', 'Resources', 'O3_20250128.json'
-        )
-        if not os.path.exists(schema_path):
-            pytest.skip("Schema file not available")
+class TestWriteSqlToTextValidation:
+    def test_rejects_read_mode(self):
+        with pytest.raises(ValueError, match="write_mode must be 'w' or 'a'"):
+            write_sql_to_text("/tmp/test.sql", ["SELECT 1;"], write_mode='r')
 
-        model = create_model(schema_path, clean=True)
+    def test_rejects_arbitrary_mode(self):
+        with pytest.raises(ValueError, match="write_mode must be 'w' or 'a'"):
+            write_sql_to_text("/tmp/test.sql", ["SELECT 1;"], write_mode='rb')
+
+
+_SCHEMA_PATH = os.path.join(
+    os.path.dirname(__file__), '..', 'src', 'Resources', 'O3_20250128.json'
+)
+
+
+class TestCreateModel:
+    @pytest.mark.skipif(
+        not os.path.exists(_SCHEMA_PATH),
+        reason="Schema file O3_20250128.json not available in Resources/"
+    )
+    def test_create_model_with_valid_json(self):
+        model = create_model(_SCHEMA_PATH, clean=True)
         assert len(model.key_elements) > 0
 
     def test_create_model_file_not_found(self):
@@ -235,11 +248,20 @@ class TestCreateModel:
             create_model("/nonexistent/path/schema.json", clean=False)
 
 
-class TestTestNamesInRelationships:
+class TestValidateNamesInRelationships:
     def test_does_not_raise(self):
         rel = _mock_relationship("Patient", "ChildElement-Of", "Diagnosis")
         ke = _mock_key_element(string_code="Patient", relationships=[rel])
         model = _mock_model(key_elements={"Patient": ke})
 
-        # Should not raise — just logs
+        # Should not raise — just logs warnings
         validate_names_in_relationships({"Patient"}, {"Diagnosis"}, model)
+
+    def test_logs_warning_for_missing_subject(self):
+        ke = _mock_key_element(string_code="Treatment", relationships=[])
+        model = _mock_model(key_elements={"Treatment": ke})
+
+        import logging
+        with patch.object(logging, 'warning') as mock_warn:
+            validate_names_in_relationships({"Patient"}, {"Treatment"}, model)
+            mock_warn.assert_any_call("String Code Treatment not in subject table names")
