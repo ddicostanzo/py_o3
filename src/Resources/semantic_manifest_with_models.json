@@ -1,0 +1,4651 @@
+{
+  "sourceFile": "variandw_schema.xlsx",
+  "summary": {
+    "tableCount": 352,
+    "factCount": 40,
+    "dimensionCount": 96,
+    "otherCount": 216,
+    "fkCount": 470,
+    "tablesWithNoPrimaryKeyCount": 191,
+    "factTablesWithNoDimFKsCount": 4,
+    "modelCount": 11
+  },
+  "models": [
+    {
+      "name": "TreatmentActivityModel",
+      "baseTable": "DWH.DimLookup",
+      "tablesReferenced": [
+        "DWH.DimLookup"
+      ],
+      "joins": [],
+      "select": [
+        {
+          "as": "ActualMachineId",
+          "fromTable": "Machine",
+          "expr": "MachineId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_STRING512",
+          "tags": ""
+        },
+        {
+          "as": "CorrelatedEventNumber",
+          "fromTable": "NA",
+          "expr": "Calculated value from function [DoseCalcPrivate].[vf_syTFHWithStats]",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "CourseId",
+          "fromTable": "Course",
+          "expr": "CourseId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "CourseStartDate",
+          "fromTable": "Course",
+          "expr": "StartDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "PatientInOutStatus",
+          "fromTable": " PatientHospitalMH ",
+          "expr": "calculated from PatientHospitalMH based on TreatmentRecordDateTime",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "ActualEnergyMode",
+          "fromTable": "ExternalFieldCommonHstry@#@RadiationHstry",
+          "expr": "ltrim(str(NominalEnergy/1000))+[RadiationType]",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "EventNumber",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syTRTHistoryRecords",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "FieldName",
+          "fromTable": "Radiation",
+          "expr": "RadiationName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "Hospital",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "IsImage",
+          "fromTable": "NA",
+          "expr": "Calculated value from vf_syTRTEventsCorrelated",
+          "dataType": "VDT_TINYINT",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianName",
+          "fromTable": "Doctor",
+          "expr": "FirstName + LastName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientId",
+          "fromTable": "Patient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STATUS32",
+          "tags": ""
+        },
+        {
+          "as": "MLCPlanType",
+          "fromTable": "MLCPlan",
+          "expr": "MLCPlanType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryMD",
+          "fromTable": "Doctor",
+          "expr": "FirstName + LastName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "Specialty",
+          "fromTable": "Doctor",
+          "expr": "Specialty",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianSpecialty",
+          "fromTable": "Doctor",
+          "expr": "Specialty",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "Technique",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "Technique",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "TreatCategory",
+          "fromTable": "RadiationHstry@#@ExternalFieldCommonHstry",
+          "expr": "substring(''MAN  TRT  TRT  PORT IMAGEIMAGE'', (5 * RVFlag + isnull(10 * (CONVERT(int, ascii(PFFlag) / ascii(PFFlag))), 0) + isnull(15 * (CONVERT(int, ascii(PIFlag) / ascii(PIFlag))), 0)) +1,5)",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentRecordDateTime",
+          "fromTable": "TreatmentRecord",
+          "expr": "TreatmentRecordDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CourseFirstTreatmentDate",
+          "fromTable": "RadiationHstry",
+          "expr": "FirstTreatmentDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "MLCLabel",
+          "fromTable": "NA",
+          "expr": "Null",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "AdjustentEventNumber",
+          "fromTable": "NA",
+          "expr": "Static value as 0 or 1 depending on TreatmentRecordDatetime and PatientSer",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "Patient",
+          "expr": "PatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrCourseSer",
+          "fromTable": "Course",
+          "expr": "CourseSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRadiationSer",
+          "fromTable": "Radiation",
+          "expr": "RadiationSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActualMachineSer",
+          "fromTable": "TreatmentRecord",
+          "expr": "ActualMachineSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "NA",
+          "expr": "CONVERT(VARCHAR(25),getdate(),120)",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "Patient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "TreatmentDateRangeControllerModel",
+      "baseTable": null,
+      "tablesReferenced": [],
+      "joins": [],
+      "select": [
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "Patient",
+          "expr": "PatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "TreatmentHistoryModel",
+      "baseTable": "DWH.FactTreatmentHistory",
+      "tablesReferenced": [
+        "DWH.FactTreatmentHistory",
+        "DWH.RadiationRefPoint"
+      ],
+      "joins": [],
+      "select": [
+        {
+          "as": "ActualMachineId",
+          "fromTable": "Machine",
+          "expr": "MachineId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollRtn",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CRtn'', fth.ActualCollMode,am.MachineScale,fth.CollRtn,NULL) AS ActualCollRtn,",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorX",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X'', fth.ActualCollMode,am.MachineScale,fth.CollX1,fth.CollX2) AS ActualCollimatorX,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorX1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X1'', fth.ActualCollMode,am.MachineScale,fth.CollX1,NULL) AS ActualCollimatorX1,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorX2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X2'', fth.ActualCollMode,am.MachineScale,fth.CollX2,NULL) AS ActualCollimatorX2,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorY",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y'', fth.ActualCollMode,am.MachineScale,fth.CollY1,fth.CollY2) AS ActualCollimatorY,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorY1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y1'', fth.ActualCollMode,am.MachineScale,fth.CollY1,NULL) AS ActualCollimatorY1,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollimatorY2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y2'', fth.ActualCollMode,am.MachineScale,fth.CollY2,NULL)  AS ActualCollimatorY2,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchLat",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CLat'', fth.ActualCollMode,am.MachineScale,fth.CouchLat,NULL) AS ActualCouchLat",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchLng",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "CouchLng",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchRtn",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''PSA'', fth.ActualCollMode,am.MachineScale,fth.PatientSupportAngle,NULL)  AS ActualCouchRtn,    --Need to Remove",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchVrt",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CVrt'', fth.ActualCollMode,am.MachineScale,fth.CouchVrt,NULL) AS  ActualCouchVrt,",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInRefPoint",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(dm.DeliveredFieldDose * 100.0, 1) ELSE ROUND(dm.DeliveredFieldDose,3)  END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualGantryRtn",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''GRtn'', fth.ActualCollMode,am.MachineScale,fth.GantryRtn,NULL) AS ActualGantryRotation",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "ActualMeterset",
+          "fromTable": "NA",
+          "expr": "CASE WHEN df.SetupFieldFlag=1 Then NULL ELSE CASE aol.LimitPrecision      WHEN 0 THEN cast(cast(fth.FieldMUActual as decimal(38,0)) as varchar)     WHEN 1 THEN cast(cast(fth.FieldMUActual as decimal(38,1)) as varchar)    WHEN 2 THEN cast(cast(fth.FieldMUActual as decimal(38,2)) as varchar)      ELSE fth.FieldMUActual END END",
+          "dataType": "VDT_MU",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId",
+          "fromTable": "NA",
+          "expr": "Replace(ltrim(rtrim(Replace(ISNULL(AddOnId1,'''')+'',''+ ISNULL(AddOnId2,'''')+'',''+ ISNULL(AddOnId3,'''')+'',''+ ISNULL(AddOnId4,'''')+'',''+ ISNULL(AddOnId5,'''')+'',''+ ISNULL(AddOnId6,'''')+'',''+ ISNULL(AddOnId7,'''')+'',''+ ISNULL(AddOnId8,'''')+'',''+ ISNULL(AddOnId9,'''')+'',''+ ISNULL(AddOnId10,''''),'','',''  ''))),''  '','','')",
+          "dataType": "VDT_STRING512",
+          "tags": ""
+        },
+        {
+          "as": "AuthorizationName",
+          "fromTable": "RefPointLog",
+          "expr": "OvrdAuthorizedName",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "ClinicalStatus",
+          "fromTable": "NA",
+          "expr": "ISNULL(dl_ClinicalStatus.LookupDescription'+@SiteLng+',dl_ClinicalStatus.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "CollRtnOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollRtnOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollX1OverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollX1OverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollX2OverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollX2OverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollY1OverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollY1OverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollY2OverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollY2OverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CorrelatedEventNumber",
+          "fromTable": "NA",
+          "expr": "calculated value from DoseCalcPrivate.vf_syTFHWithStats",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "CouchLatOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "CouchLatOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CouchLngOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "CouchLngOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CouchVrtOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "CouchVrtOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CourseId",
+          "fromTable": "Course",
+          "expr": "CourseId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "CourseStartDateTime",
+          "fromTable": "Course",
+          "expr": "StartDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentName",
+          "fromTable": "Department",
+          "expr": "DepartmentName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientInOutStatus",
+          "fromTable": "PatientActuals",
+          "expr": "CASE WHEN dbo.PatientActuals.InPatientFlag = 1 THEN 'In' ELSE 'Out' END",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "DoseConfig",
+          "fromTable": "ConfigurationItem",
+          "expr": "ConfigValue",
+          "dataType": "VDT_STRING6",
+          "tags": ""
+        },
+        {
+          "as": "DoseCorrectionforField",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syDoseRefPoint",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInField",
+          "fromTable": "DWH.RadiationRefPoint",
+          "expr": "FieldDose",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInPlan",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "DoseDelta",
+          "fromTable": "RefPointLog",
+          "expr": "DoseDelta",
+          "dataType": "VDT_DOSE",
+          "tags": ""
+        },
+        {
+          "as": "DosePerFraction",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_DOSE",
+          "tags": ""
+        },
+        {
+          "as": "DoseRate",
+          "fromTable": "ExternalField",
+          "expr": "DoseRate",
+          "dataType": "VDT_DOSERATE",
+          "tags": ""
+        },
+        {
+          "as": "ActualEnergyMode",
+          "fromTable": "NA",
+          "expr": "ltrim(str(ExternalFieldCommonHstry.NominalEnergy/1000))+fth.[RadiationType]",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "EventNumber",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syTRTHistoryRecords",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "FieldId",
+          "fromTable": "Radiation",
+          "expr": "RadiationId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "IsSetupField",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "SetupFieldFlag",
+          "dataType": "VDT_FLAG_FALSE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "FieldMUPlanned",
+          "fromTable": "NA",
+          "expr": "CASE WHEN df.SetupFieldFlag=1 Then NULL ELSE CASE pol.LimitPrecision                  WHEN 0 THEN cast(cast(df.PlannedMu as decimal(38,0)) as varchar)                  WHEN 1 THEN cast(cast(df.PlannedMu as decimal(38,1)) as varchar)                   WHEN 2 THEN cast(cast(df.PlannedMu as decimal(38,2)) as varchar)                  ELSE fth.PlannedMU END  END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "FieldName",
+          "fromTable": "Radiation",
+          "expr": "RadiationName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "FieldSetupNote",
+          "fromTable": "Radiation",
+          "expr": "SetupNote",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "FieldStatus",
+          "fromTable": "NA",
+          "expr": "SELECT CASE WHEN     @nRadiationSer IS NULL                    AND @nActualMU >= @nPlannedMU                   THEN 'Treated'              WHEN     @nRadiationSer IS NOT NULL                   AND (SELECT MURounded FROM PlanPrivate.vf_syMURounded(@nRadiationSer, @nActualMU)) >= (SELECT MURounded FROM PlanPrivate.vf_syMURounded(@nRadiationSer, @nPlannedMU))                   THEN 'Treated'  WHEN @nActualMU = 0                   THEN 'Active'              ELSE 'Pt. Treated'         END as TreatmentStatus",
+          "dataType": "VDT_STATUS32",
+          "tags": ""
+        },
+        {
+          "as": "FractionNumber",
+          "fromTable": "NA",
+          "expr": "calculated value from vf_syTRTEventsCorrelated",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "GantryRtnOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "GantryRtnOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "HistoryNote",
+          "fromTable": "RadiationHstry",
+          "expr": "HistoryNote",
+          "dataType": "VDT_STRING",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "Hospital",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "IsImage",
+          "fromTable": "NA",
+          "expr": "CASE WHEN rh.TreatmentDeliveryType IN ('OPEN_PORTFILM', 'TRMT_PORTFILM')              AND  rh.TerminationStatus IN ('MACHINE')              THEN 0 -- returning 0 here will handle PIMG with MU Subtraction as partial            WHEN     rh.TreatmentDeliveryType IN ('OPEN_PORTFILM', 'TRMT_PORTFILM')             THEN 1         ELSE 0 END as IsImage",
+          "dataType": "VDT_TINYINT",
+          "tags": ""
+        },
+        {
+          "as": "MetersetOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "MetersetOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "NoOfFractions",
+          "fromTable": "TreatmentRecord",
+          "expr": "NoOfFractions",
+          "dataType": "VDT_COUNT",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianName",
+          "fromTable": "Doctor",
+          "expr": "FirstName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "OverrideFlag",
+          "fromTable": "RadiationHstry",
+          "expr": "OverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "PatientId",
+          "fromTable": "Patient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientFullName",
+          "fromTable": "Patient",
+          "expr": "dbo.Patient.LastName + CASE WHEN dbo.Patient.FirstName IS NOT NULL THEN ', ' + ISNULL(dbo.Patient.FirstName,'') ELSE '' END",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PFFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "PFFlag",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "PIFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "PIFlag",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorRtn",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CRtn'', df.CollMode,df.MachineScale,df.CollRtn,NULL) AS PlannedCollimatorRtn,",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X'', df.CollMode,df.MachineScale,df.CollimatorX1,df.CollimatorX2) AS PlannedCollimatorX,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X1'', df.CollMode,df.MachineScale,df.CollimatorX1,NULL) AS PlannedCollimatorX1,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X2'', df.CollMode,df.MachineScale,df.CollimatorX2,NULL) AS PlannedCollimatorX2,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y'', df.CollMode,df.MachineScale,df.CollimatorY1,df.CollimatorY2) AS PlannedCollimatorY,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y1'', df.CollMode,df.MachineScale,df.CollimatorY1,NULL) AS PlannedCollimatorY1,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y2'', df.CollMode,df.MachineScale,df.CollimatorY2,NULL) AS PlannedCollimatorY2,",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchLat",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CLat'', df.CollMode,df.MachineScale,df.CouchLat,NULL) AS PlannedCouchLat",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchLng",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "CouchLng",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchRtn",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''PSA'', df.CollMode,df.MachineScale,df.PatientSupportAngle,NULL) AS  PlannedCouchRtn,",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchVrt",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CVrt'', df.CollMode,df.MachineScale,df.CouchVrt,NULL) AS  PlannedCouchVrt,",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedGantryRotation",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''GRtn'', df.CollMode,df.MachineScale,df.GantryRotation,NULL) AS PlannedGantryRotation,",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedMachineId",
+          "fromTable": "Machine",
+          "expr": "MachineId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "MLCPlanType",
+          "fromTable": "MLCPlan",
+          "expr": "MLCPlanType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "PlanSetupId",
+          "fromTable": "PlanSetup",
+          "expr": "PlanSetupId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PlannedTime",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "TreatmentTime",
+          "dataType": "VDT_TIME",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryMD",
+          "fromTable": "Doctor",
+          "expr": "CASE WHEN Doctor.FirstName IS NOT NULL THEN ', ' + Doctor.FirstName END",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "RecordMUActual",
+          "fromTable": "NA",
+          "expr": "CASE aol.LimitPrecision                  WHEN 0 THEN cast(cast(fth.DeliveredMU as decimal(38,0)) as varchar)                  WHEN 1 THEN cast(cast(fth.DeliveredMU as decimal(38,1)) as varchar)                   WHEN 2 THEN cast(cast(fth.DeliveredMU as decimal(38,2)) as varchar)                  ELSE fth.DeliveredMU END       END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "RefPointId",
+          "fromTable": "RefPoint",
+          "expr": "RefPointId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "RefPointName",
+          "fromTable": "RefPoint",
+          "expr": "RefPointName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientSex",
+          "fromTable": "NA",
+          "expr": "ISNULL(CASE WHEN @SiteLng='FRA' THEN dl_Gender.LookupDescriptionFRA   WHEN @SiteLng='ESN' THEN dl_Gender.LookupDescriptionESN                   WHEN @SiteLng='CHS' THEN dl_Gender.LookupDescriptionCHS                   WHEN @SiteLng='DEU' THEN dl_Gender.LookupDescriptionDEU                   WHEN @SiteLng='JPN' THEN dl_Gender.LookupDescriptionJPN                   WHEN SiteLng='PTB' THEN dl_Gender.LookupDescriptionPTB                   WHEN @SiteLng='SVE' THEN dl_Gender.LookupDescriptionSVE                   WHEN @SiteLng='ITA' THEN dl_Gender.LookupDescriptionIT   END,dl_Gender.LookupDescriptionENU)",
+          "dataType": "VDT_SEX",
+          "tags": ""
+        },
+        {
+          "as": "OncologistSpecialty",
+          "fromTable": "Doctor",
+          "expr": "Speciality",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianSpecialty",
+          "fromTable": "Doctor",
+          "expr": "Speciality",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PlannedStopAngle",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''SAngle'', df.CollMode,df.MachineScale,df.StopAngle,NULL)",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "Technique",
+          "fromTable": "NA",
+          "expr": "ISNULL(dl_FieldTechnique.LookupDescription'+@SiteLng+',dl_FieldTechnique.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "TreatCategory",
+          "fromTable": "NA",
+          "expr": "ltrim(rtrim(substring(''MAN  TRT  TRT  PORT IMAGEIMAGE'', (5 * fth.RVFlag + isnull(10 * (CONVERT(int, ascii(fth.PFFlag) / ascii(fth.PFFlag))), 0) + isnull(15 * (CONVERT(int, ascii(fth.PIFlag) / ascii(fth.PIFlag))), 0)) + 1, 5)))",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentStartDateTime",
+          "fromTable": "RadiationHstry",
+          "expr": "TreatmentStartTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentRecordDateTime",
+          "fromTable": "TreatmentRecord",
+          "expr": "TreatmentRecordDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ActualTreatmentTime",
+          "fromTable": "RadiationHstry",
+          "expr": "TreatmentTime",
+          "dataType": "VDT_TIME",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentTimeOverrideFlag",
+          "fromTable": "RadiationHstry",
+          "expr": "TreatmentTimeOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollXOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "isnull(ExternalFieldHstry.CollX1OverrideFlag,ExternalFieldHstry.CollX2OverrideFlag) AS CollXOverrideFlag,",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CollYOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "isnull(ExternalFieldHstry.CollY1OverrideFlag,ExternalFieldHstry.CollY2OverrideFlag) AS CollYOverrideFlag,",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseAsDateTime",
+          "fromTable": "NA",
+          "expr": "Case When @ConfigValue='cGy' then fth.DoseDeliveredPerFraction* 100.0 ELSE fth.DoseDeliveredPerFraction END",
+          "dataType": "VDT_DOSE",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryReferralFlag",
+          "fromTable": "NA",
+          "expr": "calculated value from DoseCalcPrivate.vf_syDoseFiguresAppIntSum",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualMachineScale",
+          "fromTable": "Machine",
+          "expr": "MachineScale",
+          "dataType": "VDT_SCALE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedMachineScale",
+          "fromTable": "Machine",
+          "expr": "MachineScale",
+          "dataType": "VDT_SCALE",
+          "tags": ""
+        },
+        {
+          "as": "PatSupRollOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "PatSupRollOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "PatSupPitchOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "PatSupPitchOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "PatientSupportAngleOverFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "PatientSupportAngleOverFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "SSDOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "SSDOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "EnergyModeOverrideFlag",
+          "fromTable": "ExternalFieldCommonHstry",
+          "expr": "EnergyModeOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "DoseRateOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "DoseRateOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "WedgeDoseOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "WedgeDoseOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "SnoutPosOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "SnoutPosOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "SessionEvent",
+          "fromTable": "NA",
+          "expr": "(rtrim (convert(CHAR,dc.CourseSer)) + rtrim (convert(CHAR,fth.EventNumber)))",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId1",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId2",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId3",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId4",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId5",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId6",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId7",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId8",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId9",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnId10",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentSignOffUser1",
+          "fromTable": "RadiationHstry",
+          "expr": "UserName1",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentSignOffUser2",
+          "fromTable": "RadiationHstry",
+          "expr": "UserName2",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentSignOffUser3",
+          "fromTable": "RadiationHstry",
+          "expr": "UserName3",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "ToleranceId",
+          "fromTable": "Tolerance",
+          "expr": "ToleranceId",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInCourse",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(dc.DoseDelivered* 100.0, 1) ELSE ROUND(dc.DoseDelivered,3) END  AS ActualDoseInCourse,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedDoseInCourse",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(rm.CourseDosePlanned* 100.0, 1) ELSE ROUND(rm.CourseDosePlanned,3) END   AS PlannedDoseInCourse,",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentDeliveryType",
+          "fromTable": "NA",
+          "expr": "ISNULL(dl_TreatmentDeliveryType.LookupDescription'+@SiteLng+',dl_TreatmentDeliveryType.LookupDescriptionENU)  AS TreatmentDeliveryType,",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PlannedEnergy",
+          "fromTable": "NA",
+          "expr": "ltrim(str(df.Energy/1000))+df.[RadiationType]",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorMode",
+          "fromTable": "ExternalField",
+          "expr": "CollMode",
+          "dataType": "VDT_COLLMODE",
+          "tags": ""
+        },
+        {
+          "as": "PatientDOB",
+          "fromTable": "Patient",
+          "expr": "DateOfBirth",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CourseLastTreatmentDate",
+          "fromTable": "Course",
+          "expr": "LastTreatmentDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "GantryRtnDirection",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "GantryRtnDirection",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "CourseFirstTreatmentDate",
+          "fromTable": "Course",
+          "expr": "FirstTreatmentDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ActualCollMode",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "CollMode",
+          "dataType": "VDT_COLLMODE",
+          "tags": ""
+        },
+        {
+          "as": "ActualMachineAuthorization",
+          "fromTable": "PlanSetup@#@TreatmentRecord",
+          "expr": "ISNULL(PlanSetup.StatusUserName,TreatmentRecord.ActualMachineAuthorization)",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "CollModeOverrideFlag",
+          "fromTable": "ExternalField@#@ExternalFieldHstry",
+          "expr": "PATINDEX(ExternalField.CollMode, ExternalFieldHstry.CollMode)",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "CorrectionDateTime",
+          "fromTable": "DoseCorrectionLog",
+          "expr": "CorrectionDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "MachOverrideFlag",
+          "fromTable": "TreatmentRecord",
+          "expr": "MachOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "MUpDegOverrideFlag",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "MUpDegOverrideFlag",
+          "dataType": "VDT_OVERRIDEFLAG",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType1",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType2",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType3",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType4",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType5",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType6",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType7",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType8",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType9",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ActualAddOnType10",
+          "fromTable": "TFHAddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "ctrTreatmentRecordSer",
+          "fromTable": "TreatmentRecord",
+          "expr": "TreatmentRecordSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrFirstRTPlanSer",
+          "fromTable": "NA",
+          "expr": "[DoseCalcPrivate].[vf_syFirstRTPlanSer](RTPlanSer)",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "Patient",
+          "expr": "PatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrCourseSer",
+          "fromTable": "Course",
+          "expr": "CourseSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPlanSetupSer",
+          "fromTable": "PlanSetup",
+          "expr": "PlanSetupSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRefPointSer",
+          "fromTable": "RefPoint",
+          "expr": "RefPointSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRadiationSer",
+          "fromTable": "Radiation",
+          "expr": "RadiationSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActualMachineSer",
+          "fromTable": "TreatmentRecord",
+          "expr": "ActualMachineSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "NA",
+          "expr": "Getdate()",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "WedgeDose",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "WedgeDose",
+          "dataType": "VDT_DOSE",
+          "tags": ""
+        },
+        {
+          "as": "WedgeAngle",
+          "fromTable": "ExternalFieldHstry",
+          "expr": "WedgeAngle",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlanSetupName",
+          "fromTable": "PlanSetup",
+          "expr": "PlanSetupName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "Patient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchLatIso",
+          "fromTable": "NA",
+          "expr": "CASE WHEN ActualMachineScale = 'VAR' THEN (100.0 + fth_CouchLatIso) WHEN ActualMachineScale IN ('VAR_IEC','SATURNE') THEN (CASE WHEN fth_CouchLatIso < 0.0 THEN (1000.0 + fth_CouchLatIso) ELSE (fth_CouchLatIso) END) WHEN ActualMachineScale IN ('ABB_IEC','ELEKTA_IEC','ELEKTA') THEN (CASE WHEN fth_CouchLatIso < 0.0 THEN (100.0 + fth_CouchLatIso) ELSE (fth_CouchLatIso) END) ELSE fth_CouchLatIso END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchLngIso",
+          "fromTable": "NA",
+          "expr": "fth.CouchLngIso AS ActualCouchLngIso",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualCouchVrtIso",
+          "fromTable": "DWH.FactTreatmentHistory",
+          "expr": "CASE WHEN ActualMachineScale = 'VAR' THEN (100.0 - fth_CouchVrtIso) WHEN ActualMachineScale IN ('VAR_IEC','ABB_IEC','SATURNE','ELEKTA_IEC') THEN (CASE WHEN fth_CouchVrtIso > 0.0 THEN (1000.0 - fth_CouchVrtIso) ELSE (-1.0* fth_CouchVrtIso) END) WHEN ActualMachineScale = 'ELEKTA' THEN (CASE WHEN fth_CouchVrtIso > 0.0 THEN (100.0 - fth_CouchVrtIso) ELSE (-1.0* fth_CouchVrtIso) END)ELSE fth_CouchVrtIso END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualGantryRotation",
+          "fromTable": "NA",
+          "expr": "CASE when ActualMachineScale='VAR' THEN (CASE WHEN fth_GantryRtn > 180.0 THEN (540.0- fth_GantryRtn) ELSE (180.0 - fth_GantryRtn) END ) \n\t\t\t\tELSE  fth_GantryRtn\tEND",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "TreatmentModel",
+      "baseTable": null,
+      "tablesReferenced": [],
+      "joins": [],
+      "select": [
+        {
+          "as": "PatientName",
+          "fromTable": "Patient",
+          "expr": "dbo.Patient.LastName + CASE WHEN dbo.Patient.FirstName IS NOT NULL THEN ', ' + ISNULL(dbo.Patient.FirstName,'') ELSE '' END",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientDOB",
+          "fromTable": "Patient",
+          "expr": "DateOfBirth",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "PatientCreationDate",
+          "fromTable": "Patient",
+          "expr": "CreationDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "InPatientFlag",
+          "fromTable": "PatientActuals",
+          "expr": "CASE WHEN dbo.PatientActuals.InPatientFlag = 1 THEN 'In' ELSE 'Out' END",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "DoctorId",
+          "fromTable": "Doctor",
+          "expr": "DoctorId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryMD",
+          "fromTable": "Doctor",
+          "expr": "CASE WHEN Doctor.FirstName IS NOT NULL THEN ', ' + Doctor.FirstName END",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientId",
+          "fromTable": "Patient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "Hospital",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientId2",
+          "fromTable": "Patient",
+          "expr": "PatientId2",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientSex",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(CASE WHEN @SiteLng='FRA' THEN dl_Gender.LookupDescriptionFRA WHEN @SiteLng='ESN' THEN dl_Gender.LookupDescriptionESN  WHEN @SiteLng='CHS' THEN dl_Gender.LookupDescriptionCHS  WHEN @SiteLng='DEU' THEN dl_Gender.LookupDescriptionDEU  WHEN @SiteLng='JPN' THEN dl_Gender.LookupDescriptionJPN  WHEN @SiteLng='PTB' THEN dl_Gender.LookupDescriptionPTB  WHEN @SiteLng='SVE' THEN dl_Gender.LookupDescriptionSVE  WHEN @SiteLng='ITA' THEN dl_Gender.LookupDescriptionITA  END,dl_Gender.LookupDescriptionENU)",
+          "dataType": "VDT_SEX",
+          "tags": ""
+        },
+        {
+          "as": "PatientSSN",
+          "fromTable": "Patient",
+          "expr": "SSN",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientFirstName",
+          "fromTable": "Patient",
+          "expr": "FirstName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientLastName",
+          "fromTable": "Patient",
+          "expr": "LastName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ClinicalTrial",
+          "fromTable": "Patient",
+          "expr": "CASE WHEN dbo.Patient.ClinicalTrialFlag=0 THEN 'No' ELSE 'Yes' END",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientInOutStatus",
+          "fromTable": "PatientActuals",
+          "expr": "CASE WHEN dbo.PatientActuals.InPatientFlag = 1 THEN 'In' ELSE 'Out' END",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientStatus",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(CASE WHEN @SiteLng='FRA' THEN dl_PatientStatus.LookupDescriptionFRA WHEN @SiteLng='ESN' THEN dl_PatientStatus.LookupDescriptionESN WHEN @SiteLng='CHS' THEN dl_PatientStatus.LookupDescriptionCHS WHEN @SiteLng='DEU' THEN dl_PatientStatus.LookupDescriptionDEU WHEN @SiteLng='JPN' THEN dl_PatientStatus.LookupDescriptionJPN WHEN @SiteLng='PTB' THEN dl_PatientStatus.LookupDescriptionPTB WHEN @SiteLng='SVE' THEN dl_PatientStatus.LookupDescriptionSVE WHEN @SiteLng='ITA' THEN dl_PatientStatus.LookupDescriptionITA END,dl_PatientStatus.LookupDescriptionENU)",
+          "dataType": "VDT_STATUS32",
+          "tags": ""
+        },
+        {
+          "as": "OncologistFirstName",
+          "fromTable": "Doctor",
+          "expr": "FirstName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "OncologistLastName",
+          "fromTable": "Doctor",
+          "expr": "LastName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "OncologistSpecialty",
+          "fromTable": "Doctor",
+          "expr": "Speciality",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentName",
+          "fromTable": "Department",
+          "expr": "DepartmentName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysician",
+          "fromTable": "Doctor",
+          "expr": "FirstName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianSpecialty",
+          "fromTable": "Doctor",
+          "expr": "Speciality",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientWorkPhone",
+          "fromTable": "Patient",
+          "expr": "WorkPhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientHomePhone",
+          "fromTable": "Patient",
+          "expr": "HomePhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisCode",
+          "fromTable": "icd_dx_culture",
+          "expr": "icd_cd",
+          "dataType": "VDT_STATUS16",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisDescription",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(CASE WHEN @SiteLng='FRA' THEN DiagnosisClinicalDescriptionFRA WHEN @SiteLng='ESN' THEN DiagnosisClinicalDescriptionESN WHEN @SiteLng='CHS' THEN DiagnosisClinicalDescriptionCHS WHEN @SiteLng='DEU' THEN DiagnosisClinicalDescriptionDEU WHEN @SiteLng='JPN' THEN DiagnosisClinicalDescriptionJPN WHEN @SiteLng='PTB' THEN DiagnosisClinicalDescriptionPTB WHEN @SiteLng='SVE' THEN DiagnosisClinicalDescriptionSVE WHEN @SiteLng='ITA' THEN DiagnosisClinicalDescriptionITA END,DiagnosisClinicalDescriptionENU)",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisTableName",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(CASE WHEN @SiteLng='FRA' THEN dc.DiagnosisTableFRA WHEN @SiteLng='ESN' THEN dc.DiagnosisTableESN WHEN @SiteLng='CHS' THEN dc.DiagnosisTableCHS WHEN @SiteLng='DEU' THEN dc.DiagnosisTableDEU WHEN @SiteLng='JPN' THEN dc.DiagnosisTableJPN WHEN @SiteLng='PTB' THEN dc.DiagnosisTablePTB WHEN @SiteLng='SVE' THEN dc.DiagnosisTableSVE WHEN @SiteLng='ITA' THEN dc.DiagnosisTableITA END,dc.DiagnosisTableENU)",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "CourseId",
+          "fromTable": "Course",
+          "expr": "CourseId",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "CourseNote",
+          "fromTable": "Course",
+          "expr": "Comment",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "CourseIntent",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(dl_CourseIntent.LookupDescription'+@SiteLng+',dl_CourseIntent.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PlanSetupId",
+          "fromTable": "Plan",
+          "expr": "PlanSetupId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PlanSetupName",
+          "fromTable": "Plan",
+          "expr": "PlanSetupName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "RadiationId",
+          "fromTable": "Radiation",
+          "expr": "RadiationId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "RadiationName",
+          "fromTable": "Radiation",
+          "expr": "RadiationName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "CourseStartDateTime",
+          "fromTable": "Course",
+          "expr": "StartDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ClinicalStatus",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(dl_ClinicalStatus.LookupDescription'+@SiteLng+',dl_ClinicalStatus.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "CourseFirstTreatmentDate",
+          "fromTable": "Course",
+          "expr": "FirstTreatmentDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CourseLastTreatmentDate",
+          "fromTable": "Course",
+          "expr": "LastTreatmentDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "PlannedNumberOfSession",
+          "fromTable": "Session@#@SessionRTPlan@#@PlanSetup@#@RTPlan",
+          "expr": "SELECT count(*)  FROM [Session] s  JOIN SessionRTPlan srtp ON srtp.SessionSer = s.SessionSer  JOIN RTPlan rtp ON rtp.RTPlanSer = srtp.RTPlanSer  JOIN PlanSetup ps ON ps.PlanSetupSer = rtp.PlanSetupSer  AND ps.CourseSer = c.CourseSer  AS NoTxSessionPlanned",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "RemainingNumberOfSessions",
+          "fromTable": "Session@#@SessionRTPlan@#@PlanSetup@#@RTPlan",
+          "expr": "(SELECT count(*)  FROM [Session] s  JOIN SessionRTPlan srtp ON srtp.SessionSer = s.SessionSer  AND srtp.Status IN ('TREAT', 'INACTIVE_TREAT', 'RESUME', 'INACTIVE_RESUME')  JOIN RTPlan rtp ON rtp.RTPlanSer = srtp.RTPlanSer  JOIN PlanSetup ps ON ps.PlanSetupSer = rtp.PlanSetupSer  AND ps.CourseSer = c.CourseSer  )  AS NoTxSessionRemaining",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentOrientation",
+          "fromTable": "PlanSetup",
+          "expr": "TreatmentOrientation",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PlanApprovalStatus",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(dl_PlanStatus.LookupDescription'+@SiteLng+',dl_PlanStatus.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PlanStatusApprovedBy",
+          "fromTable": "PlanSetup",
+          "expr": "StatusUserName",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PlanStatusDateTime",
+          "fromTable": "PlanSetup",
+          "expr": "StatusDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "DosePerFraction",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(rm.DosePerFraction * 100.0, 1) ELSE  ROUND(rm.DosePerFraction,3)  END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "IsActive",
+          "fromTable": "PlanSetup",
+          "expr": "IsActive",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentTechnique",
+          "fromTable": "PlanSetup",
+          "expr": "TreatmentTechnique",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "VolumeId",
+          "fromTable": "PatientVolume@#@RefPoint",
+          "expr": "(SELECT pv.PatientVolumeId FROM PatientVolume pv JOIN RefPoint rp  ON rp.PatientVolumeSer = pv.PatientVolumeSer  AND rp.RefPointSer = dfa.RefPointSer  AND dfa.PrimaryFlag = 1 )  AS 'VolumeId'",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "ActualDose",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointDelivered* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointDelivered,3) END  AS ActualDose",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedDose",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointPlanned* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointPlanned,3) END  AS PlannedDose",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "RemainingDose",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointRemaining* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointRemaining,3) END  AS RemainingDose",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInPlanChain",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointDeliveredSum* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointDeliveredSum,3) END  AS ActualDoseInPlanChain",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "RemainingDoseInPlanChain",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointRemainingSum* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointRemainingSum,3) END  AS RemainingDoseInPlanChain",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlanDoseInPlanChain",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(pm.PrimaryRefPointPlannedSum* 100.0, 1) ELSE ROUND(pm.PrimaryRefPointPlannedSum,3) END  AS PlannedDoseInPlanChain",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedNoFractions",
+          "fromTable": "NA",
+          "expr": "FractionsPlanned from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "RemainingNoFractions",
+          "fromTable": "NA",
+          "expr": "calculated value FractionsRemaining from vf_syDoseFiguresApp",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualNoFractionsTreated",
+          "fromTable": "NA",
+          "expr": "calculated value FractionsDelivered from vf_syDoseFiguresApp",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedNoFractionsInPlanChain",
+          "fromTable": "NA",
+          "expr": "calculated value NoFractionsPlannedSum from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "RemainingNoFractionsInPlanChain",
+          "fromTable": "NA",
+          "expr": "calculated value FractionsRemaining  from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualNoFractionTreatedInPlanChain",
+          "fromTable": "NA",
+          "expr": "calculated value FractionsDelivered from vf_syDoseFiguresAppSum",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "NoSessionRemaining",
+          "fromTable": "NA",
+          "expr": "(SELECT count(*)  FROM [Session] s  JOIN SessionRTPlan srtp ON srtp.SessionSer = s.SessionSer  WHERE srtp.RTPlanSer = dfa.RTPlanSer  AND srtp.[Status] IN ('TREAT', 'INACTIVE_TREAT', 'RESUME', 'INACTIVE_RESUME') )  AS 'NoSessionRemaining'",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedEnergyMode",
+          "fromTable": "Energy",
+          "expr": "(SELECT STUFF((SELECT' / ' + CONVERT(varchar, em.Energy) + em.RadiationType  FROM Radiation r  JOIN ExternalFieldCommon efc  ON efc.RadiationSer = r.RadiationSer  JOIN EnergyMode em  ON em.EnergyModeSer = efc.EnergyModeSer  WHERE r.PlanSetupSer = dfa.PlanSetupSer  FOR XML PATH('')) , 1, 3, '') )  AS 'EnergyMode'",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PlannedMachineId",
+          "fromTable": "Machine",
+          "expr": "MachineId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PlannedEnergy",
+          "fromTable": "EnergyMode",
+          "expr": "Energy",
+          "dataType": "VDT_ENERGY",
+          "tags": ""
+        },
+        {
+          "as": "PlannedMachineScale",
+          "fromTable": "Machine",
+          "expr": "MachineScale",
+          "dataType": "VDT_SCALE",
+          "tags": ""
+        },
+        {
+          "as": "IsoCenterPositionX",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "IsoCenterPositionX",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "IsoCenterPositionY",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "IsoCenterPositionY",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "IsoCenterPositionZ",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "IsoCenterPositionZ",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "ToleranceTable",
+          "fromTable": "Tolerance",
+          "expr": "ToleranceName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "SetupNote",
+          "fromTable": "Radiation",
+          "expr": "SetupNote",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "FieldPhoto",
+          "fromTable": "Photo",
+          "expr": "Picture",
+          "dataType": "VDT_IMAGE_JPEG",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentType",
+          "fromTable": "LookupTable",
+          "expr": "ISNULL(dl_FieldTechnique.LookupDescription'+@SiteLng+',dl_FieldTechnique.LookupDescriptionENU)",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "IsSetupField",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "SetupFieldFlag",
+          "dataType": "VDT_FLAG_FALSE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "FieldType",
+          "fromTable": "EnergyMode",
+          "expr": "RadiationType",
+          "dataType": "VDT_ENERGYMODE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedMu",
+          "fromTable": "NA",
+          "expr": "CASE WHEN fm.SetupFieldFlag=1 Then NULL ELSE CASE ol.LimitPrecision  WHEN 0 THEN cast(cast(fm.PlannedMu  as decimal(38,0)) as varchar)  WHEN 1 THEN cast(cast(fm.PlannedMu  as decimal(38,1)) as varchar)  WHEN 2 THEN cast(cast(fm.PlannedMu as decimal(38,2)) as varchar) ELSE fm.PlannedMu END END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlanHstryDateTime",
+          "fromTable": "PlanSetup",
+          "expr": "HstryDateTime",
+          "dataType": "VDT_DATETIMESTAMP",
+          "tags": ""
+        },
+        {
+          "as": "PlanHstryUserName",
+          "fromTable": "PlanSetup",
+          "expr": "HstryUserName",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X'', fm.CollMode,fm.MachineScale,fm.CollimatorX1,fm.CollimatorX2) AS  PlannedCollimatorX",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X1'', fm.CollMode,fm.MachineScale,fm.CollimatorX1,NULL) AS  PlannedCollimatorX1",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorX2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''X2'', fm.CollMode,fm.MachineScale,fm.CollimatorX2,NULL) AS  PlannedCollimatorX2",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y'', fm.CollMode,fm.MachineScale,fm.CollimatorY1,fm.CollimatorY2) AS  PlannedCollimatorY",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY1",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y1'',fm.CollMode,fm.MachineScale,fm.CollimatorY1,NULL) AS  PlannedCollimatorY1",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorY2",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''Y2'',fm.CollMode,fm.MachineScale,fm.CollimatorY2,NULL) AS  PlannedCollimatorY2",
+          "dataType": "VDT_COLLPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorRotation",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CRtn'', fm.CollMode,fm.MachineScale,fm.CollRtn,NULL) AS PlannedCollimatorRotation",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedDoseRate",
+          "fromTable": "ExternalField",
+          "expr": "DoseRate",
+          "dataType": "VDT_DOSERATE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedPatientSupportAngle",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''PSA'', fm.CollMode,fm.MachineScale,fm.PatientSupportAngle,NULL) AS PlannedPatientSupportAngle",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchLat",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CLat'', fm.CollMode,fm.MachineScale,fm.CouchLat,NULL) AS PlannedCouchLat",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchLng",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "CouchLng",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCollimatorMode",
+          "fromTable": "ExternalField",
+          "expr": "CollMode",
+          "dataType": "VDT_COLLMODE",
+          "tags": ""
+        },
+        {
+          "as": "MLCPlanType",
+          "fromTable": "MLCPlan",
+          "expr": "MLCPlanType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "PlannedCouchVrt",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''CVrt'', fm.CollMode,fm.MachineScale,fm.CouchVrt,NULL) AS PlannedCouchVrt",
+          "dataType": "VDT_COUCHPARAM",
+          "tags": ""
+        },
+        {
+          "as": "PlannedGantryRotation",
+          "fromTable": "[DWH].[vf_ClinicalScaleConversion](''GRtn''@#@ fm.CollMode@#@fm.MachineScale@#@fm.GantryRotation@#@NULL)",
+          "expr": "AS PlannedGantryRotation",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "PlannedGantryRtnDirection",
+          "fromTable": "ExternalField",
+          "expr": "GantryRtnDirection",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PlannedGantryRtnExt",
+          "fromTable": "ExternalField",
+          "expr": "GantryRtnExt",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PlannedSSD",
+          "fromTable": "ExternalFieldCommon",
+          "expr": "SSD",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlannedAddOnIds",
+          "fromTable": "AddOn",
+          "expr": "AddonId",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "PlannedStopAngle",
+          "fromTable": "NA",
+          "expr": "[DWH].[vf_ClinicalScaleConversion](''SAngle'', fm.CollMode,fm.MachineScale,fm.StopAngle,NULL)",
+          "dataType": "VDT_ANGLE",
+          "tags": ""
+        },
+        {
+          "as": "ToleranceId",
+          "fromTable": "Tolerance",
+          "expr": "ToleranceId",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PlannedAddOnTypes",
+          "fromTable": "AddOn",
+          "expr": "AddOnType",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "TreatmentStartDateTime",
+          "fromTable": "RadiationHstry",
+          "expr": "TreatmentStartTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "MULabel",
+          "fromTable": "OperatingLimit",
+          "expr": "ParameterName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PlanComment",
+          "fromTable": "PlanSetup",
+          "expr": "Comment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "FieldHstryDateTime",
+          "fromTable": "Radiation",
+          "expr": "HstryDateTime",
+          "dataType": "VDT_DATETIMESTAMP",
+          "tags": ""
+        },
+        {
+          "as": "FieldHstryUserName",
+          "fromTable": "Radiation",
+          "expr": "HstryUserName",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "ctrFirstRTPlanSer",
+          "fromTable": "NA",
+          "expr": "[DoseCalcPrivate].[vf_syFirstRTPlanSer](RTPlanSer)",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrescriptionSer",
+          "fromTable": "PlanSetup",
+          "expr": "PrescriptionSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ConfigValue",
+          "fromTable": "ConfigurationItem",
+          "expr": "ConfigValue",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRefImageSer",
+          "fromTable": "Radiation",
+          "expr": "RefImageSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrimaryRefPointSer",
+          "fromTable": "NA",
+          "expr": "CASE WHEN dfa.PrimaryFlag = 1 THEN dfa.RefPointSer ELSE NULL END",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPlanSetupSer",
+          "fromTable": "PlanSetup",
+          "expr": "PlanSetupSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRTPlanSer",
+          "fromTable": "RTPlan",
+          "expr": "RTPlanSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrCourseSer",
+          "fromTable": "Course",
+          "expr": "CourseSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "Patient",
+          "expr": "PatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrRadiationSer",
+          "fromTable": "Radiation",
+          "expr": "RadiationSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrimaryOncologistSer",
+          "fromTable": "Doctor",
+          "expr": "ResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrimaryReferringPhysicianSer",
+          "fromTable": "Doctor",
+          "expr": "ResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrDiagnosisSer",
+          "fromTable": "pt_dx",
+          "expr": "diagnosis_ser",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "NA",
+          "expr": "GETDATE()",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "ActualNumberOfSession",
+          "fromTable": "NA",
+          "expr": "(SELECT SUM(FractionsDelivered) FROM #PlanSummaryApp WHERE CourseSer = c.CourseSer  ) AS NoTxSessionDelivered",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "ActualDoseInCourse",
+          "fromTable": "NA",
+          "expr": "Case When '''+@ConfigValue+'''=''cGy'' then ROUND(cm.DoseDelivered* 100.0, 1) ELSE  ROUND(cm.DoseDelivered,3) END",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "PlanIntent",
+          "fromTable": "PlanSetup",
+          "expr": "Intent",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryRefPointId",
+          "fromTable": "NA",
+          "expr": "(SELECT rp.RefPointId  FROM RefPoint rp  WHERE rp.RefPointSer = dfa.RefPointSer  AND dfa.PrimaryFlag = 1  ) AS 'PrimaryRefPointId'",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PlanCreationDateTime",
+          "fromTable": "RTPlan",
+          "expr": "CreationDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "Patient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwActivityBillingModel",
+      "baseTable": "DWH.FactActivityBilling",
+      "tablesReferenced": [
+        "DWH.DimActivity",
+        "DWH.DimCourse",
+        "DWH.DimDoctor",
+        "DWH.DimHospitalDepartment",
+        "DWH.DimPatient",
+        "DWH.DimProcedureCode",
+        "DWH.DimUser",
+        "DWH.FactActivityBilling",
+        "audit.ExecutionLog"
+      ],
+      "joins": [
+        {
+          "type": "left",
+          "to": "DWH.DimActivity",
+          "on": "DWH.FactActivityBilling.DimActivityID = DWH.DimActivity.DimActivityID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimCourse",
+          "on": "DWH.FactActivityBilling.DimCourseID = DWH.DimCourse.DimCourseID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDoctor",
+          "on": "DWH.FactActivityBilling.DimDoctorID = DWH.DimDoctor.DimDoctorID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDoctor",
+          "on": "DWH.FactActivityBilling.DimDoctorID_AttendingOncologist = DWH.DimDoctor.DimDoctorID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDoctor",
+          "on": "DWH.FactActivityBilling.DimDoctorID_Referring = DWH.DimDoctor.DimDoctorID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimHospitalDepartment",
+          "on": "DWH.FactActivityBilling.DimHospitalDepartmentID = DWH.DimHospitalDepartment.DimHospitalDepartmentID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimPatient",
+          "on": "DWH.FactActivityBilling.DimPatientID = DWH.DimPatient.DimPatientID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimProcedureCode",
+          "on": "DWH.FactActivityBilling.DimProcedureCodeID = DWH.DimProcedureCode.DimProcedureCodeID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_ChargeWaivedBy = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_CompletedByUser = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_CreditedBy = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_ExportedBy = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_MarkedCompletedBy = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_Physician = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.FactActivityBilling.DimUserID_ReviewedBy = DWH.DimUser.DimUserID"
+        }
+      ],
+      "select": [
+        {
+          "as": "ProcedureCode",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "ProcedureCode",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ProcedureCodeType",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "ProcedureCodeType",
+          "dataType": "VDT_TYPE",
+          "tags": ""
+        },
+        {
+          "as": "ProcedureCodeDescription",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "ProcedureCodeDescription",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "Description",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "Description",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ProcedureBillingCode",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "ProcedureBillingCode",
+          "dataType": "VDT_ACTIVITYCODE",
+          "tags": ""
+        },
+        {
+          "as": "ActivityType",
+          "fromTable": "DWH.DimActivity",
+          "expr": "ActivityType",
+          "dataType": "VDT_TYPE",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCategory",
+          "fromTable": "DWH.DimActivity",
+          "expr": "ActivityCategoryCode",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCost",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActivityCost",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "LastModifiedOn",
+          "fromTable": "DWH.DimActivity",
+          "expr": "LastModifiedOn",
+          "dataType": "VDT_DATETIMESTAMP",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryGlobalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "PrimaryGlobalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryTechnicalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "PrimaryTechnicalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryProfessionalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "PrimaryProfessionalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "OtherProfessionalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "OtherProfessionalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "OtherTechnicalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "OtherTechnicalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "OtherGlobalCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "OtherGlobalCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "ChargeForecast",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ChargeForecast",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "ActualCharge",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActualCharge",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "ProfessionalRVU",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ProfessionalRVU",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "GlobalRVU",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "GlobalRVU",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "TechnicalRVU",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "TechnicalRVU",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "WorkUnit",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "WorkUnit",
+          "dataType": "VDT_FLOAT",
+          "tags": ""
+        },
+        {
+          "as": "Complexity",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "Complexity",
+          "dataType": "VDT_CODEVALUE",
+          "tags": ""
+        },
+        {
+          "as": "Exportable",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "Exportable",
+          "dataType": "VDT_FLAG_TRUE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "AttendingOncologistName",
+          "fromTable": "DimDoctor@#@DimStaff",
+          "expr": "DoctorFullName,StaffFullName",
+          "dataType": "VDT_STRING128",
+          "tags": " Covering Provider"
+        },
+        {
+          "as": "OncologistName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "OncologistId",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "DepartmentName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "AccountBillingCode",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "AccountBillingCode",
+          "dataType": "VDT_STRING20",
+          "tags": ""
+        },
+        {
+          "as": "FromDateOfService",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "FromDateOfService",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ToDateOfService",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ToDateOfService",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CompletedDateTime",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CompletedDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ExportedDateTime",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ExportedDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "MarkedCompletedDateTime",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "MarkedCompletedDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CreditExportedDateTime",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CreditExportedDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "InPatientFlag",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "InPatientFlag",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientStatus",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "PatientStatus",
+          "dataType": "VDT_STATUS32",
+          "tags": ""
+        },
+        {
+          "as": "MarkedCompletedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "ExportedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "ChargeWaivedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "ReviewedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "CreditedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "CreditedDateTime",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CreditedDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "CreditNote",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CreditNote",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "AllModifierCodes",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "AllModifierCodes",
+          "dataType": "VDT_STRING512",
+          "tags": ""
+        },
+        {
+          "as": "CreditAmount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CreditAmount",
+          "dataType": "VDT_MONEY",
+          "tags": ""
+        },
+        {
+          "as": "IsScheduled",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "IsScheduled",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisId",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "DiagnosisId",
+          "dataType": "VDT_STRING1024",
+          "tags": ""
+        },
+        {
+          "as": "PatientId",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientFullName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientFullName",
+          "dataType": " VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "TemplateID",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "TemplateID",
+          "dataType": "VDT_GENTMPLTID",
+          "tags": ""
+        },
+        {
+          "as": "TemplateCreationDate",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "TemplateCreationDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "TemplateRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "TemplateRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ObjectStatus",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ObjectStatus",
+          "dataType": "VDT_OBJECTSTATUS",
+          "tags": ""
+        },
+        {
+          "as": "ActivityInstance_ObjectStatus",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActivityInstance_ObjectStatus",
+          "dataType": "VDT_OBJECTSTATUS",
+          "tags": ""
+        },
+        {
+          "as": "ActInstProcCode_ObjectStatus",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActInstProcCode_ObjectStatus",
+          "dataType": "VDT_OBJECTSTATUS",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCaptureRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActivityCaptureRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ProcedureCodeRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ProcedureCodeRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "CreditRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "CreditRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ActivityInstanceRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActivityInstanceRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCodeMdRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActivityCodeMdRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "AccountBillingCodeRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "AccountBillingCodeRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ActInstProcCodeRevCount",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ActInstProcCodeRevCount",
+          "dataType": "VDT_REVISIONCOUNT",
+          "tags": ""
+        },
+        {
+          "as": "ActivityExportedFlag",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "IF ExportedDateTime IS NOT  NULL THEN 1 ELSE 0",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "ActivityBillingStatus",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "WHEN ExportedDateTime is not null THEN 'Exported' WHEN (ReviewedBy.UserId is not null OR ReviewedBy.UserId <>'NA') THEN 'Reviewed' WHEN CompletedDateTime is not null THEN 'Completed' ELSE '' END AS ActivityBillingStatus,",
+          "dataType": "NA (calculated at execution time)",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrDepartmentSer",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "ctrDepartmentSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActivityInstanceSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrActivityInstanceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrAttendingOncologistSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrAttendingOncologistSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrTemplateSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrTemplateSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrTemplateCycleSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrTemplateCycleSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActivityCaptureSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrActivityCaptureSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActInstProcCodeSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrActInstProcCodeSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrProcedureCodeSer",
+          "fromTable": "DWH.DimProcedureCode",
+          "expr": "ctrProcedureCodeSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrModifierSer",
+          "fromTable": "NA",
+          "expr": "NA",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrAccountBillingCodeSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrAccountBillingCodeSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrResourceSer",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "ctrResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrCreditSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrCreditSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrDiagnosisSer",
+          "fromTable": "DWH.FactActivityBilling",
+          "expr": "ctrDiagnosisSer",
+          "dataType": "VDT_STRING1024",
+          "tags": ""
+        },
+        {
+          "as": "ctrCourseSer",
+          "fromTable": "DWH.DimCourse",
+          "expr": "ctrCourseSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryOncologistName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryReferringPhysicianName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "audit.ExecutionLog",
+          "expr": "StartTime",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "DWH.DimPatient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwActivityModel",
+      "baseTable": "DWH.DimActivityTransaction",
+      "tablesReferenced": [
+        "DWH.DimActivity",
+        "DWH.DimActivityTransaction",
+        "DWH.DimDoctor",
+        "DWH.DimHospitalDepartment",
+        "DWH.DimLookup",
+        "DWH.DimPatient",
+        "DWH.DimUser",
+        "audit.ExecutionLog"
+      ],
+      "joins": [
+        {
+          "type": "left",
+          "to": "DWH.DimActivity",
+          "on": "DWH.DimActivityTransaction.DimActivityID = DWH.DimActivity.DimActivityID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimHospitalDepartment",
+          "on": "DWH.DimActivityTransaction.DimHospitalDepartmentID = DWH.DimHospitalDepartment.DimHospitalDepartmentID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimHospitalDepartment",
+          "on": "DWH.DimActivityTransaction.DimHospitalDepartmentID_VisitUser = DWH.DimHospitalDepartment.DimHospitalDepartmentID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.DimActivityTransaction.DimLookupID_ActualResourceType = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.DimActivityTransaction.DimLookupID_AppointmentStatus = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimPatient",
+          "on": "DWH.DimActivityTransaction.DimPatientID = DWH.DimPatient.DimPatientID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.DimActivityTransaction.DimUserID_ActivityCreatedBy = DWH.DimUser.DimUserID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimUser",
+          "on": "DWH.DimActivityTransaction.DimUserID_CancelledBy = DWH.DimUser.DimUserID"
+        }
+      ],
+      "select": [
+        {
+          "as": "ScheduledEndTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ScheduledEndTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "AppointmentDateTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "AppointmentDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "AppointmentStatus",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "AppointmentStatus",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ActivityName",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityNameENU",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCategory",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityCategoryENU",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "IsScheduled",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "IsScheduled",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "ActivityStartDateTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityStartDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ActivityEndDateTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityEndDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ActivityPriority",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityPriority",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "ActivityNote",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ActivityNote",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "ActivityCreatedBy",
+          "fromTable": "DWH.DimUser",
+          "expr": "UserId",
+          "dataType": "VDT_USERNAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientId",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId",
+          "dataType": "VDT_STRING25",
+          "tags": ""
+        },
+        {
+          "as": "PatientId2",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId2",
+          "dataType": "VDT_STRING25",
+          "tags": ""
+        },
+        {
+          "as": "PatientFullName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "CheckedIn",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "CheckedIn",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "PatientArrivalDateTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "PatientArrivalDateTime",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "DepartmentName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ResourceName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorAliasName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ResourceType",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientLocation",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "PatientLocation",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "WaitTime",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "CASE WHEN DATEDIFF(MINUTE,AppointmentDateTime,ActivityStartDateTime)>= 0 THEN CAST(DATEDIFF(MINUTE,AppointmentDateTime,ActivityStartDateTime) AS NVARCHAR(10))   ELSE ''-'' END",
+          "dataType": "NA (calculated at execution time)",
+          "tags": ""
+        },
+        {
+          "as": "ActivityPlannedLength",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "DATEDIFF(MI,AppointmentDateTime,ScheduledEndTime)",
+          "dataType": "NA (calculated at execution time)",
+          "tags": ""
+        },
+        {
+          "as": "ActivityRealLength",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "DATEDIFF (MI,ActivityStartDateTime,ActivityEndDateTime)",
+          "dataType": "NA (calculated at execution time)",
+          "tags": ""
+        },
+        {
+          "as": "WaitListedFlag",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "WaitListedFlag",
+          "dataType": "VDT_FLAG_FALSE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryOncologistFullName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianFullName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientInOutStatus",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientInOutStatus",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrResourceSer",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "ctrResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrScheduledActivitySer",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ctrScheduledActivitySer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActivityInstanceSer",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ctrActivityInstanceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActivitySer",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ctrActivitySer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrActivityCategorySer",
+          "fromTable": "DWH.DimActivity",
+          "expr": "ctrActivityCategorySer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrDepartmentSer",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "ctrDepartmentSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrCreatedByResourceSer",
+          "fromTable": "DWH.DimActivityTransaction",
+          "expr": "ctrCreatedByResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "audit.ExecutionLog",
+          "expr": "StartTime",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "DWH.DimPatient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwDateRangeControllerModel",
+      "baseTable": "DWH.DimPatient",
+      "tablesReferenced": [
+        "DWH.DimPatient"
+      ],
+      "joins": [],
+      "select": [
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwPatientDiagnosisModel",
+      "baseTable": "DWH.FactPatientDiagnosis",
+      "tablesReferenced": [
+        "DWH.DimCellType",
+        "DWH.DimDiagnosisCode",
+        "DWH.DimDxSite",
+        "DWH.DimICDOSite",
+        "DWH.DimLookup",
+        "DWH.DimPatient",
+        "DWH.FactCourseDiagnosis",
+        "DWH.FactPatientDiagnosis",
+        "audit.ExecutionLog"
+      ],
+      "joins": [
+        {
+          "type": "left",
+          "to": "DWH.DimCellType",
+          "on": "DWH.FactPatientDiagnosis.DimCellTypeID = DWH.DimCellType.DimCellTypeID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDiagnosisCode",
+          "on": "DWH.FactPatientDiagnosis.DimDiagnosisCodeID = DWH.DimDiagnosisCode.DimDiagnosisCodeID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDxSite",
+          "on": "DWH.FactPatientDiagnosis.DimDxSiteID = DWH.DimDxSite.DimDxSiteID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDxSite",
+          "on": "DWH.FactPatientDiagnosis.DimDxSiteID_BodySystem = DWH.DimDxSite.DimDxSiteID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimDxSite",
+          "on": "DWH.FactPatientDiagnosis.DimDxSiteID_PrimaryCancerSite = DWH.DimDxSite.DimDxSiteID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimICDOSite",
+          "on": "DWH.FactPatientDiagnosis.DimICDOSiteID = DWH.DimICDOSite.DimICDOSiteID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_CellCategory = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_CellGrade = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_ConfirmedDx = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_DiagnosisStatus = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_DiagnosisType = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_DxMethodType = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_ERStatus = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Her2neuMethod2Type = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Her2neuMethodType = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Her2neuStatus2Type = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Her2neuStatusType = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_HistoricDxFlag = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_ICDOVersion = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Invasive = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Laterality = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_PRStatus = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Ranking = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Recurrence = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Source = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_Stage = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimLookup",
+          "on": "DWH.FactPatientDiagnosis.DimLookupID_StageStatus = DWH.DimLookup.DimLookupID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimPatient",
+          "on": "DWH.FactPatientDiagnosis.DimPatientID = DWH.DimPatient.DimPatientID"
+        }
+      ],
+      "select": [
+        {
+          "as": "PatientId",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientId2",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId2",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisCode",
+          "fromTable": "DWH.DimDiagnosisCode",
+          "expr": "DiagnosisCode",
+          "dataType": "VDT_STATUS16",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisTableName",
+          "fromTable": "DWH.DimDiagnosisCode",
+          "expr": "DiagnosisTableENU",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisType",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisDescription",
+          "fromTable": "DWH.DimDiagnosisCode",
+          "expr": "DiagnosisClinicalDescriptionENU",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "DxDate",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "DxDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING20",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisStatusDate",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "DiagnosisStatusDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "Ranking",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "Source",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "ClinicalDescription",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "ClinicalDescription",
+          "dataType": "VDT_STRING512",
+          "tags": ""
+        },
+        {
+          "as": "HistoricDetails",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "HistoricDetails",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "Comments",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "Comments",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PathologyComments",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "PathologyComments",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "HistoricDxFlag",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "BodySystem",
+          "fromTable": "DWH.DimDxSite",
+          "expr": "SiteDescENU",
+          "dataType": "VDT_STRING100",
+          "tags": ""
+        },
+        {
+          "as": "DiagnosisSite",
+          "fromTable": "DWH.DimDxSite",
+          "expr": "SiteDescENU",
+          "dataType": "VDT_STRING100",
+          "tags": ""
+        },
+        {
+          "as": "ICDOSite",
+          "fromTable": "DWH.DimICDOSite",
+          "expr": "ICDOSiteCodeENU",
+          "dataType": "VDT_STRING100",
+          "tags": ""
+        },
+        {
+          "as": "ICDOVersion",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING40",
+          "tags": ""
+        },
+        {
+          "as": "Behaviour",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "Behaviour",
+          "dataType": "VDT_STRING50",
+          "tags": ""
+        },
+        {
+          "as": "CellType",
+          "fromTable": "DWH.DimCellType",
+          "expr": "CellTypeENU",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "CellCategory",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING100",
+          "tags": ""
+        },
+        {
+          "as": "CellGrade",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING15",
+          "tags": ""
+        },
+        {
+          "as": "Laterality",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "DistantMets",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "DistantMets",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "Nodes",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "Nodes",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "NodesPositive",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "NodesPositive",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "Size",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "Size",
+          "dataType": "decimal",
+          "tags": ""
+        },
+        {
+          "as": "Stage",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING20",
+          "tags": ""
+        },
+        {
+          "as": "StageCriteria",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "StageCriteria",
+          "dataType": "VDT_STRING40",
+          "tags": ""
+        },
+        {
+          "as": "Stagebasis",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "Stagebasis",
+          "dataType": "VDT_STRING40",
+          "tags": ""
+        },
+        {
+          "as": "StageScheme",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "StageScheme",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "StageStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "ERStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "PRStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "HerNeu",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING100",
+          "tags": ""
+        },
+        {
+          "as": "SPhase",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "SPhase",
+          "dataType": "decimal",
+          "tags": ""
+        },
+        {
+          "as": "Recurrence",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "Invasive",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING30",
+          "tags": ""
+        },
+        {
+          "as": "ConfirmedDx",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING20",
+          "tags": ""
+        },
+        {
+          "as": "DxMethodType",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING25",
+          "tags": ""
+        },
+        {
+          "as": "MethodDescription",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "MethodDescription",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "CoresTaken",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "CoresTaken",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "CoresPositive",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "CoresPositive",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "GleasonPrimary",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "GleasonPrimary",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "GleasonSecondary",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "GleasonSecondary",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "GleasonTotal",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "GleasonTotal",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "GleasonScore",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "GleasonScore",
+          "dataType": "VDT_INT",
+          "tags": ""
+        },
+        {
+          "as": "HisDescription",
+          "fromTable": "DWH.DimCellType",
+          "expr": "CellTypeENU",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "HistologyCode",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "HistologyCode",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "SummaryStage",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "SummaryStage",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "TStage",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "TStage",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "MStage",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "MStage",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "NStage",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "NStage",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "IsCourseAttached",
+          "fromTable": "DWH.FactCourseDiagnosis",
+          "expr": "WHEN FactCourseDiagnosisID is null THEN 'N' ELSE 'Y'",
+          "dataType": "VDT_STRING1",
+          "tags": ""
+        },
+        {
+          "as": "ctrDiagnosisSer",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "ctrDiagnosisSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "audit.ExecutionLog",
+          "expr": "StartTime",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "PtDxOnSetDate",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "PtDxOnSetDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "DWH.DimPatient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwPatientDoctorModel",
+      "baseTable": "DWH.DimPatient",
+      "tablesReferenced": [
+        "DWH.DimDoctor",
+        "DWH.DimPatient",
+        "DWH.DimPatientDoctor",
+        "audit.ExecutionLog"
+      ],
+      "joins": [],
+      "select": [
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER ",
+          "tags": ""
+        },
+        {
+          "as": "ctrResourceSer",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "ctrResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PrimaryFlag",
+          "fromTable": "DWH.DimPatientDoctor",
+          "expr": "PrimaryFlag",
+          "dataType": "VDT_FLAG_FALSE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "OncologistFlag",
+          "fromTable": "DWH.DimPatientDoctor",
+          "expr": "OncologistFlag",
+          "dataType": "VDT_FLAG_TRUE_DEFAULT",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "audit.ExecutionLog",
+          "expr": "StartTime",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "DWH.DimPatient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwPatientInfoDateRangeControllerModel",
+      "baseTable": "DWH.DimPatient",
+      "tablesReferenced": [
+        "DWH.DimPatient"
+      ],
+      "joins": [],
+      "select": [
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        }
+      ]
+    },
+    {
+      "name": "dwPatientModel",
+      "baseTable": "DWH.FactPatientPayor",
+      "tablesReferenced": [
+        "DWH.DimDiagnosisCode",
+        "DWH.DimDoctor",
+        "DWH.DimDxSite",
+        "DWH.DimHospitalDepartment",
+        "DWH.DimLocation",
+        "DWH.DimLookup",
+        "DWH.DimNationality",
+        "DWH.DimPatient",
+        "DWH.DimPatientUserDefinedLabels",
+        "DWH.DimPayor",
+        "DWH.FactPatient",
+        "DWH.FactPatientDiagnosis",
+        "DWH.FactPatientPayor",
+        "audit.ExecutionLog"
+      ],
+      "joins": [
+        {
+          "type": "left",
+          "to": "DWH.DimPatient",
+          "on": "DWH.FactPatientPayor.DimPatientID = DWH.DimPatient.DimPatientID"
+        },
+        {
+          "type": "left",
+          "to": "DWH.DimPayor",
+          "on": "DWH.FactPatientPayor.DimPayorID = DWH.DimPayor.DimPayorID"
+        }
+      ],
+      "select": [
+        {
+          "as": "PatientId",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId",
+          "dataType": "VDT_PATIENTID",
+          "tags": " Medical Record Number "
+        },
+        {
+          "as": "PatientId2",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientId2",
+          "dataType": "VDT_PATIENTID",
+          "tags": ""
+        },
+        {
+          "as": "PatientFirstName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientFirstName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientLastName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientLastName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientFullName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientHonorific",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientHonorific",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PatientDateOfBirth",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientDateOfBirth",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "PatientAge",
+          "fromTable": "DWH.DimPatient",
+          "expr": "FLOOR(datediff(dd, PatientDateOfBirth, getdate()) / 365.25)",
+          "dataType": " NA (calculated at execution time)",
+          "tags": ""
+        },
+        {
+          "as": "PatientCitizenShip",
+          "fromTable": "DWH.DimNationality",
+          "expr": "CitizenShip",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientType",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientType",
+          "dataType": "VDT_TABLENAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientRace",
+          "fromTable": "DWH.DimLookup",
+          "expr": "PatientRace",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientSex",
+          "fromTable": "DWH.DimLookup",
+          "expr": "PatientSex",
+          "dataType": "VDT_SEX",
+          "tags": "Gender"
+        },
+        {
+          "as": "PatientSSN",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientSSN",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientLanguage",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientLanguage",
+          "dataType": "VDT_LANGUAGE",
+          "tags": ""
+        },
+        {
+          "as": "PatientAddressLine1",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientAddressLine1",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PatientAddressLine2",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientAddressLine2",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PatientCity",
+          "fromTable": "DWH.DimLocation",
+          "expr": "PatientCity",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PatientCountry",
+          "fromTable": "DWH.DimLocation",
+          "expr": "Country",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PatientCounty",
+          "fromTable": "DWH.DimLocation",
+          "expr": "County",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PostalCode",
+          "fromTable": "DWH.DimLocation",
+          "expr": "PostalCode",
+          "dataType": "VDT_POSTALCODE",
+          "tags": "Zip Code"
+        },
+        {
+          "as": "State",
+          "fromTable": "DWH.DimLocation",
+          "expr": "State",
+          "dataType": "VDT_ADDRESSLINE",
+          "tags": ""
+        },
+        {
+          "as": "PatientFullAddress",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientFullAddress",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PatientAddressComment",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientAddressComment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PatientHomePhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientHomePhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientWorkPhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientWorkPhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientMobilePhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientMobilePhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientPagerNumber",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientPagerNumber",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientEMailAddress",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEMailAddress",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "PatientLocation",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientLocation",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PatientStatus",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU where TableName='PATIENT_STATUS'",
+          "dataType": "VDT_STATUS32",
+          "tags": ""
+        },
+        {
+          "as": "PatientInOutStatus",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientInOutStatus",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientDeathStatus",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientDeathStatus",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientDeathCause",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientDeathCause",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PatientDeathDate",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientDeathDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "ClinicalTrial",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ClinicalTrial",
+          "dataType": "VDT_STRING10",
+          "tags": ""
+        },
+        {
+          "as": "PatientComment",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientComment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PatientNotes",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientNotes",
+          "dataType": "VDT_STRING1024",
+          "tags": ""
+        },
+        {
+          "as": "PatientCreationDate",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientCreationDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "HstryDateTime",
+          "fromTable": "DWH.DimPatient",
+          "expr": "HstryDateTime",
+          "dataType": "VDT_DATETIMESTAMP",
+          "tags": ""
+        },
+        {
+          "as": "HstryUserName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "HstryUserName",
+          "dataType": "VDT_HSTRYUSERNAME",
+          "tags": ""
+        },
+        {
+          "as": "HospitalName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "HospitalName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientRoomNumber",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientRoomNumber",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PatientAdmissionDate",
+          "fromTable": "DWH.FactPatient",
+          "expr": "PatientAdmissionDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "PatientDischargeDate",
+          "fromTable": "DWH.FactPatient",
+          "expr": "PatientDischargeDate",
+          "dataType": "VDT_DATETIME",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentComment",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "DepartmentComment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentId",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "DepartmentId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "DepartmentName",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "DepartmentName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PatientDiagnosisCode",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "DiagnosisCode",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "PatientDiagnosisDescription",
+          "fromTable": "DWH.FactPatientDiagnosis",
+          "expr": "DiagnosisDescription",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "PatientDiagnosisCodeType",
+          "fromTable": "DWH.DimDiagnosisCode",
+          "expr": "DiagnosisTable",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "DxSite",
+          "fromTable": "DWH.DimDxSite",
+          "expr": "SiteDescENU",
+          "dataType": "VDT_STRING254",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactAddress",
+          "fromTable": "Dimpatient",
+          "expr": "PatientEmergencyContactAddress",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactComment",
+          "fromTable": "Dimpatient",
+          "expr": "PatientEmergencyContactComment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactEntrusted",
+          "fromTable": "Dimpatient",
+          "expr": "PatientEmergencyContactEntrusted",
+          "dataType": "VDT_NUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactFullName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEmergencyContactFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactHomePhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEmergencyContactHomePhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactMobilePhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEmergencyContactMobilePhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactWorkPhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEmergencyContactWorkPhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PatientEmergencyContactRelationship",
+          "fromTable": "DWH.DimPatient",
+          "expr": "PatientEmergencyContactRelationship",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "OncologistFirstName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFirstName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "OncologistFullName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "OncologistHonorific",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorHonorific",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "OncologistLastName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorLastName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "OncologistNameSuffix",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorNameSuffix",
+          "dataType": "VDT_NAMESUFFIX",
+          "tags": ""
+        },
+        {
+          "as": "OncologistSpecialty",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "OncologistSpecialty",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PayorInsuredName",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorInsuredName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PayorAddress",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorAddress",
+          "dataType": "VDT_STRING256",
+          "tags": ""
+        },
+        {
+          "as": "PayorAuthorizationId",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorAuthorizationId",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PayorComment",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorComment",
+          "dataType": "VDT_COMMENT",
+          "tags": ""
+        },
+        {
+          "as": "PayorCompanyName",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorCompanyName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PayorPhone",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorPhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "PayorPlanExpiraryDate",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorPlanExpiraryDate",
+          "dataType": "VDT_DATETIMESTAMP",
+          "tags": ""
+        },
+        {
+          "as": "PayorPlanNumber",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorPlanNumber",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PayorPlanType",
+          "fromTable": "DWH.DimPayor",
+          "expr": "PayorPlanType",
+          "dataType": "VDT_TYPE",
+          "tags": ""
+        },
+        {
+          "as": "PayorPolicyNumber",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorPolicyNumber",
+          "dataType": "VDT_ID",
+          "tags": ""
+        },
+        {
+          "as": "PayorRelationshipwithInsured",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorRelationshipwithInsured",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "PayorCurrentAccountNumber",
+          "fromTable": "DWH.FactPatientPayor",
+          "expr": "PayorCurrentAccountNumber",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianFirstName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFirstName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianFullName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorFullName",
+          "dataType": "VDT_STRING128",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianHonorific",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorHonorific",
+          "dataType": "VDT_STRING16",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianLastName",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorLastName",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianNameSuffix",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "DoctorNameSuffix",
+          "dataType": "VDT_NAMESUFFIX",
+          "tags": ""
+        },
+        {
+          "as": "ReferringPhysicianSpecialty",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "OncologistSpecialty",
+          "dataType": "VDT_NAME",
+          "tags": ""
+        },
+        {
+          "as": "TransportationName",
+          "fromTable": "DWH.DimPatient",
+          "expr": "TransportationName",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "TransportationPhone",
+          "fromTable": "DWH.DimPatient",
+          "expr": "TransportationPhone",
+          "dataType": "VDT_PHONENUMBER",
+          "tags": ""
+        },
+        {
+          "as": "UDFLable1",
+          "fromTable": "DWH.DimLookup",
+          "expr": "LookupDescriptionENU",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "UDFValue1",
+          "fromTable": "DWH.DimPatientUserDefinedLabels",
+          "expr": "UDFValue1",
+          "dataType": "VDT_USERDEFATTRIB",
+          "tags": ""
+        },
+        {
+          "as": "UDFLable2",
+          "fromTable": "DWH.DimLookup",
+          "expr": "UDFLable2",
+          "dataType": "VDT_STRING64",
+          "tags": ""
+        },
+        {
+          "as": "UDFValue2",
+          "fromTable": "DWH.DimPatientUserDefinedLabels",
+          "expr": "UDFValue2",
+          "dataType": "VDT_USERDEFATTRIB",
+          "tags": ""
+        },
+        {
+          "as": "ctrPatientSer",
+          "fromTable": "DWH.DimPatient",
+          "expr": "ctrPatientSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrHospitalSer",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "ctrHospitalSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrimaryOncologistSer",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "ctrResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "ctrPrimaryReferringPhysicianSer",
+          "fromTable": "DWH.DimDoctor",
+          "expr": "ctrResourceSer",
+          "dataType": "VDT_SERIALNUMBER",
+          "tags": ""
+        },
+        {
+          "as": "LastSyncTime",
+          "fromTable": "audit.ExecutionLog",
+          "expr": "StartTime",
+          "dataType": "Varchar(25)",
+          "tags": ""
+        },
+        {
+          "as": "UniversalPatientId",
+          "fromTable": "DWH.DimPatient",
+          "expr": "UniversalPatientId",
+          "dataType": "VDT_STRING32",
+          "tags": ""
+        },
+        {
+          "as": "HospitalAddress",
+          "fromTable": "DWH.DimHospitalDepartment",
+          "expr": "HospitalCompleteAddress",
+          "dataType": "VDT_STRING512",
+          "tags": ""
+        },
+        {
+          "as": "IsDeletedPatient",
+          "fromTable": "DWH.DimPatient",
+          "expr": "CASE WHEN PatientType='DeletedPatient' THEN  1 ELSE 0 END",
+          "dataType": "VDT_INT",
+          "tags": ""
+        }
+      ]
+    }
+  ]
+}

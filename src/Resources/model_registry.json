@@ -1,0 +1,1119 @@
+{
+  "version": "1.0",
+  "generatedFrom": {
+    "schemaExport": "variandw_schema.xlsx"
+  },
+  "entryPoints": {
+    "billing": {
+      "baseTable": "DWH.FactActivityBilling",
+      "preferredConceptualModel": "dwActivityBillingModel",
+      "timePolicy": {
+        "defaultDateKey": "DimDateID_FromDateOfService",
+        "dateBasis": {
+          "enum": [
+            "service",
+            "to_service",
+            "completed",
+            "marked_completed",
+            "exported",
+            "credited",
+            "credit_exported",
+            "template_created"
+          ],
+          "map": {
+            "service": "DimDateID_FromDateOfService",
+            "to_service": "DimDateID_ToDateOfService",
+            "completed": "DimDateID_CompletedDateTime",
+            "marked_completed": "DimDateID_MarkedCompletedDateTime",
+            "exported": "DimDateID_ExportedDateTime",
+            "credited": "DimDateID_CreditedDateTime",
+            "credit_exported": "DimDateID_CreditExportedDateTime",
+            "template_created": "DimDateID_TemplateCreationDate"
+          },
+          "default": "service"
+        },
+        "defaultLookbackDays": 90
+      }
+    },
+    "scheduling": {
+      "baseTable": "DWH.DimActivityTransaction",
+      "preferredConceptualModel": "dwActivityModel",
+      "timePolicy": {
+        "defaultDateKey": "DimDateID_AppointmentDateTime",
+        "dateBasis": {
+          "enum": [
+            "appointment",
+            "arrival",
+            "start",
+            "end",
+            "scheduled_end",
+            "cancellation",
+            "created"
+          ],
+          "map": {
+            "appointment": "DimDateID_AppointmentDateTime",
+            "arrival": "DimDateID_PatientArrivalDateTime",
+            "start": "DimDateID_ActivityStartDateTime",
+            "end": "DimDateID_ActivityEndDateTime",
+            "scheduled_end": "DimDateID_ScheduledEndTime",
+            "cancellation": "DimDateID_CancellationDateTime",
+            "created": "DimDateID_CreationDate"
+          },
+          "default": "appointment"
+        },
+        "defaultLookbackDays": 30
+      }
+    },
+    "activity": {
+      "baseTable": "DWH.DimActivityTransaction",
+      "preferredConceptualModel": "dwActivityModel",
+      "timePolicy": {
+        "defaultDateKey": "DimDateID_AppointmentDateTime",
+        "dateBasis": {
+          "enum": [
+            "appointment",
+            "arrival",
+            "start",
+            "end",
+            "scheduled_end",
+            "cancellation",
+            "created"
+          ],
+          "map": {
+            "appointment": "DimDateID_AppointmentDateTime",
+            "arrival": "DimDateID_PatientArrivalDateTime",
+            "start": "DimDateID_ActivityStartDateTime",
+            "end": "DimDateID_ActivityEndDateTime",
+            "scheduled_end": "DimDateID_ScheduledEndTime",
+            "cancellation": "DimDateID_CancellationDateTime",
+            "created": "DimDateID_CreationDate"
+          },
+          "default": "appointment"
+        },
+        "defaultLookbackDays": 30
+      }
+    },
+    "treatment_history": {
+      "baseTable": "DWH.FactTreatmentHistory",
+      "preferredConceptualModel": "TreatmentHistoryModel",
+      "timePolicy": {
+        "defaultDateKey": "DimDateID_TreatmentRecordDateTime",
+        "dateBasis": {
+          "enum": [
+            "record",
+            "start",
+            "end",
+            "authorization",
+            "correction",
+            "course_completed",
+            "first_treatment",
+            "last_treatment",
+            "plan_approved",
+            "breakpoint"
+          ],
+          "map": {
+            "record": "DimDateID_TreatmentRecordDateTime",
+            "start": "DimDateID_TreatmentStartTime",
+            "end": "DimDateID_TreatmentEndTime",
+            "authorization": "DimDateID_AuthorizationDate",
+            "correction": "DimDateID_CorrectionDateTime",
+            "course_completed": "DimDateID_CourseCompletedDateTime",
+            "first_treatment": "DimDateID_FirstTreatmentDate",
+            "last_treatment": "DimDateID_LastTreatmentDate",
+            "plan_approved": "DimDateID_PlanApprovedStatusDate",
+            "breakpoint": "DimDateID_BreakPointDate"
+          },
+          "default": "record"
+        },
+        "defaultLookbackDays": 365
+      }
+    }
+  },
+  "models": {
+    "TreatmentActivityModel": {
+      "baseTable": "DWH.DimLookup",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "TreatmentDateRangeControllerModel": {
+      "baseTable": null,
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "TreatmentHistoryModel": {
+      "baseTable": "DWH.FactTreatmentHistory",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": [
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID1",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID10",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID2",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID3",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID4",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID5",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID6",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID7",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID8",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimActualAddOnID9",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimPlannedAddOnID1",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimPlannedAddOnID2",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimPlannedAddOnID3",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimPlannedAddOnID4",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimAddOn",
+            "fromColumn": "DimPlannedAddOnID5",
+            "toColumn": "DimAddOnID"
+          },
+          {
+            "table": "DWH.DimCourse",
+            "fromColumn": "DimCourseID",
+            "toColumn": "DimCourseID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_AuthorizationDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_BreakPointDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CorrectionDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CourseCompletedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_FirstTreatmentDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_LastTreatmentDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_PlanApprovedStatusDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_TreatmentEndTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_TreatmentRecordDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_TreatmentStartTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimEnergy",
+            "fromColumn": "DimActualEnergyID",
+            "toColumn": "DimEnergyID"
+          },
+          {
+            "table": "DWH.DimEnergy",
+            "fromColumn": "DimPlannedEnergyID",
+            "toColumn": "DimEnergyID"
+          },
+          {
+            "table": "DWH.DimField",
+            "fromColumn": "DimFieldID",
+            "toColumn": "DimFieldID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ClinicalStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_FieldTechnique",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_PlanStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Technique",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_TechniqueLabel",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_TreatmentDeliveryType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_TreatmentIntentType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimMachine",
+            "fromColumn": "DimActualMachineID",
+            "toColumn": "DimMachineID"
+          },
+          {
+            "table": "DWH.DimMachine",
+            "fromColumn": "DimPlanMachineID",
+            "toColumn": "DimMachineID"
+          },
+          {
+            "table": "DWH.DimPatient",
+            "fromColumn": "DimPatientID",
+            "toColumn": "DimPatientID"
+          },
+          {
+            "table": "DWH.DimPlan",
+            "fromColumn": "DimPlanID",
+            "toColumn": "DimPlanID"
+          },
+          {
+            "table": "DWH.DimTreatmentTransaction",
+            "fromColumn": "DimTreatmentTransactionID",
+            "toColumn": "DimTreatmentTransactionID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_ApprovalUser",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_AuthorizedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_CompletedByUser",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_MachineAuthorization",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_StatusUser",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_UserName1",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_UserName2",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_UserName3",
+            "toColumn": "DimUserID"
+          }
+        ]
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [
+          "DimDateID_AuthorizationDate",
+          "DimDateID_BreakPointDate",
+          "DimDateID_CorrectionDateTime",
+          "DimDateID_CourseCompletedDateTime",
+          "DimDateID_FirstTreatmentDate",
+          "DimDateID_LastTreatmentDate",
+          "DimDateID_PlanApprovedStatusDate",
+          "DimDateID_TreatmentEndTime",
+          "DimDateID_TreatmentRecordDateTime",
+          "DimDateID_TreatmentStartTime"
+        ],
+        "defaultDateKey": "DimDateID_TreatmentRecordDateTime",
+        "dateBasis": {
+          "enum": [
+            "record",
+            "start",
+            "end",
+            "authorization",
+            "correction",
+            "course_completed",
+            "first_treatment",
+            "last_treatment",
+            "plan_approved",
+            "breakpoint"
+          ],
+          "map": {
+            "record": "DimDateID_TreatmentRecordDateTime",
+            "start": "DimDateID_TreatmentStartTime",
+            "end": "DimDateID_TreatmentEndTime",
+            "authorization": "DimDateID_AuthorizationDate",
+            "correction": "DimDateID_CorrectionDateTime",
+            "course_completed": "DimDateID_CourseCompletedDateTime",
+            "first_treatment": "DimDateID_FirstTreatmentDate",
+            "last_treatment": "DimDateID_LastTreatmentDate",
+            "plan_approved": "DimDateID_PlanApprovedStatusDate",
+            "breakpoint": "DimDateID_BreakPointDate"
+          },
+          "default": "record"
+        }
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "TreatmentModel": {
+      "baseTable": null,
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwActivityBillingModel": {
+      "baseTable": "DWH.FactActivityBilling",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": [
+          {
+            "table": "DWH.DimActivity",
+            "fromColumn": "DimActivityID",
+            "toColumn": "DimActivityID"
+          },
+          {
+            "table": "DWH.DimActivityTransaction",
+            "fromColumn": "DimActivityTransactionID",
+            "toColumn": "DimActivityTransactionID"
+          },
+          {
+            "table": "DWH.DimCourse",
+            "fromColumn": "DimCourseID",
+            "toColumn": "DimCourseID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CompletedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CreditExportedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CreditedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_ExportedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_FromDateOfService",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_MarkedCompletedDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_TemplateCreationDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_ToDateOfService",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDiagnosisCode",
+            "fromColumn": "DimDiagnosisCodeID",
+            "toColumn": "DimDiagnosisCodeID"
+          },
+          {
+            "table": "DWH.DimDoctor",
+            "fromColumn": "DimDoctorID",
+            "toColumn": "DimDoctorID"
+          },
+          {
+            "table": "DWH.DimDoctor",
+            "fromColumn": "DimDoctorID_AttendingOncologist",
+            "toColumn": "DimDoctorID"
+          },
+          {
+            "table": "DWH.DimDoctor",
+            "fromColumn": "DimDoctorID_Referring",
+            "toColumn": "DimDoctorID"
+          },
+          {
+            "table": "DWH.DimDrug",
+            "fromColumn": "DimDrugID",
+            "toColumn": "DimDrugID"
+          },
+          {
+            "table": "DWH.DimHospitalDepartment",
+            "fromColumn": "DimHospitalDepartmentID",
+            "toColumn": "DimHospitalDepartmentID"
+          },
+          {
+            "table": "DWH.DimInstituteLocation",
+            "fromColumn": "DimInstituteLocationID",
+            "toColumn": "DimInstituteLocationID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ActivityCategory",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_BillEventType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_DoseWastageUnit",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimPatient",
+            "fromColumn": "DimPatientID",
+            "toColumn": "DimPatientID"
+          },
+          {
+            "table": "DWH.DimPayor",
+            "fromColumn": "DimPayorID",
+            "toColumn": "DimPayorID"
+          },
+          {
+            "table": "DWH.DimProcedureCode",
+            "fromColumn": "DimProcedureCodeID",
+            "toColumn": "DimProcedureCodeID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_ChargeWaivedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_CompletedByUser",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_CreditedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_ExportedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_MarkedCompletedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_Physician",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_ReviewedBy",
+            "toColumn": "DimUserID"
+          }
+        ]
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [
+          "DimDateID_CompletedDateTime",
+          "DimDateID_CreditedDateTime",
+          "DimDateID_CreditExportedDateTime",
+          "DimDateID_ExportedDateTime",
+          "DimDateID_FromDateOfService",
+          "DimDateID_MarkedCompletedDateTime",
+          "DimDateID_TemplateCreationDate",
+          "DimDateID_ToDateOfService"
+        ],
+        "defaultDateKey": "DimDateID_FromDateOfService",
+        "dateBasis": {
+          "enum": [
+            "service",
+            "to_service",
+            "completed",
+            "marked_completed",
+            "exported",
+            "credited",
+            "credit_exported",
+            "template_created"
+          ],
+          "map": {
+            "service": "DimDateID_FromDateOfService",
+            "to_service": "DimDateID_ToDateOfService",
+            "completed": "DimDateID_CompletedDateTime",
+            "marked_completed": "DimDateID_MarkedCompletedDateTime",
+            "exported": "DimDateID_ExportedDateTime",
+            "credited": "DimDateID_CreditedDateTime",
+            "credit_exported": "DimDateID_CreditExportedDateTime",
+            "template_created": "DimDateID_TemplateCreationDate"
+          },
+          "default": "service"
+        }
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwActivityModel": {
+      "baseTable": "DWH.DimActivityTransaction",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": [
+          {
+            "table": "DWH.DimActivity",
+            "fromColumn": "DimActivityID",
+            "toColumn": "DimActivityID"
+          },
+          {
+            "table": "DWH.DimCancellationReason",
+            "fromColumn": "DimCancellationReasonID",
+            "toColumn": "DimCancellationReasonID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_ActivityEndDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_ActivityStartDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_AppointmentDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CancellationDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_CreationDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_PatientArrivalDateTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_ScheduledEndTime",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimHospitalDepartment",
+            "fromColumn": "DimHospitalDepartmentID",
+            "toColumn": "DimHospitalDepartmentID"
+          },
+          {
+            "table": "DWH.DimHospitalDepartment",
+            "fromColumn": "DimHospitalDepartmentID_VisitUser",
+            "toColumn": "DimHospitalDepartmentID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ActualResourceType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_AppointmentStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimMedoncPlan",
+            "fromColumn": "DimMedoncPlanID",
+            "toColumn": "DimMedoncPlanID"
+          },
+          {
+            "table": "DWH.DimMedoncPlanPhase",
+            "fromColumn": "DimMedoncPlanPhaseID",
+            "toColumn": "DimMedoncPlanPhaseID"
+          },
+          {
+            "table": "DWH.DimPatient",
+            "fromColumn": "DimPatientID",
+            "toColumn": "DimPatientID"
+          },
+          {
+            "table": "DWH.DimResource",
+            "fromColumn": "DimResourceID",
+            "toColumn": "DimResourceID"
+          },
+          {
+            "table": "DWH.DimResourceGroup",
+            "fromColumn": "DimResourceGroupID",
+            "toColumn": "DimResourceGroupID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_ActivityCreatedBy",
+            "toColumn": "DimUserID"
+          },
+          {
+            "table": "DWH.DimUser",
+            "fromColumn": "DimUserID_CancelledBy",
+            "toColumn": "DimUserID"
+          }
+        ]
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [
+          "DimDateID_ActivityEndDateTime",
+          "DimDateID_ActivityStartDateTime",
+          "DimDateID_AppointmentDateTime",
+          "DimDateID_CancellationDateTime",
+          "DimDateID_CreationDate",
+          "DimDateID_PatientArrivalDateTime",
+          "DimDateID_ScheduledEndTime"
+        ],
+        "defaultDateKey": "DimDateID_AppointmentDateTime",
+        "dateBasis": {
+          "enum": [
+            "appointment",
+            "arrival",
+            "start",
+            "end",
+            "scheduled_end",
+            "cancellation",
+            "created"
+          ],
+          "map": {
+            "appointment": "DimDateID_AppointmentDateTime",
+            "arrival": "DimDateID_PatientArrivalDateTime",
+            "start": "DimDateID_ActivityStartDateTime",
+            "end": "DimDateID_ActivityEndDateTime",
+            "scheduled_end": "DimDateID_ScheduledEndTime",
+            "cancellation": "DimDateID_CancellationDateTime",
+            "created": "DimDateID_CreationDate"
+          },
+          "default": "appointment"
+        }
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwDateRangeControllerModel": {
+      "baseTable": "DWH.DimPatient",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwPatientDiagnosisModel": {
+      "baseTable": "DWH.FactPatientDiagnosis",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": [
+          {
+            "table": "DWH.DimCellType",
+            "fromColumn": "DimCellTypeID",
+            "toColumn": "DimCellTypeID"
+          },
+          {
+            "table": "DWH.DimDate",
+            "fromColumn": "DimDateID_DiagnosisStatusDate",
+            "toColumn": "DimDateID"
+          },
+          {
+            "table": "DWH.DimDiagnosisCode",
+            "fromColumn": "DimDiagnosisCodeID",
+            "toColumn": "DimDiagnosisCodeID"
+          },
+          {
+            "table": "DWH.DimDxSite",
+            "fromColumn": "DimDxSiteID",
+            "toColumn": "DimDxSiteID"
+          },
+          {
+            "table": "DWH.DimDxSite",
+            "fromColumn": "DimDxSiteID_BodySystem",
+            "toColumn": "DimDxSiteID"
+          },
+          {
+            "table": "DWH.DimDxSite",
+            "fromColumn": "DimDxSiteID_PrimaryCancerSite",
+            "toColumn": "DimDxSiteID"
+          },
+          {
+            "table": "DWH.DimICDOSite",
+            "fromColumn": "DimICDOSiteID",
+            "toColumn": "DimICDOSiteID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_CellCategory",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_CellGrade",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ConfirmedDx",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_DiagnosisStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_DiagnosisType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_DxMethodType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ERStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Her2neuMethod2Type",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Her2neuMethodType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Her2neuStatus2Type",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Her2neuStatusType",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_HistoricDxFlag",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_ICDOVersion",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Invasive",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Laterality",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_PRStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Ranking",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Recurrence",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Source",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_Stage",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimLookup",
+            "fromColumn": "DimLookupID_StageStatus",
+            "toColumn": "DimLookupID"
+          },
+          {
+            "table": "DWH.DimPatient",
+            "fromColumn": "DimPatientID",
+            "toColumn": "DimPatientID"
+          }
+        ]
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [
+          "DimDateID_DiagnosisStatusDate"
+        ],
+        "defaultDateKey": "DimDateID_DiagnosisStatusDate"
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwPatientDoctorModel": {
+      "baseTable": "DWH.DimPatient",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwPatientInfoDateRangeControllerModel": {
+      "baseTable": "DWH.DimPatient",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": []
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    },
+    "dwPatientModel": {
+      "baseTable": "DWH.FactPatientPayor",
+      "joinPolicy": {
+        "mode": "facts-first",
+        "allowedDimensionJoins": [
+          {
+            "table": "DWH.DimPatient",
+            "fromColumn": "DimPatientID",
+            "toColumn": "DimPatientID"
+          },
+          {
+            "table": "DWH.DimPayor",
+            "fromColumn": "DimPayorID",
+            "toColumn": "DimPayorID"
+          }
+        ]
+      },
+      "timePolicy": {
+        "dateKeyCandidates": [],
+        "defaultDateKey": null
+      },
+      "fieldPolicy": {
+        "denyList": [
+          "PatientSSN"
+        ]
+      }
+    }
+  },
+  "globalPolicy": {
+    "timezone": "America/New_York",
+    "dateRange": {
+      "defaultMode": "inclusive",
+      "supportedModes": [
+        "inclusive",
+        "exclusive"
+      ],
+      "notes": [
+        "Interpret user-supplied dates in Eastern Time. Inclusive is default; allow end-exclusive when requested."
+      ]
+    },
+    "querySafety": {
+      "selectOnly": true,
+      "defaultRowLimit": 1000,
+      "maxRowLimit": 100000,
+      "requireDateFilterForTables": [
+        "DWH.FactActivityBilling",
+        "DWH.FactTreatmentHistory"
+      ],
+      "crossFactJoins": "disallow_unless_bridge",
+      "notes": [
+        "Planner should anchor on one base table per query (facts-first).",
+        "Disallow joining two fact tables unless an explicit bridge table is defined in semantics."
+      ]
+    }
+  },
+  "fieldPolicyDefaults": {
+    "denyList": [
+      "PatientAddressLine1",
+      "PatientAddressLine2",
+      "PatientEMailAddress",
+      "PatientEmergencyContactFullName",
+      "PatientEmergencyContactHomePhone",
+      "PatientEmergencyContactMobilePhone",
+      "PatientEmergencyContactWorkPhone",
+      "PatientFullAddress",
+      "PatientHomePhone",
+      "PatientMobilePhone",
+      "PatientPagerNumber",
+      "PatientSSN",
+      "PatientWorkPhone",
+      "UniversalPatientId"
+    ],
+    "notes": [
+      "Default deny list focuses on direct identifiers and contact details; refine based on institutional policy."
+    ]
+  }
+}
